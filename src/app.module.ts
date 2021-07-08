@@ -24,7 +24,6 @@ import { RoleModule } from './role/role.module';
       })
     }),
     SequelizeModule.forRoot({
-      ssl: false,
       dialect: process.env.DB_DIALECT as Dialect,
       port: Number(process.env.DB_PORT),
       host: process.env.DB_HOST,
@@ -32,7 +31,12 @@ import { RoleModule } from './role/role.module';
       username: process.env.DB_USER,
       password: process.env.DB_PASS,
       autoLoadModels: true,
-      synchronize: true
+      synchronize: true,
+      ssl: false,
+      dialectOptions: {
+        ssl: true
+      },
+      // native
     }),
     SeederModule.forRoot({
       runOnlyIfTableIsEmpty: true,
