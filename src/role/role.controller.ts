@@ -8,8 +8,8 @@ export class RoleController {
   ) { }
 
   @Get()
-  async index(@Query('type') type?: string) {
-    return await this.roleService.get(type);
+  async index(@Query('name') name?: string) {
+    return await this.roleService.get(name);
   }
 
   @Get(':id')

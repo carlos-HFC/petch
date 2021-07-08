@@ -6,13 +6,15 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { diskStorage } from 'multer';
 import { SeederModule } from 'nestjs-sequelize-seeder';
 import { join, resolve } from 'path';
-import { Dialect } from 'sequelize/types';
+import { Dialect } from 'sequelize';
 
 import { RoleModule } from './role/role.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      envFilePath: ['.env.dev']
+    }),
     MulterModule.register({
       dest: resolve(__dirname, '..', 'uploads'),
       storage: diskStorage({
@@ -24,7 +26,7 @@ import { RoleModule } from './role/role.module';
       })
     }),
     SequelizeModule.forRoot({
-      dialect: process.env.DB_DIALECT as Dialect,
+      dialect: 'postgres',
       port: Number(process.env.DB_PORT),
       host: process.env.DB_HOST,
       database: process.env.DB_NAME,

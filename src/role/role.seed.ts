@@ -3,13 +3,14 @@ import { Role } from './role.model';
 
 @Seeder({
   model: Role,
-  runOnlyIfTableIsEmpty: true
+  runOnlyIfTableIsEmpty: true,
+  unique: 'name'
 })
 export class RoleSeed implements OnSeederInit {
   run() {
     return [
-      { type: "Admin" },
-      { type: "Adotante" },
+      { name: "Admin" },
+      { name: "Adotante" },
     ];
   }
 }

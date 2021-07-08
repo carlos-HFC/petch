@@ -5,5 +5,5 @@ export class Role extends Model {
   @Column({
     type: DataType.STRING
   })
-  type: string;
+  name: string;
 }
