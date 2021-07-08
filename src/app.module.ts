@@ -6,9 +6,11 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { diskStorage } from 'multer';
 import { SeederModule } from 'nestjs-sequelize-seeder';
 import { join, resolve } from 'path';
-import { Dialect } from 'sequelize';
 
 import { RoleModule } from './role/role.module';
+import { SchedulingTypesModule } from './schedulingTypes/schedulingTypes.module';
+import { SolicitationTypesModule } from './solicitationTypes/solicitationTypes.module';
+import { SpeciesModule } from './species/species.module';
 
 @Module({
   imports: [
@@ -19,7 +21,7 @@ import { RoleModule } from './role/role.module';
       dest: resolve(__dirname, '..', 'uploads'),
       storage: diskStorage({
         filename(req, file, cb) {
-          const filename = `${Date.now()} __ ${file.originalname}`;
+          const filename = `${Date.now()}__${file.originalname}`;
 
           cb(null, filename);
         }
@@ -41,7 +43,6 @@ import { RoleModule } from './role/role.module';
         }
       },
       protocol: 'postgres'
-      // native: true
     }),
     SeederModule.forRoot({
       runOnlyIfTableIsEmpty: true,
@@ -51,6 +52,9 @@ import { RoleModule } from './role/role.module';
       serveRoot: '/uploads'
     }),
     RoleModule,
+    SpeciesModule,
+    SolicitationTypesModule,
+    SchedulingTypesModule,
   ],
   controllers: [],
   providers: [],
