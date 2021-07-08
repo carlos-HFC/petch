@@ -34,7 +34,7 @@ import { RoleModule } from './role/role.module';
       synchronize: true,
       ssl: false,
       dialectOptions: {
-        ssl: false
+        ssl: true
       },
       native: true
     }),
