@@ -34,9 +34,9 @@ import { RoleModule } from './role/role.module';
       synchronize: true,
       ssl: false,
       dialectOptions: {
-        ssl: true
+        ssl: false
       },
-      // native
+      native: true
     }),
     SeederModule.forRoot({
       runOnlyIfTableIsEmpty: true,
