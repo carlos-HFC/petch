@@ -6,6 +6,7 @@ import { ServeStaticModule } from '@nestjs/serve-static';
 import { diskStorage } from 'multer';
 import { SeederModule } from 'nestjs-sequelize-seeder';
 import { join, resolve } from 'path';
+import { Dialect } from 'sequelize/types';
 
 import { RoleModule } from './role/role.module';
 
@@ -23,7 +24,7 @@ import { RoleModule } from './role/role.module';
       })
     }),
     SequelizeModule.forRoot({
-      dialect: 'mysql',
+      dialect: process.env.DB_DIALECT as Dialect,
       port: Number(process.env.DB_PORT),
       host: process.env.DB_HOST,
       database: process.env.DB_NAME,
