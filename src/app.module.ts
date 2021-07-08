@@ -36,7 +36,8 @@ import { RoleModule } from './role/role.module';
       dialectOptions: {
         ssl: true
       },
-      native: true
+      protocol: 'postgres'
+      // native: true
     }),
     SeederModule.forRoot({
       runOnlyIfTableIsEmpty: true,
