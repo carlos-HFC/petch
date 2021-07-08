@@ -24,6 +24,7 @@ import { RoleModule } from './role/role.module';
       })
     }),
     SequelizeModule.forRoot({
+      ssl: false,
       dialect: process.env.DB_DIALECT as Dialect,
       port: Number(process.env.DB_PORT),
       host: process.env.DB_HOST,
