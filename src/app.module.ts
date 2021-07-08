@@ -32,9 +32,11 @@ import { RoleModule } from './role/role.module';
       password: process.env.DB_PASS,
       autoLoadModels: true,
       synchronize: true,
-      ssl: false,
       dialectOptions: {
-        ssl: true
+        ssl: {
+          require: true,
+          rejectUnauthorized: false
+        }
       },
       protocol: 'postgres'
       // native: true
