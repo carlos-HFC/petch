@@ -1,0 +1,247 @@
+openapi: 3.0.0
+info:
+  title: Swagger Petch
+  description: Swagger da Petch
+  contact:
+    email: luara.oliveira8@gmail.com
+  version: 1.0.0
+
+servers:
+  - url: http://localhost:8000
+
+security:
+  - Bearer: []
+
+tags:
+  - name: Roles
+  - name: Scheduling Types
+  - name: Solicitation Types
+  - name: Species
+
+components:
+  securitySchemes:
+    Bearer:
+      type: http
+      bearerFormat: JWT
+      scheme: bearer
+  schemas:
+    Roles:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: false
+          uniqueItems: true
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date
+        updatedAt:
+          type: string
+          format: date
+        deletedAt:
+          type: string
+          format: date
+          default: null
+      example:
+        id: 1
+        name: Admin
+        createdAt: "2020-01-01T00:00:00.000Z"
+        updatedAt: "2020-01-01T00:00:00.000Z"
+        deletedAt: null
+    Scheduling Types:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: false
+          uniqueItems: true
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date
+        updatedAt:
+          type: string
+          format: date
+        deletedAt:
+          type: string
+          format: date
+          default: null
+      example:
+        id: 1
+        name: Vacinação
+        createdAt: "2020-01-01T00:00:00.000Z"
+        updatedAt: "2020-01-01T00:00:00.000Z"
+        deletedAt: null
+    Solicitation Types:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: false
+          uniqueItems: true
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date
+        updatedAt:
+          type: string
+          format: date
+        deletedAt:
+          type: string
+          format: date
+          default: null
+      example:
+        id: 1
+        name: Dúvidas
+        createdAt: "2020-01-01T00:00:00.000Z"
+        updatedAt: "2020-01-01T00:00:00.000Z"
+        deletedAt: null
+    Species:
+      type: object
+      properties:
+        id:
+          type: integer
+          nullable: false
+          uniqueItems: true
+        name:
+          type: string
+        createdAt:
+          type: string
+          format: date
+        updatedAt:
+          type: string
+          format: date
+        deletedAt:
+          type: string
+          format: date
+          default: null
+      example:
+        id: 1
+        name: Cachorro
+        createdAt: "2020-01-01T00:00:00.000Z"
+        updatedAt: "2020-01-01T00:00:00.000Z"
+        deletedAt: null
+
+paths:
+  /roles:
+    get:
+      tags:
+        - Roles
+      description: Retornar todas as funções cadastradas
+      summary: Funções do sistema
+      operationId: getRoles
+      parameters:
+        - name: name
+          in: query
+          description: Nome da função
+          required: false
+          schema:
+            type: string
+            example: Admin
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Roles"
+  /roles/{id}:
+    get:
+      tags:
+        - Roles
+      description: Retornar uma função de acordo com o ID
+      summary: Função do sistema
+      operationId: getRoleById
+      parameters:
+        - name: id
+          in: path
+          description: ID da função
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Roles"
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: number
+                    example: 404
+                  message:
+                    type: string
+                    example: Função não encontrada
+  /solicitationTypes:
+    get:
+      tags:
+        - Solicitation Types
+      description: Retornar todas os tipos de solicitação cadastradas
+      summary: Tipos de solicitação
+      operationId: getSolicitationTypes
+      parameters:
+        - name: name
+          in: query
+          description: Nome do tipo de solicitação
+          required: false
+          schema:
+            type: string
+            example: Dúvida
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Solicitation Types"
+  /solicitationTypes/{id}:
+    get:
+      tags:
+        - Solicitation Types
+      description: Retornar um tipo de solicitação de acordo com o ID
+      summary: Tipo de solicitação
+      operationId: getSolicitationTypeById
+      parameters:
+        - name: id
+          in: path
+          description: ID do tipo de solicitação
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Solicitation Types"
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: number
+                    example: 404
+                  message:
+                    type: string
+                    example: Tipo de solicitação não encontrada
