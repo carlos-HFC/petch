@@ -7,10 +7,12 @@ import { diskStorage } from 'multer';
 import { SeederModule } from 'nestjs-sequelize-seeder';
 import { join, resolve } from 'path';
 
+import { AuthModule } from './auth/auth.module';
 import { RoleModule } from './role/role.module';
 import { SchedulingTypesModule } from './schedulingTypes/schedulingTypes.module';
 import { SolicitationTypesModule } from './solicitationTypes/solicitationTypes.module';
 import { SpeciesModule } from './species/species.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -27,23 +29,33 @@ import { SpeciesModule } from './species/species.module';
         }
       })
     }),
-    SequelizeModule.forRoot({
-      dialect: 'postgres',
-      port: Number(process.env.DB_PORT),
-      host: process.env.DB_HOST,
-      database: process.env.DB_NAME,
-      username: process.env.DB_USER,
-      password: process.env.DB_PASS,
-      autoLoadModels: true,
-      synchronize: true,
-      dialectOptions: {
-        ssl: {
-          require: true,
-          rejectUnauthorized: false
-        }
-      },
-      protocol: 'postgres'
-    }),
+    process.env.NODE_ENV === 'dev'
+      ? SequelizeModule.forRoot({
+        dialect: 'mysql',
+        port: Number(process.env.DB_PORT),
+        host: process.env.DB_HOST,
+        database: process.env.DB_NAME,
+        username: process.env.DB_USER,
+        password: process.env.DB_PASS,
+        autoLoadModels: true,
+        synchronize: true,
+      }) : SequelizeModule.forRoot({
+        dialect: 'postgres',
+        port: Number(process.env.DB_PORT),
+        host: process.env.DB_HOST,
+        database: process.env.DB_NAME,
+        username: process.env.DB_USER,
+        password: process.env.DB_PASS,
+        autoLoadModels: true,
+        synchronize: true,
+        dialectOptions: {
+          ssl: {
+            require: true,
+            rejectUnauthorized: false
+          }
+        },
+        protocol: 'postgres'
+      }),
     SeederModule.forRoot({
       runOnlyIfTableIsEmpty: true,
     }),
@@ -55,6 +67,8 @@ import { SpeciesModule } from './species/species.module';
     SpeciesModule,
     SolicitationTypesModule,
     SchedulingTypesModule,
+    UserModule,
+    AuthModule
   ],
   controllers: [],
   providers: [],
