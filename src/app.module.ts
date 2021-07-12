@@ -1,33 +1,21 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
-import { MulterModule } from '@nestjs/platform-express';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { diskStorage } from 'multer';
 import { SeederModule } from 'nestjs-sequelize-seeder';
-import { join, resolve } from 'path';
 
 import { AuthModule } from './auth/auth.module';
+import { MediaModule } from './medias/media.module';
 import { RoleModule } from './role/role.module';
 import { SchedulingTypesModule } from './schedulingTypes/schedulingTypes.module';
 import { SolicitationTypesModule } from './solicitationTypes/solicitationTypes.module';
 import { SpeciesModule } from './species/species.module';
+import { UploadService } from './upload.service';
 import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       envFilePath: ['.env.dev']
-    }),
-    MulterModule.register({
-      dest: resolve(__dirname, '..', 'uploads'),
-      storage: diskStorage({
-        filename(req, file, cb) {
-          const filename = `${Date.now()}__${file.originalname}`;
-
-          cb(null, filename);
-        }
-      })
     }),
     process.env.NODE_ENV === 'dev'
       ? SequelizeModule.forRoot({
@@ -59,18 +47,15 @@ import { UserModule } from './user/user.module';
     SeederModule.forRoot({
       runOnlyIfTableIsEmpty: true,
     }),
-    ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
-      serveRoot: '/uploads'
-    }),
     RoleModule,
     SpeciesModule,
     SolicitationTypesModule,
     SchedulingTypesModule,
     UserModule,
-    AuthModule
+    AuthModule,
+    MediaModule
   ],
   controllers: [],
-  providers: [],
+  providers: [UploadService],
 })
 export class AppModule { }
