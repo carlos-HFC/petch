@@ -190,7 +190,7 @@ paths:
     get:
       tags:
         - Solicitation Types
-      description: Retornar todas os tipos de solicitação cadastradas
+      description: Retornar todos os tipos de solicitação cadastradas
       summary: Tipos de solicitação
       operationId: getSolicitationTypes
       parameters:
@@ -231,7 +231,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Solicitation Types"
+                $ref: "#/components/schemas/Scheduling Types"
         404:
           description: Not Found
           content:
@@ -245,3 +245,155 @@ paths:
                   message:
                     type: string
                     example: Tipo de solicitação não encontrada
+  /schedulingTypes:
+    get:
+      tags:
+        - Scheduling Types
+      description: Retornar todos os tipos de agendamento cadastrados
+      summary: Tipos de agendamento
+      operationId: getSchedulingTypes
+      parameters:
+        - name: name
+          in: query
+          description: Nome do tipo de agendamento
+          required: false
+          schema:
+            type: string
+            example: Banho
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Scheduling Types"
+  /schedulingTypes/{id}:
+    get:
+      tags:
+        - Scheduling Types
+      description: Retornar um tipo de agendamento de acordo com o ID
+      summary: Tipo de agendamento
+      operationId: getSchedulingTypeById
+      parameters:
+        - name: id
+          in: path
+          description: ID do tipo de agendamento
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Scheduling Types"
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: number
+                    example: 404
+                  message:
+                    type: string
+                    example: Tipo de agendamento não encontrado
+  /species:
+    get:
+      tags:
+        - Species
+      description: Retornar todas as espécies cadastradas
+      summary: Espécies
+      operationId: getSpecies
+      parameters:
+        - name: name
+          in: query
+          description: Nome da espécie
+          required: false
+          schema:
+            type: string
+            example: Cachorro
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Species"
+    post:
+      tags:
+        - Species
+      description: Cadastrar uma nova espécie
+      summary: Nova Espécie
+      operationId: postSpecies
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Species"
+            example:
+              name: Cavalo
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Species"
+        400:
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: number
+                    example: 400
+                  message:
+                    type: string
+                    example: Espécie já cadastrada
+  /species/{id}:
+    get:
+      tags:
+        - Species
+      description: Retornar uma espécie de acordo com o ID
+      summary: Espécie
+      operationId: getSpeiesById
+      parameters:
+        - name: id
+          in: path
+          description: ID da espécie
+          required: true
+          schema:
+            type: number
+            example: 1
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Species"
+        404:
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  statusCode:
+                    type: number
+                    example: 404
+                  message:
+                    type: string
+                    example: Espécie não encontrada
