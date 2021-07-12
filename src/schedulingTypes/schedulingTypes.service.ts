@@ -28,9 +28,7 @@ export class SchedulingTypesService {
   async getByName(name: string) {
     return await this.schedulingTypesModel.findOne({
       where: {
-        name: {
-          [$.iLike]: name.trim()
-        }
+        name: name.normalize().trim().toLowerCase()
       }
     });
   }
