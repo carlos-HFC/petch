@@ -23,7 +23,7 @@ export class AuthService {
 
     if (!user || !(await user.checkPass(password))) throw new HttpException('As credenciais estão incorretas', 400);
 
-    const token = this.createToken(user);
+    const token = this.createTokenJwt(user);
 
     return token;
   }
@@ -35,7 +35,7 @@ export class AuthService {
   async resetPassword() { }
   async register() { }
 
-  private createToken(user: User) {
+  private createTokenJwt(user: User) {
     return this.jwtService.sign({ id: user.id, email: user.email, role: user.role.name, cpf: user.cpf, password: user.hash });
   }
 
