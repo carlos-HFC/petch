@@ -3,11 +3,12 @@ import { ConfigModule } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { SeederModule } from 'nestjs-sequelize-seeder';
-import { RoleModule } from 'src/role/role.module';
-import { UserController } from './user.controller';
 
+import { UserController } from './user.controller';
 import { User } from './user.model';
 import { UserService } from './user.service';
+import { MediaModule } from '../medias/media.module';
+import { RoleModule } from '../role/role.module';
 
 @Module({
   imports: [
@@ -15,7 +16,8 @@ import { UserService } from './user.service';
     JwtModule.register({
       secret: process.env.JWT_SECRET
     }),
-    RoleModule
+    RoleModule,
+    MediaModule
     // SeederModule.forFeature
     // ConfigModule.forRoot({})
   ],
