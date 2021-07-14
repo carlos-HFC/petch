@@ -4,6 +4,7 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { SeederModule } from 'nestjs-sequelize-seeder';
 
 import { AuthModule } from './auth/auth.module';
+import { GiftModule } from './gift/gift.module';
 import { MediaModule } from './medias/media.module';
 import { OngModule } from './ong/ong.module';
 import { PartnerModule } from './partner/partner.module';
@@ -16,9 +17,7 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath: ['.env.dev']
-    }),
+    ConfigModule.forRoot(),
     process.env.NODE_ENV === 'dev'
       ? SequelizeModule.forRoot({
         dialect: 'mysql',
@@ -58,6 +57,7 @@ import { UserModule } from './user/user.module';
     MediaModule,
     OngModule,
     PartnerModule,
+    GiftModule,
   ],
   controllers: [],
   providers: [UploadService],
