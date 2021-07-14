@@ -12,8 +12,8 @@ export class UserService {
   constructor(
     @InjectModel(User)
     private readonly userModel: typeof User,
-    private roleService: RoleService,
     private mediaService: MediaService,
+    private roleService: RoleService,
   ) { }
 
   async get() {

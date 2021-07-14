@@ -1,4 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
+
 import { RoleService } from './role.service';
 
 @Controller('roles')

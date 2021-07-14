@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
+
 import { PartnerService } from './partner.service';
 
 @Controller('partners')

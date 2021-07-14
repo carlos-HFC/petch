@@ -25,7 +25,7 @@ export class AuthService {
 
     const token = this.createTokenJwt(user);
 
-    return token;
+    return { token };
   }
 
   async validate(payload: { email: string; }) {

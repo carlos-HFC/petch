@@ -1,6 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Op as $ } from 'sequelize';
 
 import { Species } from './species.model';
 import { trimObj } from '../utils';
