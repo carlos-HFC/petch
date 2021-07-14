@@ -1,9 +1,9 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { MediaService } from 'src/medias/media.service';
-import { trimObj, validateCEP } from 'src/utils';
 
 import { Partner } from './partner.model';
+import { MediaService } from '../medias/media.service';
+import { trimObj, validateCEP, validateEmail, validatePhone } from '../utils';
 
 @Injectable()
 export class PartnerService {
@@ -30,18 +30,31 @@ export class PartnerService {
   }
 
   async getByName(name: string) {
-    const partner = await this.partnerModel.findOne({
+    return await this.partnerModel.findOne({
       where: {
         name: name.normalize().trim().toLowerCase()
       }
     });
+  }
 
-    return partner;
+  async getByEmail(email: string) {
+    validateEmail(email);
+
+    return await this.partnerModel.findOne({
+      where: {
+        email: email.normalize().trim().toLowerCase()
+      }
+    });
   }
 
   async post(data: TCreatePartner, media?: Express.MulterS3.File) {
     trimObj(data);
     validateCEP(data.cep);
+    validatePhone(data.phone1);
+    validatePhone(data?.phone2);
+    validatePhone(data?.phone3);
+
+    if (await this.getByEmail(data.email) || await this.getByName(data.name)) throw new HttpException('Parceiro já cadastrado', 400);
 
     const file = await this.mediaService.post(media);
 

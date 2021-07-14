@@ -2,6 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
 import { Ong } from './ong.model';
+import { trimObj, validateCEP, validateEmail, validatePhone } from '../utils';
 
 @Injectable()
 export class OngService {
@@ -27,17 +28,34 @@ export class OngService {
   }
 
   async getByName(name: string) {
-    const ong = await this.ongModel.findOne({
+    return await this.ongModel.findOne({
       where: {
         name: name.normalize().trim().toLowerCase()
       }
     });
+  }
 
-    return ong;
+  async getByEmail(email: string) {
+    validateEmail(email);
+    return await this.ongModel.findOne({
+      where: {
+        email: email.normalize().trim().toLowerCase()
+      }
+    });
   }
 
   async post(data: TCreateOng) {
-    return await this.ongModel.create({ ...data });
+    trimObj(data);
+    validateCEP(data.cep);
+    validatePhone(data.phone1);
+    validatePhone(data?.phone2);
+    validatePhone(data?.phone3);
+
+    if (await this.getByEmail(data.email) || await this.getByName(data.name)) throw new HttpException('ONG já cadastrada', 400);
+
+    const ong = await this.ongModel.create({ ...data });
+
+    return ong;
   }
 
   async put(data: TUpdateOng) { }
