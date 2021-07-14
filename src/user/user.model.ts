@@ -124,7 +124,7 @@ export class User extends Model {
   role: Role;
 
   @ForeignKey(() => Media)
-  @Column({ allowNull: false })
+  @Column
   mediaId: number;
 
   @BelongsTo(() => Media)
