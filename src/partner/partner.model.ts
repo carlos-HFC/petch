@@ -1,5 +1,6 @@
 import { BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, Table } from 'sequelize-typescript';
-import { Media } from 'src/medias/media.model';
+
+import { Media } from '../medias/media.model';
 
 @DefaultScope(() => ({
   include: [Media]
@@ -8,9 +9,17 @@ import { Media } from 'src/medias/media.model';
 export class Partner extends Model {
   @Column({
     type: DataType.STRING,
-    allowNull: false
+    allowNull: false,
+    unique: true
   })
   name: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    unique: true
+  })
+  email: string;
 
   @Column({
     type: DataType.STRING,
@@ -40,6 +49,15 @@ export class Partner extends Model {
     type: DataType.STRING,
     allowNull: false
   })
+  district: string;
+
+  @Column(DataType.STRING)
+  complement: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false
+  })
   city: string;
 
   @Column({
@@ -64,9 +82,5 @@ export class Partner extends Model {
   @BeforeSave
   static async formatData(partner: Partner) {
     partner.uf = partner.uf.toUpperCase();
-    partner.cep = partner.cep.replace(/[-]/g, '');
-    partner.phone1 = partner.phone1.replace(/[()-]/g, '');
-    partner.phone2 = partner.phone2?.replace(/[()-]/g, '');
-    partner.phone3 = partner.phone3?.replace(/[()-]/g, '');
   }
 }
