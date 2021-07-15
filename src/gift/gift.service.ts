@@ -1,6 +1,8 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+
 import { Gift } from './gift.model';
+import { trimObj } from '../utils';
 
 @Injectable()
 export class GiftService {
@@ -21,7 +23,14 @@ export class GiftService {
     return gift;
   }
 
-  async post(data: object) { }
+  async post(data: TCreateGift) {
+    trimObj(data);
+
+    const gift = await this.giftModel.create({ ...data });
+
+    return gift;
+  }
+
   async put(data: object) { }
 
   async delete(id: number) {

@@ -1,4 +1,4 @@
-import { Controller, Get, Param } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 
 import { GiftService } from './gift.service';
 
@@ -16,5 +16,10 @@ export class GiftController {
   @Get(':id')
   async byId(@Param('id') id: number) {
     return await this.giftService.getById(id);
+  }
+
+  @Post()
+  async create(@Body() data: TCreateGift) {
+    return await this.giftService.post(data)
   }
 }
