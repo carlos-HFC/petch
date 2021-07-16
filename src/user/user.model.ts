@@ -140,6 +140,9 @@ export class User extends Model {
     user.birthday = format(parseISO(user.birthday), 'yyyy-MM-dd');
     user.uf = user.uf.toUpperCase();
     user.gender = user.gender.toUpperCase();
+    user.cpf = user.cpf.replace(/[.-\s]/g, '')
+    user.cep = user.cep.replace(/[-\s]/g, '')
+    user.phone = user.phone.replace(/[()-\s]/g, '')
   }
 
   checkPass(password: string) {

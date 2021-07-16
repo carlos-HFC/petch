@@ -17,11 +17,9 @@ export class AuthService {
     trimObj(data);
     validateEmail(data.email);
 
-    const { email, password } = data;
+    const user = await this.userService.findByEmail(data.email);
 
-    const user = await this.userService.getByEmail(email);
-
-    if (!user || !(await user.checkPass(password))) throw new HttpException('As credenciais estão incorretas', 400);
+    if (!user || !(await user.checkPass(data.password))) throw new HttpException('As credenciais estão incorretas', 400);
 
     const token = this.createTokenJwt(user);
 
@@ -29,7 +27,7 @@ export class AuthService {
   }
 
   async validate(payload: { email: string; }) {
-    return await this.userService.getByEmail(payload.email);
+    return await this.userService.findByEmail(payload.email);
   }
   async forgotPassword() { }
   async resetPassword() { }

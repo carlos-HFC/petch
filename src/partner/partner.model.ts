@@ -82,5 +82,9 @@ export class Partner extends Model {
   @BeforeSave
   static async formatData(partner: Partner) {
     partner.uf = partner.uf.toUpperCase();
+    partner.cep = partner.cep.replace(/[\s-]/g, '');
+    partner.phone1 = partner.phone1.replace(/[\s()-]/g, '');
+    partner.phone2 = partner.phone2?.replace(/[\s()-]/g, '');
+    partner.phone3 = partner.phone3?.replace(/[\s()-]/g, '');
   }
 }

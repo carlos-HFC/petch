@@ -71,5 +71,9 @@ export class Ong extends Model {
   static async formatData(ong: Ong) {
     ong.actingStates = ong.actingStates.toUpperCase();
     ong.uf = ong.uf.toUpperCase();
+    ong.cep = ong.cep.replace(/[\s-]/g, '');
+    ong.phone1 = ong.phone1.replace(/[\s()-]/g, '');
+    ong.phone2 = ong.phone2?.replace(/[\s()-]/g, '');
+    ong.phone3 = ong.phone3?.replace(/[\s()-]/g, '');
   }
 }
