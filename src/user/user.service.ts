@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { differenceInCalendarYears, isValid, parseISO } from 'date-fns';
 
 import { User } from './user.model';
+import { Media } from '../medias/media.model';
 import { MediaService } from '../medias/media.service';
 import { RoleService } from '../role/role.service';
 import { createToken, trimObj, validateCEP, validateCPF, validateEmail, validatePassword, validatePhone } from '../utils';
@@ -20,7 +21,7 @@ export class UserService {
     return await this.userModel.findAll();
   }
 
-  async getById(id: number) {
+  async findById(id: number) {
     const user = await this.userModel.findByPk(id);
 
     if (!user) throw new HttpException('Usuário não encontrado', 404);
@@ -28,7 +29,7 @@ export class UserService {
     return user;
   }
 
-  async getByCPF(cpf: string) {
+  async findByCPF(cpf: string) {
     validateCPF(cpf);
 
     return await this.userModel.findOne({
@@ -38,7 +39,7 @@ export class UserService {
     });
   }
 
-  async getByEmail(email: string) {
+  async findByEmail(email: string) {
     validateEmail(email);
 
     return await this.userModel.findOne({
@@ -54,7 +55,7 @@ export class UserService {
     validateCEP(data.cep);
     validatePhone(data.phone);
 
-    if (await this.getByCPF(data.cpf) || await this.getByEmail(data.email)) throw new HttpException('Usuário já cadastrado', 400);
+    if (await this.findByCPF(data.cpf) || await this.findByEmail(data.email)) throw new HttpException('Usuário já cadastrado', 400);
 
     const birth = parseISO(data.birthday);
 
@@ -71,12 +72,13 @@ export class UserService {
 
     const role = await this.roleService.getByName(data.isAdmin ? 'admin' : 'adotante');
 
-    const file = await this.mediaService.post(media);
+    let file: Media | undefined;
+    if (media) file = await this.mediaService.post(media);
 
     const user = await this.userModel.create({
       ...data,
       roleId: role.id,
-      mediaId: file.id,
+      mediaId: file?.id,
       tokenVerificationEmail: createToken()
     });
 
@@ -86,8 +88,32 @@ export class UserService {
   async put() { }
 
   async delete(id: number) {
-    const user = await this.getById(id);
+    const user = await this.findById(id);
 
     await user.destroy();
+  }
+
+  async confirmRegister(email: string, tokenVerificationEmail: string) {
+    if (!email) throw new HttpException('E-mail não informdo', 400);
+
+    const user = await this.findByEmail(email);
+
+    switch (true) {
+      case !user:
+        throw new HttpException('Usuário não encontrado', 404);
+      case user.emailVerified:
+        throw new HttpException('Usuário já confirmado', 400);
+      case user.tokenVerificationEmail !== tokenVerificationEmail:
+        throw new HttpException('Token inválido', 400);
+      default:
+        break;
+    }
+
+    await user.update({
+      tokenVerificationEmail: null,
+      emailVerified: true
+    });
+
+    return { message: 'Você foi verificado com sucesso!' };
   }
 }
