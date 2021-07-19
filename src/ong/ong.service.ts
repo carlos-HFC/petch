@@ -12,22 +12,18 @@ export class OngService {
   ) { }
 
   async get() {
-    const ongs = await this.ongModel.findAll();
-
-    return ongs.map(ong => {
-      return Object.assign(ong, { actingStates: ong.actingStates.split(',').map(el => el.trim()) });
-    });
+    return await this.ongModel.findAll();
   }
 
-  async getById(id: number) {
+  async findById(id: number) {
     const ong = await this.ongModel.findByPk(id);
 
     if (!ong) throw new HttpException('ONG não encontrada', 404);
 
-    return Object.assign(ong, { actingStates: ong.actingStates.split(',').map(el => el.trim()) });
+    return ong;
   }
 
-  async getByName(name: string) {
+  async findByName(name: string) {
     return await this.ongModel.findOne({
       where: {
         name: name.normalize().trim().toLowerCase()
@@ -35,11 +31,11 @@ export class OngService {
     });
   }
 
-  async getByEmail(email: string) {
+  async findByEmail(email: string) {
     validateEmail(email);
     return await this.ongModel.findOne({
       where: {
-        email: email.normalize().trim().toLowerCase()
+        email: email.trim().toLowerCase()
       }
     });
   }
@@ -51,7 +47,7 @@ export class OngService {
     validatePhone(data?.phone2);
     validatePhone(data?.phone3);
 
-    if (await this.getByEmail(data.email) || await this.getByName(data.name)) throw new HttpException('ONG já cadastrada', 400);
+    if (await this.findByEmail(data.email) || await this.findByName(data.name)) throw new HttpException('ONG já cadastrada', 400);
 
     const ong = await this.ongModel.create({ ...data });
 
@@ -61,7 +57,7 @@ export class OngService {
   async put(data: TUpdateOng) { }
 
   async delete(id: number) {
-    const ong = await this.getById(id);
+    const ong = await this.findById(id);
 
     await ong.destroy();
   }

@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post } from '@nestjs/common';
 
 import { OngService } from './ong.service';
 
@@ -15,7 +15,7 @@ export class OngController {
 
   @Get(':id')
   async byId(@Param('id') id: number) {
-    return await this.ongService.getById(id);
+    return await this.ongService.findById(id);
   }
 
   @Post()
@@ -24,6 +24,7 @@ export class OngController {
   }
 
   @Delete(':id')
+  @HttpCode(204)
   async delete(@Param('id') id: number) {
     return await this.ongService.delete(id);
   }
