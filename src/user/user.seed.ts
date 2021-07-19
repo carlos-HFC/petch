@@ -24,7 +24,8 @@ export class UserSeed implements OnSeederInit {
         city: 'Mogi Guaçu',
         uf: 'SP',
         phone: '19997111194',
-        roleId: 1
+        roleId: 1,
+        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
       {
         name: 'Carlos Henrique Faustino Cardoso',
@@ -40,7 +41,8 @@ export class UserSeed implements OnSeederInit {
         city: 'São Paulo',
         uf: 'SP',
         phone: '11994034599',
-        roleId: 2
+        roleId: 2,
+        avatar: 'https://images.unsplash.com/photo-1504593811423-6dd665756598?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fHBlcnNvbnxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
       {
         name: 'Mirella Letícia Drumond',
@@ -56,7 +58,8 @@ export class UserSeed implements OnSeederInit {
         city: 'São Paulo',
         uf: 'SP',
         phone: '(11) 99900-8029',
-        roleId: 2
+        roleId: 2,
+        avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixid=MnwxMjA3fDB8MHxzZWFyY2h8OXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
       {
         name: 'Guilherme Sérgio Araújo',
@@ -72,7 +75,8 @@ export class UserSeed implements OnSeederInit {
         city: 'Araraquara',
         uf: 'SP',
         phone: '(16) 98958-6008',
-        roleId: 2
+        roleId: 2,
+        avatar: 'https://images.unsplash.com/photo-1500048993953-d23a436266cf?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fHBlcnNvbnxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
       {
         name: 'Luiz Nathan das Neves',
@@ -88,7 +92,8 @@ export class UserSeed implements OnSeederInit {
         city: 'Sertãozinho',
         uf: 'SP',
         phone: '(16) 99297-4392',
-        roleId: 2
+        roleId: 2,
+        avatar: 'https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
       {
         name: 'Liz Lúcia Santos',
@@ -104,7 +109,8 @@ export class UserSeed implements OnSeederInit {
         city: 'São Paulo',
         uf: 'SP',
         phone: '(11) 98163-1442',
-        roleId: 2
+        roleId: 2,
+        avatar: 'https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fHBlcnNvbnxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
       {
         name: 'Débora Benedita Allana Ramos',
@@ -120,7 +126,8 @@ export class UserSeed implements OnSeederInit {
         city: 'Avaré',
         uf: 'SP',
         phone: '(14) 98768-1027',
-        roleId: 2
+        roleId: 2,
+        avatar: 'https://images.unsplash.com/photo-1619312676557-aa9fe05ef190?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29uJTIwbWlkJTIwYWdlfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
       {
         name: 'Danilo Leonardo Fogaça',
@@ -136,7 +143,8 @@ export class UserSeed implements OnSeederInit {
         city: 'Ribeirão Preto',
         uf: 'SP',
         phone: '(16) 98172-1371',
-        roleId: 2
+        roleId: 2,
+        avatar: 'https://images.unsplash.com/photo-1535643302794-19c3804b874b?ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cGVyc29uJTIwbWlkJTIwYWdlfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
     ];
   }

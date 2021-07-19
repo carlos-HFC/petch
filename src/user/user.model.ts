@@ -2,11 +2,10 @@ import { compare, hash } from 'bcrypt';
 import { format, parseISO } from 'date-fns';
 import { BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, Table } from 'sequelize-typescript';
 
-import { Media } from '../medias/media.model';
 import { Role } from '../role/role.model';
 
 @DefaultScope(() => ({
-  include: [Role, Media]
+  include: [Role]
 }))
 @Table({ paranoid: true })
 export class User extends Model {
@@ -22,6 +21,9 @@ export class User extends Model {
     allowNull: false,
   })
   name: string;
+
+  @Column(DataType.STRING)
+  avatar: string;
 
   @Column({
     type: DataType.STRING,
@@ -123,13 +125,6 @@ export class User extends Model {
   @BelongsTo(() => Role)
   role: Role;
 
-  @ForeignKey(() => Media)
-  @Column
-  mediaId: number;
-
-  @BelongsTo(() => Media)
-  media: Media;
-
   @BeforeSave
   static async hashPass(user: User) {
     if (user.password) return user.hash = await hash(user.password, 10);
@@ -137,12 +132,13 @@ export class User extends Model {
 
   @BeforeSave
   static async formatData(user: User) {
+    user.email = user.email.toLowerCase();
     user.birthday = format(parseISO(user.birthday), 'yyyy-MM-dd');
     user.uf = user.uf.toUpperCase();
     user.gender = user.gender.toUpperCase();
-    user.cpf = user.cpf.replace(/[.-\s]/g, '')
-    user.cep = user.cep.replace(/[-\s]/g, '')
-    user.phone = user.phone.replace(/[()-\s]/g, '')
+    user.cpf = user.cpf.replace(/[.-\s]/g, '');
+    user.cep = user.cep.replace(/[-\s]/g, '');
+    user.phone = user.phone.replace(/[()-\s]/g, '');
   }
 
   checkPass(password: string) {

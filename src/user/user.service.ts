@@ -3,9 +3,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { differenceInCalendarYears, isValid, parseISO } from 'date-fns';
 
 import { User } from './user.model';
-import { Media } from '../medias/media.model';
-import { MediaService } from '../medias/media.service';
 import { RoleService } from '../role/role.service';
+import { UploadService } from '../upload.service';
 import { createToken, trimObj, validateCEP, validateCPF, validateEmail, validatePassword, validatePhone } from '../utils';
 
 @Injectable()
@@ -13,8 +12,8 @@ export class UserService {
   constructor(
     @InjectModel(User)
     private readonly userModel: typeof User,
-    private mediaService: MediaService,
     private roleService: RoleService,
+    private uploadService: UploadService,
   ) { }
 
   async get() {
@@ -34,7 +33,7 @@ export class UserService {
 
     return await this.userModel.findOne({
       where: {
-        cpf: cpf.trim()
+        cpf: cpf.replace(/[\s-.]/g, '')
       }
     });
   }
@@ -44,7 +43,7 @@ export class UserService {
 
     return await this.userModel.findOne({
       where: {
-        email: email.trim()
+        email: email.trim().toLowerCase()
       }
     });
   }
@@ -70,15 +69,14 @@ export class UserService {
         break;
     }
 
-    const role = await this.roleService.getByName(data.isAdmin ? 'admin' : 'adotante');
+    const file = media ? await this.uploadService.uploadFile(media) : null;
 
-    let file: Media | undefined;
-    if (media) file = await this.mediaService.post(media);
+    const role = await this.roleService.getByName(data.isAdmin ? 'admin' : 'adotante');
 
     const user = await this.userModel.create({
       ...data,
       roleId: role.id,
-      mediaId: file?.id,
+      avatar: file && file.url,
       tokenVerificationEmail: createToken()
     });
 
