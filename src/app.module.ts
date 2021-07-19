@@ -5,7 +5,6 @@ import { SeederModule } from 'nestjs-sequelize-seeder';
 
 import { AuthModule } from './auth/auth.module';
 import { GiftModule } from './gift/gift.module';
-import { MediaModule } from './medias/media.module';
 import { OngModule } from './ong/ong.module';
 import { PartnerModule } from './partner/partner.module';
 import { RoleModule } from './role/role.module';
@@ -54,7 +53,6 @@ import { UserModule } from './user/user.module';
     SchedulingTypesModule,
     UserModule,
     AuthModule,
-    MediaModule,
     OngModule,
     PartnerModule,
     GiftModule,

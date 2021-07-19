@@ -7,8 +7,8 @@ import { UserController } from './user.controller';
 import { User } from './user.model';
 import { UserSeed } from './user.seed';
 import { UserService } from './user.service';
-import { MediaModule } from '../medias/media.module';
 import { RoleModule } from '../role/role.module';
+import { UploadService } from '../upload.service';
 
 @Module({
   imports: [
@@ -18,10 +18,9 @@ import { RoleModule } from '../role/role.module';
       secret: process.env.JWT_SECRET
     }),
     RoleModule,
-    MediaModule
   ],
   controllers: [UserController],
-  providers: [UserService],
+  providers: [UserService, UploadService],
   exports: [UserService],
 })
 export class UserModule { }
