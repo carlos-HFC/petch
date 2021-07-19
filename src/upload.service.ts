@@ -18,10 +18,6 @@ export class UploadService {
       ACL: 'public-read'
     }).promise();
 
-    return {
-      mimetype: file.mimetype,
-      url: upload.Location,
-      name: upload.Key
-    };
+    return { url: upload.Location };
   }
 }
