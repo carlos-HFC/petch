@@ -6,6 +6,7 @@ import { GiftController } from './gift.controller';
 import { Gift } from './gift.model';
 import { GiftSeed } from './gift.seed';
 import { GiftService } from './gift.service';
+import { UploadService } from '../upload.service';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { GiftService } from './gift.service';
     SequelizeModule.forFeature([Gift])
   ],
   controllers: [GiftController],
-  providers: [GiftService],
+  providers: [GiftService, UploadService],
   exports: [GiftService]
 })
 export class GiftModule { }

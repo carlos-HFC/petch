@@ -9,34 +9,31 @@ export class Gift extends Model {
   name: string;
 
   @Column({
-    type: DataType.STRING,
-    defaultValue: ''
+    type: DataType.TEXT,
+    allowNull: false,
   })
+  description: string;
+
+  @Column(DataType.STRING)
   size: string;
 
-  @Column({
-    type: DataType.STRING,
-    defaultValue: ''
-  })
+  @Column(DataType.STRING)
   color: string;
 
-  @Column({
-    type: DataType.STRING,
-    defaultValue: ''
-  })
+  @Column(DataType.STRING)
   weight: string;
 
-  @Column({
-    type: DataType.STRING,
-    defaultValue: ''
-  })
+  @Column(DataType.STRING)
   taste: string;
+
+  @Column(DataType.STRING)
+  media: string;
 
   @BeforeSave
   static async formatSize(gift: Gift) {
-    gift.size = gift.size?.toUpperCase();
-    gift.weight = gift.weight?.toUpperCase();
-    gift.color = gift.color?.charAt(0).toUpperCase() + gift.color?.slice(1);
-    gift.taste = gift.taste?.charAt(0).toUpperCase() + gift.taste?.slice(1);
+    if (gift.size) gift.size = gift.size.toUpperCase();
+    if (gift.weight) gift.weight = gift.weight.toUpperCase();
+    if (gift.color) gift.color = gift.color.charAt(0).toUpperCase() + gift.color.slice(1);
+    if (gift.taste) gift.taste = gift.taste.charAt(0).toUpperCase() + gift.taste.slice(1);
   }
 }

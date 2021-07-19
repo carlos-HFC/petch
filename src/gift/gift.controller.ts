@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 import { GiftService } from './gift.service';
 
@@ -19,7 +20,8 @@ export class GiftController {
   }
 
   @Post()
-  async create(@Body() data: TCreateGift) {
-    return await this.giftService.post(data)
+  @UseInterceptors(FileInterceptor('media'))
+  async create(@Body() data: TCreateGift, @UploadedFile() media?: Express.MulterS3.File) {
+    return await this.giftService.post(data, media);
   }
 }

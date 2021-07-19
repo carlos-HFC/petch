@@ -2,13 +2,15 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
 import { Gift } from './gift.model';
+import { UploadService } from '../upload.service';
 import { trimObj } from '../utils';
 
 @Injectable()
 export class GiftService {
   constructor(
     @InjectModel(Gift)
-    private readonly giftModel: typeof Gift
+    private readonly giftModel: typeof Gift,
+    private uploadService: UploadService
   ) { }
 
   async get() {
@@ -23,10 +25,15 @@ export class GiftService {
     return gift;
   }
 
-  async post(data: TCreateGift) {
+  async post(data: TCreateGift, media?: Express.MulterS3.File) {
     trimObj(data);
 
-    const gift = await this.giftModel.create({ ...data });
+    const file = media ? await this.uploadService.uploadFile(media) : null;
+
+    const gift = await this.giftModel.create({
+      ...data,
+      media: file && file.url
+    });
 
     return gift;
   }
