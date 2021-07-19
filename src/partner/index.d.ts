@@ -1,6 +1,11 @@
 type TCreatePartner = {
-  name: string;
+  fantasyName: string;
+  companyName: string;
+  cnpj: string;
+  stateRegistration: string;
+  responsible: string;
   email: string;
+  website: string;
   phone1: string;
   phone2?: string;
   phone3?: string;
@@ -10,7 +15,6 @@ type TCreatePartner = {
   complement?: string;
   city: string;
   uf: string;
-  services: string;
-}
+};
 
-type TUpdatePartner = Partial<TCreatePartner>
+type TUpdatePartner = Partial<TCreatePartner>;

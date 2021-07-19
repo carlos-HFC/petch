@@ -2,47 +2,53 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
 import { Partner } from './partner.model';
-import { MediaService } from '../medias/media.service';
-import { trimObj, validateCEP, validateEmail, validatePhone } from '../utils';
+import { UploadService } from '../upload.service';
+import { trimObj, validateCEP, validateCNPJ, validateEmail, validatePhone } from '../utils';
 
 @Injectable()
 export class PartnerService {
   constructor(
     @InjectModel(Partner)
     private readonly partnerModel: typeof Partner,
-    private mediaService: MediaService
+    private uploadService: UploadService
   ) { }
 
   async get() {
-    const partners = await this.partnerModel.findAll();
-
-    return partners.map(partner => {
-      return Object.assign(partner, { services: partner.services.split(',').map(el => el.trim()) });
-    });
+    return await this.partnerModel.findAll();
   }
 
-  async getById(id: number) {
+  async findById(id: number) {
     const partner = await this.partnerModel.findByPk(id);
 
     if (!partner) throw new HttpException('ONG não encontrada', 404);
 
-    return Object.assign(partner, { services: partner.services.split(',').map(el => el.trim()) });
+    return partner;
   }
 
-  async getByName(name: string) {
-    return await this.partnerModel.findOne({
-      where: {
-        name: name.normalize().trim().toLowerCase()
-      }
-    });
-  }
-
-  async getByEmail(email: string) {
+  async findByEmail(email: string) {
     validateEmail(email);
 
     return await this.partnerModel.findOne({
       where: {
-        email: email.normalize().trim().toLowerCase()
+        email: email.trim().toLowerCase()
+      }
+    });
+  }
+
+  async findByCNPJ(cnpj: string) {
+    validateCNPJ(cnpj);
+
+    return await this.partnerModel.findOne({
+      where: {
+        cnpj: cnpj.replace(/[\/\s.-]/g, '')
+      }
+    });
+  }
+
+  async findByStateRegistration(stateRegistration: string) {
+    return await this.partnerModel.findOne({
+      where: {
+        stateRegistration: stateRegistration.replace(/[\s.]/g, '')
       }
     });
   }
@@ -54,11 +60,14 @@ export class PartnerService {
     validatePhone(data?.phone2);
     validatePhone(data?.phone3);
 
-    if (await this.getByEmail(data.email) || await this.getByName(data.name)) throw new HttpException('Parceiro já cadastrado', 400);
+    if (await this.findByEmail(data.email) || await this.findByCNPJ(data.cnpj) || await this.findByStateRegistration(data.stateRegistration)) throw new HttpException('Parceiro já cadastrado', 400);
 
-    const file = await this.mediaService.post(media);
+    const file = media ? await this.uploadService.uploadFile(media) : null;
 
-    const partner = await this.partnerModel.create({ ...data, mediaId: file.id });
+    const partner = await this.partnerModel.create({
+      ...data,
+      logo: file && file.url
+    });
 
     return partner;
   }
@@ -66,7 +75,7 @@ export class PartnerService {
   async put(data: TUpdatePartner) { }
 
   async delete(id: number) {
-    const partner = await this.getById(id);
+    const partner = await this.findById(id);
 
     await partner.destroy();
   }

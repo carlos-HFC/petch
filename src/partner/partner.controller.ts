@@ -16,7 +16,7 @@ export class PartnerController {
 
   @Get(':id')
   async byId(@Param('id') id: number) {
-    return await this.partnerService.getById(id);
+    return await this.partnerService.findById(id);
   }
 
   @Post()

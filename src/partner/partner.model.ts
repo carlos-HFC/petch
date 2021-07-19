@@ -1,18 +1,38 @@
-import { BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, Table } from 'sequelize-typescript';
+import { BeforeSave, Column, DataType, Model, Table } from 'sequelize-typescript';
 
-import { Media } from '../medias/media.model';
-
-@DefaultScope(() => ({
-  include: [Media]
-}))
 @Table({ paranoid: true })
 export class Partner extends Model {
   @Column({
     type: DataType.STRING,
     allowNull: false,
+  })
+  fantasyName: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  companyName: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
     unique: true
   })
-  name: string;
+  cnpj: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+    unique: true
+  })
+  stateRegistration: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  responsible: string;
 
   @Column({
     type: DataType.STRING,
@@ -20,6 +40,12 @@ export class Partner extends Model {
     unique: true
   })
   email: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  website: string;
 
   @Column({
     type: DataType.STRING,
@@ -66,25 +92,19 @@ export class Partner extends Model {
   })
   uf: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  services: string;
-
-  @ForeignKey(() => Media)
-  @Column
-  mediaId: number;
-
-  @BelongsTo(() => Media)
-  media: Media;
+  @Column(DataType.STRING)
+  logo: string;
 
   @BeforeSave
   static async formatData(partner: Partner) {
+    partner.email = partner.email.toLowerCase();
     partner.uf = partner.uf.toUpperCase();
     partner.cep = partner.cep.replace(/[\s-]/g, '');
+    partner.stateRegistration = partner.stateRegistration.replace(/[\s.]/g, '');
+    partner.cnpj = partner.cnpj.replace(/[\/\s-.]/g, '');
     partner.phone1 = partner.phone1.replace(/[\s()-]/g, '');
     partner.phone2 = partner.phone2?.replace(/[\s()-]/g, '');
     partner.phone3 = partner.phone3?.replace(/[\s()-]/g, '');
+    if (!partner.website.includes('https://')) partner.website = `https://${partner.website}`;
   }
 }
