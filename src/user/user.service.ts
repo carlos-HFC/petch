@@ -83,7 +83,57 @@ export class UserService {
     return user;
   }
 
-  async put() { }
+  async put(user: User, data: TUpdateUser, media?: Express.MulterS3.File) {
+    trimObj(data);
+
+    if (data.cep) validateCEP(data.cep);
+    if (data.phone) validatePhone(data.phone);
+
+    if (data.email && data.email !== user.email) {
+      if (await this.findByEmail(data.email)) throw new HttpException('Usuário já cadastrado', 400);
+    }
+
+    if (data.cpf && data.cpf !== user.cpf) {
+      if (await this.findByCPF(data.cpf)) throw new HttpException('Usuário já cadastrado', 400);
+    }
+
+    switch (true) {
+      case data.birthday && !isValid(parseISO(data.birthday)):
+        throw new HttpException('Data de nascimento inválida', 400);
+      case data.birthday && differenceInCalendarYears(new Date(), parseISO(data.birthday)) < 18:
+        throw new HttpException('Você não tem a idade mínima de 18 anos', 400);
+      default:
+        break;
+    }
+
+    if (data.oldPassword) {
+      const { oldPassword, password, confirmPassword } = data;
+
+      switch (true) {
+        case !(await user.checkPass(oldPassword)):
+          throw new HttpException('Senha atual incorreta', 400);
+        case !password:
+          throw new HttpException('Nova senha é obrigatória', 400);
+        case oldPassword === password:
+          throw new HttpException('Nova senha não pode ser igual a senha atual', 400);
+        case password && !confirmPassword:
+          throw new HttpException('Confirmação de senha é obrigatória', 400);
+        case password !== confirmPassword:
+          throw new HttpException('Nova senha e confirmação de senha não correspondem', 400);
+        default:
+          break;
+      }
+
+      validatePassword(password);
+    }
+
+    const file = media ? await this.uploadService.uploadFile(media) : null;
+
+    await user.update({
+      ...data,
+      avatar: file && file.url
+    });
+  }
 
   async delete(id: number) {
     const user = await this.findById(id);

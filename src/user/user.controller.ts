@@ -1,10 +1,12 @@
-import { Body, Controller, Get, Param, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Patch, Post, Put, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Request } from 'express';
 
 import { User } from './user.model';
 import { UserService } from './user.service';
 import { CreateUser } from './user.swagger';
+import { JwtAuthGuard } from '../auth/auth.guard';
 
 @ApiTags('Users')
 @Controller('users')
@@ -78,7 +80,43 @@ export class UserController {
     return await this.userService.post(data, media);
   }
 
-  async update() { }
+  @ApiCreatedResponse({ type: User, description: 'Created' })
+  @ApiBadRequestResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 400,
+        },
+        message: {
+          type: 'string',
+          oneOf: [
+            { example: 'Arquivo não suportado' },
+            { example: 'Usuário já cadastrado' },
+            { example: 'CEP inválido' },
+            { example: 'CPF inválido' },
+            { example: 'E-mail inválido' },
+            { example: 'Número de telefone/celular inválido' },
+            { example: 'Senha muito curta' },
+            { example: 'Senha precisa ter uma letra maiúscula, uma letra minúscula, um caractere especial e um número' },
+            { example: 'Senhas não correspondem' },
+            { example: 'Data de nascimento inválida' },
+            { example: 'Você não tem a idade mínima de 18 anos' },
+          ]
+        },
+      }
+    }
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: CreateUser })
+  @Put()
+  @UseGuards(JwtAuthGuard)
+  @UseInterceptors(FileInterceptor('media'))
+  async update(@Req() req: Request, @Body() data: TUpdateUser, @UploadedFile() media?: Express.MulterS3.File) {
+    return await this.userService.put(req.user, data, media);
+  }
+
   async delete() { }
 
   @ApiNoContentResponse({ description: 'No Content' })
@@ -130,7 +168,7 @@ export class UserController {
     }
   })
   @ApiQuery({ name: 'email' })
-  @Put('/confirm')
+  @Patch('/confirm')
   async confirmRegister(@Query('email') email: string, @Body() data: { tokenVerificationEmail: string; }) {
     return await this.userService.confirmRegister(email, data.tokenVerificationEmail);
   }
