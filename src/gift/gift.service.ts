@@ -17,7 +17,7 @@ export class GiftService {
     return await this.giftModel.findAll();
   }
 
-  async getById(id: number) {
+  async findById(id: number) {
     const gift = await this.giftModel.findByPk(id);
 
     if (!gift) throw new HttpException('Brinde não encontrado', 404);
@@ -38,10 +38,21 @@ export class GiftService {
     return gift;
   }
 
-  async put(data: object) { }
+  async put(id: number, data: TUpdateGift, media?: Express.MulterS3.File) {
+    trimObj(data);
+
+    const gift = await this.findById(id);
+
+    const file = media ? await this.uploadService.uploadFile(media) : null;
+
+    await gift.update({
+      ...data,
+      media: file && file.url
+    });
+  }
 
   async delete(id: number) {
-    const gift = await this.getById(id);
+    const gift = await this.findById(id);
 
     await gift.destroy();
   }

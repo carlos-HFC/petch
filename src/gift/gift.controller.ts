@@ -1,9 +1,9 @@
-import { Body, Controller, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 
-import { Gift } from './gift.model';
 import { GiftService } from './gift.service';
+import { CreateGift, Gift, UpdateGift } from './gift.swagger';
 
 @ApiTags('Gifts')
 @Controller('gifts')
@@ -37,7 +37,7 @@ export class GiftController {
   @ApiParam({ name: 'id', required: true })
   @Get(':id')
   async byId(@Param('id') id: number) {
-    return await this.giftService.getById(id);
+    return await this.giftService.findById(id);
   }
 
   @ApiCreatedResponse({ type: Gift, description: 'Created' })
@@ -57,10 +57,50 @@ export class GiftController {
     }
   })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: Gift })
+  @ApiBody({ type: CreateGift })
   @Post()
   @UseInterceptors(FileInterceptor('media'))
   async create(@Body() data: TCreateGift, @UploadedFile() media?: Express.MulterS3.File) {
     return await this.giftService.post(data, media);
+  }
+
+  @ApiOkResponse({ description: 'Success' })
+  @ApiBadRequestResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 400,
+        },
+        message: {
+          type: 'string',
+          example: 'Arquivo não suportado'
+        },
+      }
+    }
+  })
+  @ApiNotFoundResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 404,
+        },
+        message: {
+          type: 'string',
+          example: 'Brinde não encontrado',
+        },
+      }
+    }
+  })
+  @ApiParam({ name: 'id', required: true })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UpdateGift })
+  @Put(':id')
+  @UseInterceptors(FileInterceptor('media'))
+  async update(@Param('id') id: number, @Body() data: TUpdateGift, @UploadedFile() media?: Express.MulterS3.File) {
+    return await this.giftService.put(id, data, media);
   }
 }
