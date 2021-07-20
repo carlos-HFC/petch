@@ -4,7 +4,7 @@ import { Request } from 'express';
 
 import { User } from '../user/user.model';
 import { UserService } from '../user/user.service';
-import { trimObj, validateEmail } from '../utils';
+import { trimObj } from '../utils';
 
 @Injectable()
 export class AuthService {
@@ -15,7 +15,6 @@ export class AuthService {
 
   async login(data: TLogin) {
     trimObj(data);
-    validateEmail(data.email);
 
     const user = await this.userService.findByEmail(data.email);
 
