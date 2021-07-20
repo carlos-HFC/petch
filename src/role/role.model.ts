@@ -3,11 +3,7 @@ import { Column, DataType, Model, Table } from 'sequelize-typescript';
 
 @Table({ paranoid: true })
 export class Role extends Model {
-  @ApiProperty({
-    example: 1,
-    uniqueItems: true,
-    type: 'integer'
-  })
+  @ApiProperty({ uniqueItems: true, type: 'integer', readOnly: true })
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
@@ -17,37 +13,19 @@ export class Role extends Model {
   })
   id: number;
 
-  @ApiProperty({
-    example: 'Admin',
-    type: 'string'
-  })
+  @ApiProperty({ type: 'string' })
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
   name: string;
 
-  @ApiProperty({
-    example: '2020-01-01T00:00:00.000Z',
-    type: 'string',
-    format: 'date',
-    required: false
-  })
+  @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   createdAt: Date;
 
-  @ApiProperty({
-    example: '2020-01-01T00:00:00.000Z',
-    type: 'string',
-    format: 'date',
-    required: false
-  })
+  @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   updatedAt: Date;
 
-  @ApiProperty({
-    example: null,
-    type: 'string',
-    format: 'date',
-    required: false
-  })
+  @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   deletedAt: Date | null;
 }

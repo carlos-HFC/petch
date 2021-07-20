@@ -93,6 +93,7 @@ export class UserService {
 
   async confirmRegister(email: string, tokenVerificationEmail: string) {
     if (!email) throw new HttpException('E-mail não informdo', 400);
+    if (!tokenVerificationEmail) throw new HttpException('Token não informdo', 400);
 
     const user = await this.findByEmail(email);
 

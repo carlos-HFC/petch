@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { ApiParam, ApiResponse, ApiTags, ApiQuery } from '@nestjs/swagger';
+import { ApiParam, ApiTags, ApiQuery, ApiOkResponse, ApiNotFoundResponse } from '@nestjs/swagger';
 
 import { Role } from './role.model';
 import { RoleService } from './role.service';
@@ -11,24 +11,15 @@ export class RoleController {
     private roleService: RoleService
   ) { }
 
-  @ApiResponse({
-    type: [Role],
-    status: 200,
-    description: 'Success',
-  })
+  @ApiOkResponse({ type: [Role], description: 'Success' })
   @ApiQuery({ name: 'name', enum: ['Admin', 'Adotante'], required: false })
   @Get()
   async index(@Query('name') name?: string) {
     return await this.roleService.get(name);
   }
 
-  @ApiResponse({
-    type: Role,
-    status: 200,
-    description: 'Success',
-  })
-  @ApiResponse({
-    status: 404,
+  @ApiOkResponse({ type: Role, description: 'Success' })
+  @ApiNotFoundResponse({
     description: 'Not Found',
     schema: {
       type: 'object',
