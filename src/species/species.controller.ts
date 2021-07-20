@@ -1,5 +1,5 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBody, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiBody, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { Species } from './species.model';
 import { SpeciesService } from './species.service';
@@ -60,6 +60,69 @@ export class SpeciesController {
   @ApiBody({ type: Species })
   @Post()
   async create(@Body() data: { name: string; }) {
-    return await this.speciesService.post(data);
+    return await this.speciesService.post(data.name);
+  }
+
+  @ApiOkResponse({ description: 'Success' })
+  @ApiBadRequestResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 400,
+        },
+        message: {
+          type: 'string',
+          example: 'Espécie já cadastrada'
+        },
+      }
+    }
+  })
+  @ApiNotFoundResponse({
+    description: 'Not Found',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 404,
+        },
+        message: {
+          type: 'string',
+          example: 'Espécie não encontrada',
+        },
+      }
+    }
+  })
+  @ApiBody({ type: Species })
+  @ApiParam({ name: 'id', required: true })
+  @Put(':id')
+  async update(@Param('id') id: number, @Body() data: { name: string; }) {
+    return await this.speciesService.put(id, data.name);
+  }
+
+  @ApiNoContentResponse({ description: 'No Content' })
+  @ApiNotFoundResponse({
+    description: 'Not Found',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 404,
+        },
+        message: {
+          type: 'string',
+          example: 'Espécie não encontrada',
+        },
+      }
+    }
+  })
+  @ApiParam({ name: 'id', required: true })
+  @Delete(':id')
+  @HttpCode(204)
+  async delete(@Param('id') id: number) {
+    return await this.speciesService.delete(id)
   }
 }

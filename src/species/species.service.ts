@@ -33,12 +33,27 @@ export class SpeciesService {
     });
   }
 
-  async post(data: { name: string; }) {
-    trimObj(data);
-    const exists = await this.getByName(data.name);
+  async post(name: string) {
+    trimObj({ name });
+    const exists = await this.getByName(name);
 
     if (exists) throw new HttpException('Espécie já cadastrada', 400);
 
-    return await this.speciesModel.create({ ...data });
+    return await this.speciesModel.create({ name });
+  }
+
+  async put(id: number, name: string) {
+    trimObj({ name });
+    const specie = await this.getById(id);
+
+    if (await this.getByName(name)) throw new HttpException('Espécie já cadastrada', 400);
+
+    await specie.update({ name });
+  }
+
+  async delete(id: number) {
+    const specie = await this.getById(id);
+
+    await specie.destroy();
   }
 }
