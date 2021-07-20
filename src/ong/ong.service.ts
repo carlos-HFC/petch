@@ -44,8 +44,8 @@ export class OngService {
     trimObj(data);
     validateCEP(data.cep);
     validatePhone(data.phone1);
-    validatePhone(data?.phone2);
-    validatePhone(data?.phone3);
+    if (data.phone2) validatePhone(data.phone2);
+    if (data.phone3) validatePhone(data.phone3);
 
     if (await this.findByEmail(data.email) || await this.findByName(data.name)) throw new HttpException('ONG já cadastrada', 400);
 
@@ -54,7 +54,25 @@ export class OngService {
     return ong;
   }
 
-  async put(data: TUpdateOng) { }
+  async put(id: number, data: TUpdateOng) {
+    trimObj(data);
+    if (data.cep) validateCEP(data.cep);
+    if (data.phone1) validatePhone(data.phone1);
+    if (data.phone2) validatePhone(data.phone2);
+    if (data.phone3) validatePhone(data.phone3);
+
+    const ong = await this.findById(id);
+
+    if (data.email && data.email !== ong.email) {
+      if (await this.findByEmail(data.email)) throw new HttpException('ONG já cadastrada', 400);
+    }
+
+    if (data.name && data.name !== ong.name) {
+      if (await this.findByName(data.name)) throw new HttpException('ONG já cadastrada', 400);
+    }
+
+    await ong.update({ ...data });
+  }
 
   async delete(id: number) {
     const ong = await this.findById(id);
