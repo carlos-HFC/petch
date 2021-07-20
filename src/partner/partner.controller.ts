@@ -1,9 +1,9 @@
-import { Body, Controller, Delete, Get, Param, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Post, Put, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
-import { Partner } from './partner.model';
 
 import { PartnerService } from './partner.service';
+import { CreatePartner, Partner, UpdatePartner } from './partner.swagger';
 
 @ApiTags('Partners')
 @Controller('partners')
@@ -58,11 +58,36 @@ export class PartnerController {
     }
   })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: Partner })
+  @ApiBody({ type: CreatePartner })
   @Post()
   @UseInterceptors(FileInterceptor('media'))
   async create(@Body() data: TCreatePartner, @UploadedFile() media?: Express.MulterS3.File) {
     return await this.partnerService.post(data, media);
+  }
+
+  @ApiOkResponse({ description: 'Success' })
+  @ApiBadRequestResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 400,
+        },
+        message: {
+          type: 'string',
+          example: 'Arquivo não suportado'
+        },
+      }
+    }
+  })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UpdatePartner })
+  @ApiParam({ name: 'id', required: true })
+  @Put(':id')
+  @UseInterceptors(FileInterceptor('media'))
+  async update(@Param('id') id: number, @Body() data: TCreatePartner, @UploadedFile() media?: Express.MulterS3.File) {
+    return await this.partnerService.put(id, data, media);
   }
 
   @ApiNoContentResponse({ description: 'No Content' })
