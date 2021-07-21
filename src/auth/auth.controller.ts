@@ -13,7 +13,8 @@ export class AuthController {
   ) { }
 
   @ApiOkResponse({
-    description: 'Success', schema: {
+    description: 'Success',
+    schema: {
       type: 'object',
       properties: {
         token: {
@@ -58,6 +59,11 @@ export class AuthController {
   @HttpCode(200)
   async login(@Body() data: TLogin) {
     return await this.authService.login(data);
+  }
+
+  @Post('register')
+  async register(@Body() data: TCreateUser) {
+    return await this.authService.register(data)
   }
 
   async forgot() { }

@@ -30,7 +30,12 @@ export class AuthService {
   }
   async forgotPassword() { }
   async resetPassword() { }
-  async register() { }
+
+  async register(data: TCreateUser, media?: Express.MulterS3.File) {
+    trimObj(data);
+
+    await this.userService.post(data, false, media);
+  }
 
   private createTokenJwt(user: User) {
     return this.jwtService.sign({ id: user.id, email: user.email, role: user.role.name, cpf: user.cpf, password: user.hash });
