@@ -1,5 +1,5 @@
 type TCreateUser = {
-  isAdmin?: boolean;
+  googleId?: string
   name: string;
   email: string;
   password: string;

@@ -48,7 +48,7 @@ export class UserService {
     });
   }
 
-  async post(data: TCreateUser, media?: Express.MulterS3.File) {
+  async post(data: TCreateUser, isAdmin: boolean, media?: Express.MulterS3.File) {
     trimObj(data);
     validatePassword(data.password);
     validateCEP(data.cep);
@@ -71,7 +71,7 @@ export class UserService {
 
     const file = media ? await this.uploadService.uploadFile(media) : null;
 
-    const role = await this.roleService.getByName(data.isAdmin ? 'admin' : 'adotante');
+    const role = await this.roleService.getByName(isAdmin ? 'admin' : 'adotante');
 
     const user = await this.userModel.create({
       ...data,
@@ -85,7 +85,6 @@ export class UserService {
 
   async put(user: User, data: TUpdateUser, media?: Express.MulterS3.File) {
     trimObj(data);
-
     if (data.cep) validateCEP(data.cep);
     if (data.phone) validatePhone(data.phone);
 
