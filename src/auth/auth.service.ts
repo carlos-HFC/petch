@@ -1,6 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { Request } from 'express';
 
 import { User } from '../user/user.model';
 import { UserService } from '../user/user.service';
@@ -38,10 +37,23 @@ export class AuthService {
   }
 
   private createTokenJwt(user: User) {
-    return this.jwtService.sign({ id: user.id, email: user.email, role: user.role.name, cpf: user.cpf, password: user.hash });
+    return this.jwtService.sign({ id: user.id, email: user.email, role: user.role.name, cpf: user.cpf, password: user.hash, google: user.googleId });
   }
 
-  async googleLogin(req: Request) {
-    return { user: req.user };
+  async googleLogin(data: TGoogleLogin) {
+    trimObj(data);
+
+    const [userByGoogle, userByEmail] = await Promise.all([
+      this.userService.findByGoogleId(data.googleId),
+      this.userService.findByEmail(data.email),
+    ]);
+
+    if (userByGoogle || userByEmail) {
+      await userByGoogle.update({ ...data });
+
+      const token = this.createTokenJwt(userByGoogle);
+
+      return { token };
+    }
   }
 }

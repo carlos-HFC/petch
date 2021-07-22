@@ -1,8 +1,7 @@
-import { Body, Controller, Get, HttpCode, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, HttpCode, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { Request } from 'express';
 
-import { GoogleAuthGuard } from './auth.guard';
 import { AuthService } from './auth.service';
 
 @ApiTags('Auth')
@@ -61,21 +60,18 @@ export class AuthController {
     return await this.authService.login(data);
   }
 
+  @Post('/login/google')
+  @HttpCode(200)
+  async googleLogin(@Body() data: TGoogleLogin) {
+    return await this.authService.googleLogin(data);
+  }
+
   @Post('register')
-  async register(@Body() data: TCreateUser) {
-    return await this.authService.register(data)
+  @UseInterceptors(FileInterceptor('media'))
+  async register(@Body() data: TCreateUser, @UploadedFile() media: Express.MulterS3.File) {
+    return await this.authService.register(data, media);
   }
 
   async forgot() { }
   async reset() { }
-
-  @UseGuards(GoogleAuthGuard)
-  @Get('/google')
-  async googleAuth(@Req() req: Request) { }
-
-  @UseGuards(GoogleAuthGuard)
-  @Get('/google/redirect')
-  async googleAuthRedirect(@Req() req: Request) {
-    return await this.authService.googleLogin(req);
-  }
 }
