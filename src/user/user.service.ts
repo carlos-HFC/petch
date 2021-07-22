@@ -28,6 +28,14 @@ export class UserService {
     return user;
   }
 
+  async findByGoogleId(googleId: string) {
+    return await this.userModel.findOne({
+      where: {
+        googleId: googleId.trim()
+      }
+    });
+  }
+
   async findByCPF(cpf: string) {
     validateCPF(cpf);
 
@@ -50,9 +58,9 @@ export class UserService {
 
   async post(data: TCreateUser, isAdmin: boolean, media?: Express.MulterS3.File) {
     trimObj(data);
-    validatePassword(data.password);
-    validateCEP(data.cep);
-    validatePhone(data.phone);
+    if (data.password) validatePassword(data.password);
+    if (data.cep) validateCEP(data.cep);
+    if (data.phone) validatePhone(data.phone);
 
     if (await this.findByCPF(data.cpf) || await this.findByEmail(data.email)) throw new HttpException('Usuário já cadastrado', 400);
 
