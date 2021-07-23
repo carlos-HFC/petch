@@ -1,5 +1,7 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
 
+import { Role } from '../role/role.model';
+
 export class User {
   @ApiProperty({ type: 'integer', uniqueItems: true, readOnly: true })
   id: number;
@@ -64,6 +66,9 @@ export class User {
   @ApiProperty({ type: 'number' })
   roleId: number;
 
+  @ApiProperty({ type: Role })
+  role: Role;
+
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   createdAt: Date;
 
@@ -74,11 +79,11 @@ export class User {
   deletedAt: Date | null;
 }
 
-export class CreateUser extends OmitType(User, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'hash', 'avatar', 'tokenResetPassword', 'tokenResetPasswordExpires', 'tokenVerificationEmail', 'emailVerified', 'roleId']) {
-  @ApiProperty({ type: 'string' })
+export class CreateUser extends OmitType(User, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'hash', 'avatar', 'tokenResetPassword', 'tokenResetPasswordExpires', 'tokenVerificationEmail', 'emailVerified', 'roleId', 'role']) {
+  @ApiProperty({ type: 'string', required: false })
   password: string;
 
-  @ApiProperty({ type: 'string' })
+  @ApiProperty({ type: 'string', required: false })
   confirmPassword: string;
 
   @ApiProperty({ type: 'string', format: 'binary', required: false })

@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Patch, Post, Put, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { Request } from 'express';
@@ -17,6 +17,36 @@ export class UserController {
   ) { }
 
   @ApiOkResponse({ type: [User], description: 'Success' })
+  @ApiUnauthorizedResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 401,
+        },
+        message: {
+          type: 'string',
+          example: 'Unauthorized'
+        }
+      }
+    }
+  })
+  @ApiForbiddenResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 403,
+        },
+        message: {
+          type: 'string',
+          example: 'Você não tem permissão'
+        }
+      }
+    }
+  })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('admin')
@@ -26,6 +56,36 @@ export class UserController {
   }
 
   @ApiOkResponse({ type: [User], description: 'Success' })
+  @ApiUnauthorizedResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 401,
+        },
+        message: {
+          type: 'string',
+          example: 'Unauthorized'
+        }
+      }
+    }
+  })
+  @ApiForbiddenResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 403,
+        },
+        message: {
+          type: 'string',
+          example: 'Você não tem permissão'
+        }
+      }
+    }
+  })
   @ApiNotFoundResponse({
     description: 'Not Found',
     schema: {
@@ -177,7 +237,62 @@ export class UserController {
     return await this.userService.put(req.user, data, media);
   }
 
-  async delete() { }
+  @ApiNoContentResponse({ description: 'No Content' })
+  @ApiUnauthorizedResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 401,
+        },
+        message: {
+          type: 'string',
+          example: 'Unauthorized'
+        }
+      }
+    }
+  })
+  @ApiForbiddenResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 403,
+        },
+        message: {
+          type: 'string',
+          example: 'Você não tem permissão'
+        }
+      }
+    }
+  })
+  @ApiNotFoundResponse({
+    description: 'Not Found',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 404
+        },
+        message: {
+          type: 'string',
+          example: 'Usuário não encontrado',
+        },
+      }
+    }
+  })
+  @ApiParam({ name: 'id', required: true })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RoleDecorator('admin')
+  @Delete(':id')
+  @HttpCode(204)
+  async delete(@Param('id') id: number) {
+    return await this.userService.delete(id);
+  }
 
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiBadRequestResponse({

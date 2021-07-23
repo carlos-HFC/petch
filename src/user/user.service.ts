@@ -5,7 +5,7 @@ import { differenceInCalendarYears, isValid, parseISO } from 'date-fns';
 import { User } from './user.model';
 import { RoleService } from '../role/role.service';
 import { UploadService } from '../upload.service';
-import { createToken, trimObj, validateCEP, validateCPF, validateEmail, validatePassword, validatePhone } from '../utils';
+import { createTokenHEX, trimObj, validateCEP, validateCPF, validateEmail, validatePassword, validatePhone } from '../utils';
 
 @Injectable()
 export class UserService {
@@ -81,11 +81,12 @@ export class UserService {
 
     const role = await this.roleService.getByName(isAdmin ? 'admin' : 'adotante');
 
+    if (file) Object.assign(data, { avatar: file.url });
+
     const user = await this.userModel.create({
       ...data,
       roleId: role.id,
-      avatar: file && file.url,
-      tokenVerificationEmail: createToken()
+      tokenVerificationEmail: createTokenHEX()
     });
 
     return user;
@@ -136,10 +137,9 @@ export class UserService {
 
     const file = media ? await this.uploadService.uploadFile(media) : null;
 
-    await user.update({
-      ...data,
-      avatar: file && file.url
-    });
+    if (file) Object.assign(data, { avatar: file.url });
+
+    await user.update({ ...data });
   }
 
   async delete(id: number) {
@@ -169,7 +169,5 @@ export class UserService {
       tokenVerificationEmail: null,
       emailVerified: true
     });
-
-    return { message: 'Você foi verificado com sucesso!' };
   }
 }
