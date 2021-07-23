@@ -1,6 +1,6 @@
-import { Body, Controller, Get, Param, Post, Put, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 
 import { GiftService } from './gift.service';
 import { CreateGift, Gift, UpdateGift } from './gift.swagger';
@@ -102,5 +102,28 @@ export class GiftController {
   @UseInterceptors(FileInterceptor('media'))
   async update(@Param('id') id: number, @Body() data: TUpdateGift, @UploadedFile() media?: Express.MulterS3.File) {
     return await this.giftService.put(id, data, media);
+  }
+
+  @ApiNoContentResponse({ description: 'No Content' })
+  @ApiNotFoundResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 404,
+        },
+        message: {
+          type: 'string',
+          example: 'Brinde não encontrado',
+        },
+      }
+    }
+  })
+  @ApiParam({ name: 'id', required: true })
+  @Delete(':id')
+  @HttpCode(204)
+  async delete(@Param('id') id: number) {
+    return await this.giftService.delete(id);
   }
 }
