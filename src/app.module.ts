@@ -9,6 +9,7 @@ import { OngModule } from './ong/ong.module';
 import { PartnerModule } from './partner/partner.module';
 import { RoleModule } from './role/role.module';
 import { SchedulingTypesModule } from './schedulingTypes/schedulingTypes.module';
+import { SolicitationModule } from './solicitation/solicitation.module';
 import { SolicitationTypesModule } from './solicitationTypes/solicitationTypes.module';
 import { SpeciesModule } from './species/species.module';
 import { UploadService } from './upload.service';
@@ -56,6 +57,7 @@ import { UserModule } from './user/user.module';
     OngModule,
     PartnerModule,
     GiftModule,
+    SolicitationModule
   ],
   controllers: [],
   providers: [UploadService],
