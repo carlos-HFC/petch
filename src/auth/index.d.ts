@@ -9,3 +9,8 @@ type TGoogleLogin = {
   googleId: string;
   avatar?: string;
 };
+
+type TResetPassword = TLogin & {
+  token: string;
+  confirmPassword: string;
+};

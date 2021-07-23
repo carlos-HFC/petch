@@ -1,9 +1,10 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import { isAfter } from 'date-fns';
 
 import { User } from '../user/user.model';
 import { UserService } from '../user/user.service';
-import { trimObj } from '../utils';
+import { createTokenHEX, trimObj, validatePassword } from '../utils';
 
 @Injectable()
 export class AuthService {
@@ -27,8 +28,61 @@ export class AuthService {
   async validate(payload: { email: string; }) {
     return await this.userService.findByEmail(payload.email);
   }
-  async forgotPassword() { }
-  async resetPassword() { }
+
+  async forgotPassword(email: string) {
+    const user = await this.userService.findByEmail(email);
+
+    if (!user) throw new HttpException('Usuário não encontrado', 404);
+
+    const token = createTokenHEX(), now = new Date().setHours(new Date().getHours() + 1);
+
+    await user.update({
+      tokenResetPassword: token,
+      tokenResetPasswordExpires: now.toString(),
+    });
+
+    return { token };
+  }
+
+  async resetPassword(data: TResetPassword) {
+    trimObj(data);
+
+    const user = await this.userService.findByEmail(data.email);
+
+    switch (true) {
+      case !user:
+        throw new HttpException('Usuário não encontrado', 404);
+      case !data.token:
+        throw new HttpException('Token é obrigatório', 400);
+      case data.token !== user.tokenResetPassword:
+        throw new HttpException('Token inválido', 400);
+      case isAfter(new Date(), Number(user.tokenResetPasswordExpires)):
+        throw new HttpException('Token expirou', 400);
+      default:
+        break;
+    }
+
+    switch (true) {
+      case !data.password:
+        throw new HttpException('Nova senha é obrigatória', 400);
+      case await user.checkPass(data.password):
+        throw new HttpException('Nova senha não pode ser igual a senha atual', 400);
+      case data.password && !data.confirmPassword:
+        throw new HttpException('Confirmação de senha é obrigatória', 400);
+      case data.password !== data.confirmPassword:
+        throw new HttpException('Nova senha e confirmação de senha não correspondem', 400);
+      default:
+        break;
+    }
+
+    validatePassword(data.password);
+
+    await user.update({
+      ...data,
+      tokenResetPassword: null,
+      tokenResetPasswordExpires: null,
+    });
+  }
 
   async register(data: TCreateUser, media?: Express.MulterS3.File) {
     trimObj(data);
