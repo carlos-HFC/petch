@@ -11,12 +11,12 @@ export class SolicitationTypesService {
   ) { }
 
   async get(name?: string) {
-    if (name) return await this.getByName(name);
+    if (name) return await this.findByName(name);
 
     return await this.solicitationTypesModel.findAll();
   }
 
-  async getById(id: number) {
+  async findById(id: number) {
     const solicitationTypes = await this.solicitationTypesModel.findByPk(id);
 
     if (!solicitationTypes) throw new HttpException("Tipo de solicitação não encontrada", 404);
@@ -24,7 +24,7 @@ export class SolicitationTypesService {
     return solicitationTypes;
   }
 
-  async getByName(name: string) {
+  async findByName(name: string) {
     return await this.solicitationTypesModel.findOne({
       where: {
         name: name.normalize().trim().toLowerCase()

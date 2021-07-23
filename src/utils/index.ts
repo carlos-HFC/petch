@@ -76,7 +76,7 @@ export function validatePhone(phone: string) {
   if (!regex.test(phone) || phone.length < 10 || phone.length > 11) throw new HttpException('Número de telefone/celular inválido', 400);
 }
 
-export function createToken() {
+export function createTokenHEX() {
   return randomBytes(20).toString('hex');
 }
 
@@ -142,9 +142,5 @@ export function validateCNPJ(cnpj: string) {
     v2 = (11 - v2);
   }
 
-  if (v2 !== Number(cnpj[13])) {
-    throw new HttpException('CNPJ inválido', 400);
-  } else {
-    return true;
-  }
+  if (v2 !== Number(cnpj[13])) throw new HttpException('CNPJ inválido', 400);
 }

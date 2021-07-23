@@ -38,6 +38,6 @@ export class SolicitationTypesController {
   @ApiParam({ name: 'id', required: true })
   @Get(':id')
   async byId(@Param('id') id: number) {
-    return await this.solicitationTypesService.getById(id);
+    return await this.solicitationTypesService.findById(id);
   }
 }
