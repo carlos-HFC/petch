@@ -94,3 +94,17 @@ export class UpdateUser extends OmitType(PartialType(CreateUser), ['googleId']) 
   @ApiProperty({ type: 'string', required: false })
   oldPassword: string;
 }
+
+export class FilterUser {
+  @ApiProperty({ type: 'string', enum: ['M', 'F', 'O'], required: false })
+  gender?: string;
+
+  @ApiProperty({ type: 'boolean', required: false })
+  googleId?: boolean;
+
+  @ApiProperty({ type: 'string', required: false })
+  uf?: string;
+
+  @ApiProperty({ type: 'boolean', required: false })
+  inactives?: boolean;
+}
