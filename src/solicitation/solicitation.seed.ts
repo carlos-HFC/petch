@@ -5,6 +5,7 @@ import { Solicitation } from './solicitation.model';
   model: Solicitation,
   runOnlyIfTableIsEmpty: true,
   containsForeignKeys: true,
+  foreignDelay: 5000
 })
 export class SolicitationSeed implements OnSeederInit {
   run() {
