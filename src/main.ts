@@ -28,8 +28,8 @@ async function bootstrap() {
     .addTag('Partners', 'Armazenar os parceiros do Petch')
     .addTag('Roles', 'Armazenar as funções que os usuários terão dentro da plataforma')
     .addTag('Scheduling Types', 'Armazenar os tipos de agendamento que o adotante pode efetuar')
-    .addTag('Solicitations', 'Armazenar todas as solicitações que os usuários enviarem')
-    .addTag('Solicitation Types', 'Armazenar os tipos de solicitação que os usuários podem abrir')
+    .addTag('Solicitations', 'Armazenar todas as solicitações que os adotantes enviarem')
+    .addTag('Solicitation Types', 'Armazenar os tipos de solicitação que os adotantes podem abrir')
     .addTag('Species', 'Armazenar as espécies de animais da plataforma')
     .addTag('Users', 'Armazenar todos os usuários da plataforma')
     .build();

@@ -9,7 +9,8 @@ import { User } from '../user/user.model';
     {
       model: User,
       attributes: ['id', 'name', 'email']
-    }]
+    }
+  ]
 }))
 @Table({ paranoid: true })
 export class Solicitation extends Model {

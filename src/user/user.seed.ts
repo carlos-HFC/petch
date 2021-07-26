@@ -6,6 +6,7 @@ import { User } from './user.model';
   model: User,
   runOnlyIfTableIsEmpty: true,
   unique: ['googleId', 'email', 'cpf'],
+  containsForeignKeys: true
 })
 export class UserSeed implements OnSeederInit {
   run() {
