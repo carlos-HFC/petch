@@ -7,11 +7,13 @@ import { Gift } from './gift.model';
 import { GiftSeed } from './gift.seed';
 import { GiftService } from './gift.service';
 import { UploadService } from '../upload.service';
+import { PartnerModule } from 'src/partner/partner.module';
 
 @Module({
   imports: [
     SeederModule.forFeature([GiftSeed]),
-    SequelizeModule.forFeature([Gift])
+    SequelizeModule.forFeature([Gift]),
+    PartnerModule
   ],
   controllers: [GiftController],
   providers: [GiftService, UploadService],

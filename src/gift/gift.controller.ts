@@ -1,6 +1,6 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { GiftService } from './gift.service';
 import { CreateGift, Gift, UpdateGift } from './gift.swagger';
@@ -13,9 +13,10 @@ export class GiftController {
   ) { }
 
   @ApiOkResponse({ type: [Gift], description: 'Success' })
+  @ApiQuery({ name: 'inactives', type: 'boolean', required: false })
   @Get()
-  async index() {
-    return await this.giftService.get();
+  async index(@Query('inactives') inactives: boolean) {
+    return await this.giftService.get(inactives);
   }
 
   @ApiOkResponse({ type: Gift, description: 'Success' })
@@ -35,9 +36,10 @@ export class GiftController {
     }
   })
   @ApiParam({ name: 'id', required: true })
+  @ApiQuery({ name: 'inactives', type: 'boolean', required: false })
   @Get(':id')
-  async byId(@Param('id') id: number) {
-    return await this.giftService.findById(id);
+  async byId(@Param('id') id: number, @Query('inactives') inactives: boolean) {
+    return await this.giftService.findById(id, inactives);
   }
 
   @ApiCreatedResponse({ type: Gift, description: 'Created' })
@@ -64,6 +66,7 @@ export class GiftController {
     return await this.giftService.post(data, media);
   }
 
+  @ApiOperation({ summary: 'Editar um brinde' })
   @ApiOkResponse({ description: 'Success' })
   @ApiBadRequestResponse({
     schema: {
@@ -102,6 +105,29 @@ export class GiftController {
   @UseInterceptors(FileInterceptor('media'))
   async update(@Param('id') id: number, @Body() data: TUpdateGift, @UploadedFile() media?: Express.MulterS3.File) {
     return await this.giftService.put(id, data, media);
+  }
+
+  @ApiNoContentResponse({ description: 'No Content' })
+  @ApiNotFoundResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 404,
+        },
+        message: {
+          type: 'string',
+          example: 'Brinde não encontrado',
+        },
+      }
+    }
+  })
+  @ApiParam({ name: 'id', required: true })
+  @Patch(':id')
+  @HttpCode(204)
+  async restore(@Param('id') id: number) {
+    return await this.giftService.restore(id);
   }
 
   @ApiNoContentResponse({ description: 'No Content' })

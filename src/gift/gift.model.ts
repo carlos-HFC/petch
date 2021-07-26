@@ -1,5 +1,15 @@
-import { BeforeSave, Column, DataType, Model, Table } from 'sequelize-typescript';
+import { BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, Table } from 'sequelize-typescript';
 
+import { Partner } from '../partner/partner.model';
+
+@DefaultScope(() => ({
+  include: [
+    {
+      model: Partner,
+      attributes: ['fantasyName']
+    }
+  ]
+}))
 @Table({ paranoid: true })
 export class Gift extends Model {
   @Column({
@@ -13,6 +23,12 @@ export class Gift extends Model {
     allowNull: false,
   })
   description: string;
+
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  coverage: string;
 
   @Column(DataType.STRING)
   size: string;
@@ -29,8 +45,16 @@ export class Gift extends Model {
   @Column(DataType.STRING)
   media: string;
 
+  @ForeignKey(() => Partner)
+  @Column
+  partnerId: number;
+
+  @BelongsTo(() => Partner)
+  partner: Partner;
+
   @BeforeSave
-  static async formatSize(gift: Gift) {
+  static async formatData(gift: Gift) {
+    gift.coverage = gift.coverage.toUpperCase();
     if (gift.size) gift.size = gift.size.toUpperCase();
     if (gift.weight) gift.weight = gift.weight.toUpperCase();
     if (gift.color) gift.color = gift.color.charAt(0).toUpperCase() + gift.color.slice(1);

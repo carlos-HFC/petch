@@ -4,21 +4,24 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Gift } from './gift.model';
 import { UploadService } from '../upload.service';
 import { trimObj } from '../utils';
+import { PartnerService } from 'src/partner/partner.service';
 
 @Injectable()
 export class GiftService {
   constructor(
     @InjectModel(Gift)
     private readonly giftModel: typeof Gift,
+    private partnerService: PartnerService,
     private uploadService: UploadService
   ) { }
 
-  async get() {
+  async get(inactives?: boolean) {
+    if (inactives) return await this.giftModel.findAll({ paranoid: false });
     return await this.giftModel.findAll();
   }
 
-  async findById(id: number) {
-    const gift = await this.giftModel.findByPk(id);
+  async findById(id: number, inactives?: boolean) {
+    const gift = await this.giftModel.findByPk(id, { paranoid: !inactives });
 
     if (!gift) throw new HttpException('Brinde não encontrado', 404);
 
@@ -28,12 +31,13 @@ export class GiftService {
   async post(data: TCreateGift, media?: Express.MulterS3.File) {
     trimObj(data);
 
-    const file = media ? await this.uploadService.uploadFile(media) : null;
+    await this.partnerService.findById(data.partnerId);
 
-    const gift = await this.giftModel.create({
-      ...data,
-      media: file && file.url
-    });
+    const file = media && await this.uploadService.uploadFile(media);
+
+    if (file) Object.assign(data, { media: file.url });
+
+    const gift = await this.giftModel.create({ ...data });
 
     return gift;
   }
@@ -43,17 +47,24 @@ export class GiftService {
 
     const gift = await this.findById(id);
 
-    const file = media ? await this.uploadService.uploadFile(media) : null;
+    if (data.partnerId) await this.partnerService.findById(data.partnerId);
 
-    await gift.update({
-      ...data,
-      media: file && file.url
-    });
+    const file = media && await this.uploadService.uploadFile(media);
+
+    if (file) Object.assign(data, { media: file.url });
+
+    await gift.update({ ...data });
   }
 
   async delete(id: number) {
     const gift = await this.findById(id);
 
     await gift.destroy();
+  }
+
+  async restore(id: number) {
+    const gift = await this.findById(id, true);
+
+    await gift.restore();
   }
 }
