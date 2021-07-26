@@ -4,7 +4,7 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedR
 import { Request } from 'express';
 
 import { UserService } from './user.service';
-import { CreateUser, UpdateUser, User } from './user.swagger';
+import { CreateUser, FilterUser, UpdateUser, User } from './user.swagger';
 import { JwtAuthGuard } from '../auth/auth.guard';
 import { RoleGuard } from '../role/role.guard';
 import { RoleDecorator } from '../role/role.decorator';
@@ -47,12 +47,13 @@ export class UserController {
       }
     }
   })
+  @ApiQuery({ type: FilterUser, required: false })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('admin')
   @Get()
-  async index() {
-    return await this.userService.get();
+  async index(@Query() query: TFilterUser) {
+    return await this.userService.get(query);
   }
 
   @ApiOkResponse({ type: [User], description: 'Success' })
@@ -103,12 +104,13 @@ export class UserController {
     }
   })
   @ApiParam({ name: 'id', required: true })
+  @ApiQuery({ name: 'inactives', type: 'boolean', required: false })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('admin')
   @Get(':id')
-  async byId(@Param('id') id: number) {
-    return await this.userService.findById(id);
+  async byId(@Param('id') id: number, @Query('inactives') inactives: boolean) {
+    return await this.userService.findById(id, inactives);
   }
 
   @ApiCreatedResponse({ type: User, description: 'Created' })
@@ -235,6 +237,63 @@ export class UserController {
   @UseInterceptors(FileInterceptor('media'))
   async update(@Req() req: Request, @Body() data: TUpdateUser, @UploadedFile() media?: Express.MulterS3.File) {
     return await this.userService.put(req.user, data, media);
+  }
+
+  @ApiNoContentResponse({ description: 'No Content' })
+  @ApiUnauthorizedResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 401,
+        },
+        message: {
+          type: 'string',
+          example: 'Unauthorized'
+        }
+      }
+    }
+  })
+  @ApiForbiddenResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 403,
+        },
+        message: {
+          type: 'string',
+          example: 'Você não tem permissão'
+        }
+      }
+    }
+  })
+  @ApiNotFoundResponse({
+    description: 'Not Found',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 404
+        },
+        message: {
+          type: 'string',
+          example: 'Usuário não encontrado',
+        },
+      }
+    }
+  })
+  @ApiParam({ name: 'id', required: true })
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RoleDecorator('admin')
+  @Patch(':id')
+  @HttpCode(204)
+  async restore(@Param('id') id: number) {
+    return await this.userService.restore(id);
   }
 
   @ApiNoContentResponse({ description: 'No Content' })

@@ -19,3 +19,10 @@ type TCreateUser = {
 type TUpdateUser = Partial<TCreateUser> & {
   oldPassword?: string;
 };
+
+type TFilterUser = {
+  gender?: string
+  googleId?: boolean
+  uf?: string
+  inactives?: boolean
+}

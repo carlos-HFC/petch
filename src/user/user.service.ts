@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { differenceInCalendarYears, isValid, parseISO } from 'date-fns';
+import { Op as $ } from 'sequelize';
 
 import { User } from './user.model';
 import { RoleService } from '../role/role.service';
@@ -16,12 +17,21 @@ export class UserService {
     private uploadService: UploadService,
   ) { }
 
-  async get() {
-    return await this.userModel.findAll();
+  async get(query?: TFilterUser) {
+    const options = {};
+
+    if (query.uf) Object.assign(options, { uf: query.uf.toUpperCase() });
+    if (query.gender) Object.assign(options, { gender: query.gender.toUpperCase() });
+    if (query.googleId) Object.assign(options, { googleId: { [$.not]: null } });
+
+    return await this.userModel.findAll({
+      paranoid: !query.inactives,
+      where: { ...options }
+    });
   }
 
-  async findById(id: number) {
-    const user = await this.userModel.findByPk(id);
+  async findById(id: number, inactives?: boolean) {
+    const user = await this.userModel.findByPk(id, { paranoid: !inactives });
 
     if (!user) throw new HttpException('Usuário não encontrado', 404);
 
@@ -146,6 +156,12 @@ export class UserService {
     const user = await this.findById(id);
 
     await user.destroy();
+  }
+
+  async restore(id: number) {
+    const user = await this.findById(id, true);
+
+    await user.restore();
   }
 
   async confirmRegister(email: string, tokenVerificationEmail: string) {
