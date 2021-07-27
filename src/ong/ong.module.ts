@@ -6,6 +6,7 @@ import { OngController } from './ong.controller';
 import { Ong } from './ong.model';
 import { OngSeed } from './ong.seed';
 import { OngService } from './ong.service';
+import { UploadService } from '../upload.service';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { OngService } from './ong.service';
     SequelizeModule.forFeature([Ong])
   ],
   controllers: [OngController],
-  providers: [OngService],
+  providers: [OngService, UploadService],
   exports: [OngService],
 })
 export class OngModule { }

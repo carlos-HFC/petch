@@ -10,6 +10,9 @@ export class Ong {
   @ApiProperty({ type: 'string', uniqueItems: true })
   email: string;
 
+  @ApiProperty({ type: 'string', required: false })
+  logo: string;
+
   @ApiProperty({ type: 'string' })
   phone1: string;
 
@@ -50,6 +53,9 @@ export class Ong {
   deletedAt: Date | null;
 }
 
-export class CreateOng extends OmitType(Ong, ['createdAt', 'updatedAt', 'deletedAt', 'id']) { }
+export class CreateOng extends OmitType(Ong, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'logo']) {
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
+  media: string;
+}
 
 export class UpdateOng extends PartialType(CreateOng) { }

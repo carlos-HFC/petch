@@ -1,5 +1,6 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBody, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
 
 import { OngService } from './ong.service';
 import { CreateOng, Ong, UpdateOng } from './ong.swagger';
@@ -13,8 +14,8 @@ export class OngController {
 
   @ApiOkResponse({ type: [Ong], description: 'Success' })
   @Get()
-  async index() {
-    return await this.ongService.get();
+  async index(@Query() query?: TFilterOng) {
+    return await this.ongService.get(query);
   }
 
   @ApiOkResponse({ type: Ong, description: 'Success' })
@@ -61,10 +62,12 @@ export class OngController {
       }
     }
   })
+  @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateOng })
   @Post()
-  async create(@Body() data: TCreateOng) {
-    return await this.ongService.post(data);
+  @UseInterceptors(FileInterceptor('media'))
+  async create(@Body() data: TCreateOng, @UploadedFile() media?: Express.MulterS3.File) {
+    return await this.ongService.post(data, media);
   }
 
   @ApiOkResponse({ description: 'Success' })
@@ -104,11 +107,13 @@ export class OngController {
       }
     }
   })
+  @ApiConsumes('multipart/form-data')
   @ApiParam({ name: 'id', required: true })
   @ApiBody({ type: UpdateOng })
   @Put(':id')
-  async update(@Param('id') id: number, @Body() data: TUpdateOng) {
-    return await this.ongService.put(id, data);
+  @UseInterceptors(FileInterceptor('media'))
+  async update(@Param('id') id: number, @Body() data: TUpdateOng, @UploadedFile() media?: Express.MulterS3.File) {
+    return await this.ongService.put(id, data, media);
   }
 
   @ApiNoContentResponse({ description: 'No Content' })
