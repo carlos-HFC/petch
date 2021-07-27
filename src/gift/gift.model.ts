@@ -24,12 +24,6 @@ export class Gift extends Model {
   })
   description: string;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  coverage: string;
-
   @Column(DataType.STRING)
   size: string;
 
@@ -54,7 +48,6 @@ export class Gift extends Model {
 
   @BeforeSave
   static async formatData(gift: Gift) {
-    gift.coverage = gift.coverage.toUpperCase();
     if (gift.size) gift.size = gift.size.toUpperCase();
     if (gift.weight) gift.weight = gift.weight.toUpperCase();
     if (gift.color) gift.color = gift.color.charAt(0).toUpperCase() + gift.color.slice(1);
