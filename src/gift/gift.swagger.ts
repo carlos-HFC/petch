@@ -35,6 +35,17 @@ export class Gift {
   deletedAt: Date | null;
 }
 
-export class CreateGift extends OmitType(Gift, ['createdAt', 'updatedAt', 'deletedAt', 'id']) { }
+export class CreateGift extends OmitType(Gift, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'media']) {
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
+  media: string;
+}
 
 export class UpdateGift extends PartialType(CreateGift) { }
+
+export class FilterGift {
+  @ApiProperty({ type: 'boolean', required: false })
+  inactives: boolean;
+
+  @ApiProperty({ type: 'string', required: false })
+  name: string;
+}

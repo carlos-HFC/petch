@@ -1,12 +1,16 @@
 type TCreateGift = {
-  partnerId: number
+  partnerId: number;
   name: string;
   description: string;
-  coverage: string;
   color?: string;
   size?: string;
   weight?: string;
   taste?: string;
-}
+};
 
-type TUpdateGift = Partial<TCreateGift>
+type TUpdateGift = Partial<TCreateGift>;
+
+type TFilterGift = {
+  inactives?: boolean;
+  name?: string;
+};

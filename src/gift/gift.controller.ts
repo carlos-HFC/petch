@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { GiftService } from './gift.service';
-import { CreateGift, Gift, UpdateGift } from './gift.swagger';
+import { CreateGift, FilterGift, Gift, UpdateGift } from './gift.swagger';
 
 @ApiTags('Gifts')
 @Controller('gifts')
@@ -13,10 +13,10 @@ export class GiftController {
   ) { }
 
   @ApiOkResponse({ type: [Gift], description: 'Success' })
-  @ApiQuery({ name: 'inactives', type: 'boolean', required: false })
+  @ApiQuery({ type: FilterGift, required: false })
   @Get()
-  async index(@Query('inactives') inactives: boolean) {
-    return await this.giftService.get(inactives);
+  async index(@Query() query: TFilterGift) {
+    return await this.giftService.get(query);
   }
 
   @ApiOkResponse({ type: Gift, description: 'Success' })
@@ -98,8 +98,8 @@ export class GiftController {
       }
     }
   })
-  @ApiParam({ name: 'id', required: true })
   @ApiConsumes('multipart/form-data')
+  @ApiParam({ name: 'id', required: true })
   @ApiBody({ type: UpdateGift })
   @Put(':id')
   @UseInterceptors(FileInterceptor('media'))

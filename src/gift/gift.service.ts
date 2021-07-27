@@ -1,5 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op as $ } from 'sequelize';
 
 import { Gift } from './gift.model';
 import { UploadService } from '../upload.service';
@@ -15,9 +16,19 @@ export class GiftService {
     private uploadService: UploadService
   ) { }
 
-  async get(inactives?: boolean) {
-    if (inactives) return await this.giftModel.findAll({ paranoid: false });
-    return await this.giftModel.findAll();
+  async get(query?: TFilterGift) {
+    const where = {};
+
+    if (query.name) Object.assign(where, {
+      name: {
+        [$.startsWith]: query.name.normalize().toLowerCase().trim()
+      }
+    });
+
+    return await this.giftModel.findAll({
+      paranoid: !query.inactives,
+      where
+    });
   }
 
   async findById(id: number, inactives?: boolean) {
