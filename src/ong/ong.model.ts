@@ -15,6 +15,9 @@ export class Ong extends Model {
     unique: true
   })
   email: string;
+  
+  @Column(DataType.STRING)
+  logo: string;
 
   @Column({
     type: DataType.STRING,
