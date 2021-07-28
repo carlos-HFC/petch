@@ -12,7 +12,8 @@
     "baseUrl": "./",
     "incremental": true,
     "lib": [
-      "ESNext.String"
+      "ESNext.String",
+      "ESNext.Array",
     ]
   }
 }
