@@ -1,9 +1,9 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { OngService } from './ong.service';
-import { CreateOng, Ong, UpdateOng } from './ong.swagger';
+import { CreateOng, FilterOng, Ong, UpdateOng } from './ong.swagger';
 
 @ApiTags('ONGs')
 @Controller('ongs')
@@ -13,6 +13,7 @@ export class OngController {
   ) { }
 
   @ApiOkResponse({ type: [Ong], description: 'Success' })
+  @ApiQuery({ type: FilterOng, required: false })
   @Get()
   async index(@Query() query?: TFilterOng) {
     return await this.ongService.get(query);
@@ -37,8 +38,8 @@ export class OngController {
   })
   @ApiParam({ name: 'id', required: true })
   @Get(':id')
-  async byId(@Param('id') id: number) {
-    return await this.ongService.findById(id);
+  async byId(@Param('id') id: number, @Query('inactives') inactives?: boolean) {
+    return await this.ongService.findById(id, inactives);
   }
 
   @ApiCreatedResponse({ type: Ong, description: 'Created' })

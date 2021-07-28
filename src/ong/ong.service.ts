@@ -1,5 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op as $ } from 'sequelize';
 
 import { Ong } from './ong.model';
 import { trimObj, validateCEP, validateEmail, validatePhone } from '../utils';
@@ -14,11 +15,33 @@ export class OngService {
   ) { }
 
   async get(query?: TFilterOng) {
-    return await this.ongModel.findAll();
+    trimObj(query);
+    const where = {};
+
+    if (query.name) Object.assign(where, { name: { [$.startsWith]: query.name.normalize().toLowerCase() } });
+    if (query.uf) Object.assign(where, { uf: query.uf.toUpperCase() });
+
+    if (query.actingStates) {
+      const ongs = await this.ongModel.findAll({
+        paranoid: !query.inactives,
+        where
+      });
+
+      const states = query.actingStates.toUpperCase().split(',').map(acting => acting.trim());
+
+      const ongsFiltered = states.flatMap(state => ongs.filter(ong => ong.actingStates.includes(state)));
+
+      return [...new Map(ongsFiltered.map(ong => [ong['id'], ong])).values()].sort((a, b) => a.id < b.id ? - 1 : 1);
+    }
+
+    return await this.ongModel.findAll({
+      paranoid: !query.inactives,
+      where
+    });
   }
 
-  async findById(id: number) {
-    const ong = await this.ongModel.findByPk(id);
+  async findById(id: number, inactives?: boolean) {
+    const ong = await this.ongModel.findByPk(id, { paranoid: !inactives });
 
     if (!ong) throw new HttpException('ONG não encontrada', 404);
 

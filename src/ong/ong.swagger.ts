@@ -59,3 +59,17 @@ export class CreateOng extends OmitType(Ong, ['createdAt', 'updatedAt', 'deleted
 }
 
 export class UpdateOng extends PartialType(CreateOng) { }
+
+export class FilterOng {
+  @ApiProperty({ type: 'string', required: false })
+  name?: string;
+
+  @ApiProperty({ type: 'string', required: false })
+  uf?: string;
+
+  @ApiProperty({ type: 'string', required: false })
+  actingStates?: string;
+
+  @ApiProperty({ type: 'boolean', required: false })
+  inactives?: boolean;
+}
