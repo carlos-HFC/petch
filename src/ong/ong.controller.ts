@@ -37,6 +37,7 @@ export class OngController {
     }
   })
   @ApiParam({ name: 'id', required: true })
+  @ApiQuery({ name: 'inactives', type: 'string', required: false })
   @Get(':id')
   async byId(@Param('id') id: number, @Query('inactives') inactives?: boolean) {
     return await this.ongService.findById(id, inactives);
