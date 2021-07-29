@@ -66,4 +66,16 @@ export class Partner {
 }
 
 export class CreatePartner extends OmitType(Partner, ['createdAt', 'updatedAt', 'deletedAt', 'id']) { }
+
 export class UpdatePartner extends PartialType(Partner) { }
+
+export class FilterPartner {
+  @ApiProperty({ type: 'boolean', required: false })
+  inactives?: boolean;
+
+  @ApiProperty({ type: 'string', required: false })
+  fantasyName?: string;
+
+  @ApiProperty({ type: 'string', required: false })
+  uf?: string;
+}

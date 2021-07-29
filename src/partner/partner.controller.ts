@@ -1,9 +1,9 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { PartnerService } from './partner.service';
-import { CreatePartner, Partner, UpdatePartner } from './partner.swagger';
+import { CreatePartner, FilterPartner, Partner, UpdatePartner } from './partner.swagger';
 
 @ApiTags('Partners')
 @Controller('partners')
@@ -13,9 +13,10 @@ export class PartnerController {
   ) { }
 
   @ApiOkResponse({ type: [Partner], description: 'Success' })
+  @ApiQuery({ type: FilterPartner, required: false })
   @Get()
-  async index() {
-    return await this.partnerService.get();
+  async index(@Query() query?: TFilterPartner) {
+    return await this.partnerService.get(query);
   }
 
   @ApiOkResponse({ type: Partner, description: 'Success' })
@@ -36,9 +37,10 @@ export class PartnerController {
     }
   })
   @ApiParam({ name: 'id', required: true })
+  @ApiQuery({ name: 'inactives', type: 'boolean', required: false })
   @Get(':id')
-  async byId(@Param('id') id: number) {
-    return await this.partnerService.findById(id);
+  async byId(@Param('id') id: number, @Query('inactives') inactives?: boolean) {
+    return await this.partnerService.findById(id, inactives);
   }
 
   @ApiCreatedResponse({ type: Partner, description: 'Created' })
@@ -112,5 +114,29 @@ export class PartnerController {
   @HttpCode(204)
   async delete(@Param('id') id: number) {
     return await this.partnerService.delete(id);
+  }
+
+  @ApiNoContentResponse({ description: 'No Content' })
+  @ApiNotFoundResponse({
+    description: 'Not Found',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 404,
+        },
+        message: {
+          type: 'string',
+          example: 'Parceiro não encontrado',
+        },
+      }
+    }
+  })
+  @ApiParam({ name: 'id', required: true })
+  @Patch(':id')
+  @HttpCode(204)
+  async restore(@Param('id') id: number) {
+    return await this.partnerService.restore(id);
   }
 }

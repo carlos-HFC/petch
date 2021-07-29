@@ -18,3 +18,9 @@ type TCreatePartner = {
 };
 
 type TUpdatePartner = Partial<TCreatePartner>;
+
+type TFilterPartner = {
+  inactives?: boolean
+  fantasyName?: string
+  uf?: string
+}

@@ -1,5 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Op as $ } from 'sequelize';
 
 import { Partner } from './partner.model';
 import { UploadService } from '../upload.service';
@@ -13,12 +14,21 @@ export class PartnerService {
     private uploadService: UploadService
   ) { }
 
-  async get() {
-    return await this.partnerModel.findAll();
+  async get(query?: TFilterPartner) {
+    trimObj(query);
+    const where = {};
+
+    if (query.fantasyName) Object.assign(where, { fantasyName: { [$.startsWith]: query.fantasyName.normalize().toLowerCase() } });
+    if (query.uf) Object.assign(where, { uf: query.uf.toUpperCase() });
+
+    return await this.partnerModel.findAll({
+      paranoid: !query.inactives,
+      where
+    });
   }
 
-  async findById(id: number) {
-    const partner = await this.partnerModel.findByPk(id);
+  async findById(id: number, inactives?: boolean) {
+    const partner = await this.partnerModel.findByPk(id, { paranoid: !inactives });
 
     if (!partner) throw new HttpException('ONG não encontrada', 404);
 
@@ -27,7 +37,6 @@ export class PartnerService {
 
   async findByEmail(email: string) {
     validateEmail(email);
-
     return await this.partnerModel.findOne({
       where: {
         email: email.trim().toLowerCase()
@@ -37,7 +46,6 @@ export class PartnerService {
 
   async findByCNPJ(cnpj: string) {
     validateCNPJ(cnpj);
-
     return await this.partnerModel.findOne({
       where: {
         cnpj: cnpj.replace(/[\/\s.-]/g, '')
@@ -105,5 +113,11 @@ export class PartnerService {
     const partner = await this.findById(id);
 
     await partner.destroy();
+  }
+
+  async restore(id: number) {
+    const partner = await this.findById(id, true);
+
+    await partner.restore();
   }
 }
