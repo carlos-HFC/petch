@@ -1,19 +1,10 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { BeforeSave, Column, DataType, Model, Table } from 'sequelize-typescript';
+import { BeforeSave, Column, DataType, Model, NotEmpty, Table } from 'sequelize-typescript';
+
+import { capitalizeFirstLetter } from '../utils';
 
 @Table({ paranoid: true })
 export class Species extends Model {
-  @ApiProperty({ uniqueItems: true, type: 'integer', readOnly: true })
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
-    unique: true
-  })
-  id: number;
-
-  @ApiProperty({ type: 'string', uniqueItems: true })
+  @NotEmpty({ msg: "Campo 'Nome' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -21,17 +12,11 @@ export class Species extends Model {
   })
   name: string;
 
-  @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
-  createdAt: Date;
-
-  @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
-  updatedAt: Date;
-
-  @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
-  deletedAt: Date | null;
+  @Column(DataType.STRING)
+  avatar: string;
 
   @BeforeSave
   static async upperFirst(species: Species) {
-    return species.name = species.name.charAt(0).toUpperCase() + species.name.slice(1);
+    return species.name = capitalizeFirstLetter(species.name);
   }
 }

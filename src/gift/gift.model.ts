@@ -1,6 +1,7 @@
-import { BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, Table } from 'sequelize-typescript';
+import { BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, NotEmpty, Table } from 'sequelize-typescript';
 
 import { Partner } from '../partner/partner.model';
+import { capitalizeFirstLetter } from '../utils';
 
 @DefaultScope(() => ({
   include: [
@@ -12,12 +13,14 @@ import { Partner } from '../partner/partner.model';
 }))
 @Table({ paranoid: true })
 export class Gift extends Model {
+  @NotEmpty({ msg: "Campo 'Nome' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   name: string;
 
+  @NotEmpty({ msg: "Campo 'Descrição' não pode ser vazio" })
   @Column({
     type: DataType.TEXT,
     allowNull: false,
@@ -50,7 +53,7 @@ export class Gift extends Model {
   static async formatData(gift: Gift) {
     if (gift.size) gift.size = gift.size.toUpperCase();
     if (gift.weight) gift.weight = gift.weight.toUpperCase();
-    if (gift.color) gift.color = gift.color.charAt(0).toUpperCase() + gift.color.slice(1);
-    if (gift.taste) gift.taste = gift.taste.charAt(0).toUpperCase() + gift.taste.slice(1);
+    if (gift.color) gift.color = capitalizeFirstLetter(gift.color);
+    if (gift.taste) gift.taste = capitalizeFirstLetter(gift.taste);
   }
 }

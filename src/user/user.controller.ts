@@ -126,6 +126,7 @@ export class UserController {
           type: 'string',
           oneOf: [
             { example: 'Arquivo não suportado' },
+            { example: 'Campo "X" não pode ser vazio' },
             { example: 'Usuário já cadastrado' },
             { example: 'CEP inválido' },
             { example: 'CPF inválido' },
@@ -195,6 +196,7 @@ export class UserController {
           type: 'string',
           oneOf: [
             { example: 'Arquivo não suportado' },
+            { example: 'Campo "X" não pode ser vazio' },
             { example: 'Usuário já cadastrado' },
             { example: 'CEP inválido' },
             { example: 'CPF inválido' },

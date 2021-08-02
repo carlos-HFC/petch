@@ -1,6 +1,6 @@
 import { compare, hash } from 'bcrypt';
 import { format, parseISO } from 'date-fns';
-import { BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, Table } from 'sequelize-typescript';
+import { BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, NotEmpty, Table } from 'sequelize-typescript';
 
 import { Role } from '../role/role.model';
 
@@ -16,6 +16,7 @@ export class User extends Model {
   })
   googleId: string;
 
+  @NotEmpty({ msg: "Campo 'Nome' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -25,6 +26,7 @@ export class User extends Model {
   @Column(DataType.STRING)
   avatar: string;
 
+  @NotEmpty({ msg: "Campo 'E-mail' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     unique: true,
@@ -48,6 +50,7 @@ export class User extends Model {
   @Column(DataType.VIRTUAL)
   password: string;
 
+  @NotEmpty({ msg: "Campo 'CPF' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     unique: true,
@@ -55,24 +58,28 @@ export class User extends Model {
   })
   cpf: string;
 
+  @NotEmpty({ msg: "Campo 'Data de Nascimento' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   birthday: string;
 
+  @NotEmpty({ msg: "Campo 'Gênero' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   gender: string;
 
+  @NotEmpty({ msg: "Campo 'CEP' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   cep: string;
 
+  @NotEmpty({ msg: "Campo 'Endereço' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -82,24 +89,28 @@ export class User extends Model {
   @Column(DataType.STRING)
   complement: string;
 
+  @NotEmpty({ msg: "Campo 'Bairro' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   district: string;
 
+  @NotEmpty({ msg: "Campo 'Cidade' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   city: string;
 
+  @NotEmpty({ msg: "Campo 'UF' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   uf: string;
 
+  @NotEmpty({ msg: "Campo 'Telefone' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,

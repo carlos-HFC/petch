@@ -53,7 +53,10 @@ export class GiftController {
         },
         message: {
           type: 'string',
-          example: 'Arquivo não suportado'
+          oneOf: [
+            { example: 'Arquivo não suportado' },
+            { example: 'Campo "X" não pode ser vazio' },
+          ]
         },
       }
     }
@@ -78,7 +81,10 @@ export class GiftController {
         },
         message: {
           type: 'string',
-          example: 'Arquivo não suportado'
+          oneOf: [
+            { example: 'Arquivo não suportado' },
+            { example: 'Campo "X" não pode ser vazio' },
+          ]
         },
       }
     }

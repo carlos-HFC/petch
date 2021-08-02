@@ -59,6 +59,7 @@ export class OngController {
             { example: 'E-mail inválido' },
             { example: 'Número de telefone/celular inválido' },
             { example: 'ONG já cadastrada' },
+            { example: 'Campo "X" não pode ser vazio' },
           ]
         },
       }
@@ -88,6 +89,7 @@ export class OngController {
             { example: 'E-mail inválido' },
             { example: 'Número de telefone/celular inválido' },
             { example: 'ONG já cadastrada' },
+            { example: 'Campo "X" não pode ser vazio' },
           ]
         },
       }

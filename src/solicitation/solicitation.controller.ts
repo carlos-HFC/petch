@@ -124,6 +124,7 @@ export class SolicitationController {
           type: 'string',
           oneOf: [
             { example: 'Arquivo não suportado' },
+            { example: 'Campo "X" não pode ser vazio' },
             { example: 'Descrição é obrigatória' },
             { example: 'E-mail é obrigatório' },
             { example: 'E-mail inválido' },

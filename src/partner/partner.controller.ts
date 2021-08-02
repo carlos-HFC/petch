@@ -54,7 +54,10 @@ export class PartnerController {
         },
         message: {
           type: 'string',
-          example: 'Arquivo não suportado'
+          oneOf: [
+            { example: 'Arquivo não suportado' },
+            { example: 'Campo "X" não pode ser vazio' },
+          ]
         },
       }
     }
@@ -78,7 +81,10 @@ export class PartnerController {
         },
         message: {
           type: 'string',
-          example: 'Arquivo não suportado'
+          oneOf: [
+            { example: 'Arquivo não suportado' },
+            { example: 'Campo "X" não pode ser vazio' },
+          ]
         },
       }
     }

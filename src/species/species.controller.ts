@@ -1,8 +1,9 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBody, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
-import { Species } from './species.model';
 import { SpeciesService } from './species.service';
+import { CreateSpecies, FilterSpecies, Species } from './species.swagger';
 
 @ApiTags('Species')
 @Controller('species')
@@ -12,10 +13,10 @@ export class SpeciesController {
   ) { }
 
   @ApiOkResponse({ type: [Species], description: 'Success' })
-  @ApiQuery({ name: 'name', required: false })
+  @ApiQuery({ type: FilterSpecies, required: false })
   @Get()
-  async index(@Query('name') name?: string) {
-    return await this.speciesService.get(name);
+  async index(@Query() query?: TFilterSpecies) {
+    return await this.speciesService.get(query);
   }
 
   @ApiOkResponse({ type: Species, description: 'Success' })
@@ -36,9 +37,10 @@ export class SpeciesController {
     }
   })
   @ApiParam({ name: 'id', required: true })
+  @ApiQuery({ name: 'inactives', type: 'boolean', required: false })
   @Get(':id')
-  async byId(@Param('id') id: number) {
-    return await this.speciesService.getById(id);
+  async byId(@Param('id') id: number, @Query('inactives') inactives?: boolean) {
+    return await this.speciesService.findById(id, inactives);
   }
 
   @ApiCreatedResponse({ type: Species, description: 'Created' })
@@ -52,15 +54,21 @@ export class SpeciesController {
         },
         message: {
           type: 'string',
-          example: 'Espécie já cadastrada'
+          oneOf: [
+            { example: 'Arquivo não suportado' },
+            { example: 'Espécie já cadastrada' },
+            { example: 'Campo "Nome" não pode ser vazio' },
+          ]
         },
       }
     }
   })
-  @ApiBody({ type: Species })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: CreateSpecies })
   @Post()
-  async create(@Body() data: { name: string; }) {
-    return await this.speciesService.post(data.name);
+  @UseInterceptors(FileInterceptor('media'))
+  async create(@Body() data: TCreateSpecies, @UploadedFile() media?: Express.MulterS3.File) {
+    return await this.speciesService.post(data, media);
   }
 
   @ApiOkResponse({ description: 'Success' })
@@ -74,7 +82,11 @@ export class SpeciesController {
         },
         message: {
           type: 'string',
-          example: 'Espécie já cadastrada'
+          oneOf: [
+            { example: 'Arquivo não suportado' },
+            { example: 'Espécie já cadastrada' },
+            { example: 'Campo "Nome" não pode ser vazio' },
+          ]
         },
       }
     }
@@ -98,8 +110,9 @@ export class SpeciesController {
   @ApiBody({ type: Species })
   @ApiParam({ name: 'id', required: true })
   @Put(':id')
-  async update(@Param('id') id: number, @Body() data: { name: string; }) {
-    return await this.speciesService.put(id, data.name);
+  @UseInterceptors(FileInterceptor('media'))
+  async update(@Param('id') id: number, @Body() data: TUpdateSpecies, @UploadedFile() media?: Express.MulterS3.File) {
+    return await this.speciesService.put(id, data, media);
   }
 
   @ApiNoContentResponse({ description: 'No Content' })
@@ -123,6 +136,30 @@ export class SpeciesController {
   @Delete(':id')
   @HttpCode(204)
   async delete(@Param('id') id: number) {
-    return await this.speciesService.delete(id)
+    return await this.speciesService.delete(id);
+  }
+
+  @ApiNoContentResponse({ description: 'No Content' })
+  @ApiNotFoundResponse({
+    description: 'Not Found',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 404,
+        },
+        message: {
+          type: 'string',
+          example: 'Espécie não encontrada',
+        },
+      }
+    }
+  })
+  @ApiParam({ name: 'id', required: true })
+  @Patch(':id')
+  @HttpCode(204)
+  async restore(@Param('id') id: number) {
+    return await this.speciesService.restore(id);
   }
 }
