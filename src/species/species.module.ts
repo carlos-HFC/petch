@@ -6,6 +6,7 @@ import { SpeciesController } from './species.controller';
 import { Species } from './species.model';
 import { SpeciesSeed } from './species.seed';
 import { SpeciesService } from './species.service';
+import { UploadService } from '../upload.service';
 
 @Module({
   imports: [
@@ -13,7 +14,7 @@ import { SpeciesService } from './species.service';
     SequelizeModule.forFeature([Species])
   ],
   controllers: [SpeciesController],
-  providers: [SpeciesService],
+  providers: [SpeciesService, UploadService],
   exports: [SpeciesService],
 })
 export class SpeciesModule { }
