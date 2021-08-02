@@ -3,9 +3,9 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Op as $ } from 'sequelize';
 
 import { Gift } from './gift.model';
+import { PartnerService } from '../partner/partner.service';
 import { UploadService } from '../upload.service';
 import { trimObj } from '../utils';
-import { PartnerService } from 'src/partner/partner.service';
 
 @Injectable()
 export class GiftService {
@@ -17,11 +17,12 @@ export class GiftService {
   ) { }
 
   async get(query?: TFilterGift) {
+    trimObj(query);
     const where = {};
 
     if (query.name) Object.assign(where, {
       name: {
-        [$.startsWith]: query.name.normalize().toLowerCase().trim()
+        [$.startsWith]: query.name.normalize().toLowerCase()
       }
     });
 
@@ -42,29 +43,39 @@ export class GiftService {
   async post(data: TCreateGift, media?: Express.MulterS3.File) {
     trimObj(data);
 
-    await this.partnerService.findById(data.partnerId);
+    try {
+      if (data.partnerId) await this.partnerService.findById(data.partnerId);
 
-    const file = media && await this.uploadService.uploadFile(media);
+      if (media) {
+        const file = (await this.uploadService.uploadFile(media)).url;
+        Object.assign(data, { media: file });
+      }
 
-    if (file) Object.assign(data, { media: file.url });
+      const gift = await this.giftModel.create({ ...data });
 
-    const gift = await this.giftModel.create({ ...data });
-
-    return gift;
+      return gift;
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
   }
 
   async put(id: number, data: TUpdateGift, media?: Express.MulterS3.File) {
     trimObj(data);
 
-    const gift = await this.findById(id);
+    try {
+      const gift = await this.findById(id);
 
-    if (data.partnerId) await this.partnerService.findById(data.partnerId);
+      if (data.partnerId) await this.partnerService.findById(data.partnerId);
 
-    const file = media && await this.uploadService.uploadFile(media);
+      if (media) {
+        const file = (await this.uploadService.uploadFile(media)).url;
+        Object.assign(data, { media: file });
+      }
 
-    if (file) Object.assign(data, { media: file.url });
-
-    await gift.update({ ...data });
+      await gift.update({ ...data });
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
   }
 
   async delete(id: number) {

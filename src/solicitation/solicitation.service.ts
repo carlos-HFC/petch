@@ -1,11 +1,11 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { SolicitationTypesService } from 'src/solicitationTypes/solicitationTypes.service';
-import { UploadService } from 'src/upload.service';
-import { User } from 'src/user/user.model';
-import { trimObj, validateEmail } from 'src/utils';
 
 import { Solicitation } from './solicitation.model';
+import { SolicitationTypesService } from '../solicitationTypes/solicitationTypes.service';
+import { UploadService } from '../upload.service';
+import { User } from '../user/user.model';
+import { trimObj, validateEmail } from '../utils';
 
 @Injectable()
 export class SolicitationService {
@@ -31,31 +31,35 @@ export class SolicitationService {
   async post(data: TCreateSolicitation, media?: Express.MulterS3.File, user?: User) {
     trimObj(data);
 
-    await this.solicitationTypeService.findById(data.solicitationTypeId);
+    try {
+      await this.solicitationTypeService.findById(data.solicitationTypeId);
 
-    if (!data.description) throw new HttpException('Descrição é obrigatória', 400);
+      if (media) {
+        const image = (await this.uploadService.uploadFile(media)).url;
+        Object.assign(data, { image });
+      }
 
-    const file = media && await this.uploadService.uploadFile(media);
+      if (user) {
+        if (data.name) delete data.name;
+        if (data.email) delete data.email;
 
-    if (file) Object.assign(data, { image: file.url });
+        const solicitation = await this.solicitationModel.create({
+          ...data,
+          userId: user.id
+        });
 
-    if (user) {
-      if (data.name) delete data.name;
-      if (data.email) delete data.email;
+        return solicitation;
+      }
 
-      const solicitation = await this.solicitationModel.create({
-        ...data,
-        userId: user.id
-      });
+      if (!data.email) throw new HttpException('E-mail é obrigatório', 400);
+      validateEmail(data.email);
+
+      const solicitation = await this.solicitationModel.create({ ...data });
 
       return solicitation;
+    } catch (error) {
+      throw new HttpException(error, 400);
     }
-
-    if (!data.email) throw new HttpException('E-mail é obrigatório', 400);
-
-    validateEmail(data.email);
-
-    return await this.solicitationModel.create({ ...data });
   }
 
   async put(data: object) { }

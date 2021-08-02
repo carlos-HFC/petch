@@ -39,7 +39,7 @@ export class PartnerService {
     validateEmail(email);
     return await this.partnerModel.findOne({
       where: {
-        email: email.trim().toLowerCase()
+        email: email.toLowerCase()
       }
     });
   }
@@ -63,50 +63,60 @@ export class PartnerService {
 
   async post(data: TCreatePartner, media?: Express.MulterS3.File) {
     trimObj(data);
-    validateCEP(data.cep);
-    validatePhone(data.phone1);
-    if (data.phone2) validatePhone(data.phone2);
-    if (data.phone3) validatePhone(data.phone3);
 
-    if (await this.findByEmail(data.email) || await this.findByCNPJ(data.cnpj) || await this.findByStateRegistration(data.stateRegistration)) throw new HttpException('Parceiro já cadastrado', 400);
+    try {
+      validateCEP(data.cep);
+      validatePhone(data.phone1);
+      if (data.phone2) validatePhone(data.phone2);
+      if (data.phone3) validatePhone(data.phone3);
 
-    const file = media ? await this.uploadService.uploadFile(media) : null;
+      if (await this.findByEmail(data.email) || await this.findByCNPJ(data.cnpj) || await this.findByStateRegistration(data.stateRegistration)) throw new HttpException('Parceiro já cadastrado', 400);
 
-    const partner = await this.partnerModel.create({
-      ...data,
-      logo: file && file.url
-    });
+      if (media) {
+        const logo = (await this.uploadService.uploadFile(media)).url;
+        Object.assign(data, { logo });
+      }
 
-    return partner;
+      const partner = await this.partnerModel.create({ ...data });
+
+      return partner;
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
   }
 
   async put(id: number, data: TUpdatePartner, media?: Express.MulterS3.File) {
     trimObj(data);
-    if (data.cep) validateCEP(data.cep);
-    if (data.phone1) validatePhone(data.phone1);
-    if (data.phone2) validatePhone(data.phone2);
-    if (data.phone3) validatePhone(data.phone3);
 
-    const partner = await this.findById(id);
+    try {
+      if (data.cep) validateCEP(data.cep);
+      if (data.phone1) validatePhone(data.phone1);
+      if (data.phone2) validatePhone(data.phone2);
+      if (data.phone3) validatePhone(data.phone3);
 
-    if (data.email && data.email !== partner.email) {
-      if (await this.findByEmail(data.email)) throw new HttpException('Parceiro já cadastrado', 400);
+      const partner = await this.findById(id);
+
+      if (data.email && data.email !== partner.email) {
+        if (await this.findByEmail(data.email)) throw new HttpException('Parceiro já cadastrado', 400);
+      }
+
+      if (data.cnpj && data.cnpj !== partner.cnpj) {
+        if (await this.findByCNPJ(data.cnpj)) throw new HttpException('Parceiro já cadastrado', 400);
+      }
+
+      if (data.stateRegistration && data.stateRegistration !== partner.stateRegistration) {
+        if (await this.findByStateRegistration(data.stateRegistration)) throw new HttpException('Parceiro já cadastrado', 400);
+      }
+
+      if (media) {
+        const logo = (await this.uploadService.uploadFile(media)).url;
+        Object.assign(data, { logo });
+      }
+
+      await partner.update({ ...data });
+    } catch (error) {
+      throw new HttpException(error, 400)
     }
-
-    if (data.cnpj && data.cnpj !== partner.cnpj) {
-      if (await this.findByCNPJ(data.cnpj)) throw new HttpException('Parceiro já cadastrado', 400);
-    }
-
-    if (data.stateRegistration && data.stateRegistration !== partner.stateRegistration) {
-      if (await this.findByStateRegistration(data.stateRegistration)) throw new HttpException('Parceiro já cadastrado', 400);
-    }
-
-    const file = media ? await this.uploadService.uploadFile(media) : null;
-
-    await partner.update({
-      ...data,
-      logo: file && file.url
-    });
   }
 
   async delete(id: number) {
