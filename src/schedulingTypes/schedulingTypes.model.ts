@@ -1,6 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { BeforeSave, Column, DataType, Model, Table } from 'sequelize-typescript';
 
+import { capitalizeFirstLetter } from '../utils';
+
 @Table({ paranoid: true })
 export class SchedulingTypes extends Model {
   @ApiProperty({ uniqueItems: true, type: 'integer', readOnly: true })
@@ -30,6 +32,6 @@ export class SchedulingTypes extends Model {
 
   @BeforeSave
   static async upperFirst(schedulingTypes: SchedulingTypes) {
-    return schedulingTypes.name = schedulingTypes.name.charAt(0).toUpperCase() + schedulingTypes.name.slice(1);
+    return schedulingTypes.name = capitalizeFirstLetter(schedulingTypes.name);
   }
 }

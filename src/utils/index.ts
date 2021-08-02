@@ -7,10 +7,14 @@ export function trimObj(obj: object) {
   }
 }
 
-export function validateEmail(email: string) {
-  const regex = /\S+@\S+\.\S+/;
+export function capitalizeFirstLetter(str: string) {
+  trimObj({ str });
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
-  email = email.trim();
+export function validateEmail(email: string) {
+  trimObj({ email });
+  const regex = /\S+@\S+\.\S+/;
 
   if (!regex.test(email)) throw new HttpException('E-mail inválido', 400);
 }
@@ -60,9 +64,8 @@ export function validateCPF(cpf: string) {
 }
 
 export function validatePassword(password: string) {
+  trimObj({ password });
   const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[-_@#$!%/+*=()?&,.:;?|])[A-Za-z\d-_@#$!%/+*=()?&,.:;?|]/;
-
-  password = password.trim();
 
   if (password.length < 7) throw new HttpException('Senha muito curta', 400);
   if (!regex.test(password)) throw new HttpException('Senha precisa ter uma letra maiúscula, uma letra minúscula, um caractere especial e um número', 400);
