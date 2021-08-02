@@ -10,7 +10,7 @@ type TCreateOng = {
   complement?: string;
   city: string;
   uf: string;
-  actingStates: string;
+  coverage: string;
 };
 
 type TUpdateOng = Partial<TCreateOng>;
@@ -19,5 +19,5 @@ type TFilterOng = {
   inactives?: boolean;
   name?: string;
   uf?: string;
-  actingStates?: string;
+  coverage?: string;
 };

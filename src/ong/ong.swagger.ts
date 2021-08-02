@@ -41,7 +41,7 @@ export class Ong {
   uf: string;
 
   @ApiProperty({ type: 'string' })
-  actingStates: string;
+  coverage: string;
 
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   createdAt: Date;
@@ -68,7 +68,7 @@ export class FilterOng {
   uf?: string;
 
   @ApiProperty({ type: 'string', required: false })
-  actingStates?: string;
+  coverage?: string;
 
   @ApiProperty({ type: 'boolean', required: false })
   inactives?: boolean;
