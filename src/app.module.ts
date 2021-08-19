@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { GiftModule } from './gift/gift.module';
 import { OngModule } from './ong/ong.module';
 import { PartnerModule } from './partner/partner.module';
+import { PetModule } from './pet/pet.module';
 import { RoleModule } from './role/role.module';
 import { SchedulingTypesModule } from './schedulingTypes/schedulingTypes.module';
 import { SolicitationModule } from './solicitation/solicitation.module';
@@ -57,7 +58,8 @@ import { UserModule } from './user/user.module';
     OngModule,
     PartnerModule,
     GiftModule,
-    SolicitationModule
+    SolicitationModule,
+    PetModule,
   ],
   controllers: [],
   providers: [UploadService],
