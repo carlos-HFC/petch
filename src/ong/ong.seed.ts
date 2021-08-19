@@ -20,7 +20,7 @@ export class OngSeed implements OnSeederInit {
         district: 'Parque Santo Antônio',
         city: 'São Paulo',
         uf: 'SP',
-        actingStates: 'SP, RJ, MG, ES',
+        coverage: 'SP, RJ, MG, ES',
       },
       {
         name: 'Pet Place',
@@ -33,7 +33,7 @@ export class OngSeed implements OnSeederInit {
         district: 'Forquilhinha',
         city: 'São José',
         uf: 'SC',
-        actingStates: 'SC, PR, SP',
+        coverage: 'SC, PR, SP',
       },
       {
         name: 'ONG Melhor Amigo',
@@ -47,7 +47,7 @@ export class OngSeed implements OnSeederInit {
         district: 'Cidade Pedro Mendes Carneiro',
         city: 'Sobral',
         uf: 'CE',
-        actingStates: 'CE, PE',
+        coverage: 'CE, PE',
       },
     ];
   }

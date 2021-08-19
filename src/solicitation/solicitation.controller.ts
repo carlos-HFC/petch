@@ -1,13 +1,13 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { Request } from 'express';
 
 import { SolicitationService } from './solicitation.service';
 import { CreateSolicitation, Solicitation } from './solicitation.swagger';
 import { JwtAuthGuard, OptionalAuthGuard } from '../auth/auth.guard';
 import { RoleDecorator } from '../role/role.decorator';
 import { RoleGuard } from '../role/role.guard';
-import { Request } from 'express';
-import { FileInterceptor } from '@nestjs/platform-express';
 
 @ApiTags('Solicitations')
 @Controller('solicitations')

@@ -19,15 +19,15 @@ export class UserService {
   ) { }
 
   async get(query?: TFilterUser) {
-    const options = {};
+    const where = {};
 
-    if (query.uf) Object.assign(options, { uf: query.uf.toUpperCase() });
-    if (query.gender) Object.assign(options, { gender: query.gender.toUpperCase() });
-    if (query.googleId) Object.assign(options, { googleId: { [$.not]: null } });
+    if (query.uf) Object.assign(where, { uf: query.uf.toUpperCase() });
+    if (query.gender) Object.assign(where, { gender: query.gender.toUpperCase() });
+    if (query.googleId) Object.assign(where, { googleId: { [$.not]: null } });
 
     return await this.userModel.findAll({
       paranoid: !query.inactives,
-      where: { ...options }
+      where
     });
   }
 

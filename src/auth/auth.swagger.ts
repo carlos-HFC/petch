@@ -15,7 +15,7 @@ export class GoogleLogin {
   @ApiProperty({ type: 'string' })
   googleId: string;
 
-  @ApiProperty({ type: 'string' })
+  @ApiProperty({ type: 'string', required: false })
   name: string;
 
   @ApiProperty({ type: 'string', required: false })

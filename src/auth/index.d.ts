@@ -5,8 +5,8 @@ type TLogin = {
 
 type TGoogleLogin = {
   email: string;
-  name: string;
   googleId: string;
+  name?: string;
   avatar?: string;
 };
 
