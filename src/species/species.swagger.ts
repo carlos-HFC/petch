@@ -1,4 +1,5 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
+import { CreateSize, Size } from '../size/size.swagger';
 
 export class Species {
   @ApiProperty({ type: 'integer', uniqueItems: true, readOnly: true })
@@ -10,6 +11,9 @@ export class Species {
   @ApiProperty({ type: 'string', required: false })
   avatar: string;
 
+  @ApiProperty({ type: [Size], required: false })
+  sizes: Size[];
+
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   createdAt: Date;
 
@@ -20,12 +24,18 @@ export class Species {
   deletedAt: Date | null;
 }
 
-export class CreateSpecies extends OmitType(Species, ['id', 'avatar', 'createdAt', 'updatedAt', 'deletedAt']) {
+export class CreateSpecies extends OmitType(Species, ['id', 'avatar', 'sizes', 'createdAt', 'updatedAt', 'deletedAt']) {
+  @ApiProperty({ type: [CreateSize] })
+  size: CreateSize[];
+
   @ApiProperty({ type: 'string', format: 'binary', required: false })
   media: string;
 }
 
-export class UpdateSpecies extends PartialType(CreateSpecies) { }
+export class UpdateSpecies extends PartialType(OmitType(Species, ['id', 'avatar', 'sizes', 'createdAt', 'updatedAt', 'deletedAt'])) {
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
+  media: string;
+}
 
 export class FilterSpecies {
   @ApiProperty({ type: 'boolean', required: false })

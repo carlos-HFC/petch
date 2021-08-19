@@ -1,8 +1,9 @@
-import { HttpException, Injectable } from '@nestjs/common';
+import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op as $ } from 'sequelize';
 
 import { Species } from './species.model';
+import { SizeService } from '../size/size.service';
 import { UploadService } from '../upload.service';
 import { trimObj } from '../utils';
 
@@ -11,7 +12,9 @@ export class SpeciesService {
   constructor(
     @InjectModel(Species)
     private readonly speciesModel: typeof Species,
-    private uploadService: UploadService
+    private uploadService: UploadService,
+    @Inject(forwardRef(() => SizeService))
+    private sizeService: SizeService,
   ) { }
 
   async get(query?: TFilterSpecies) {
@@ -57,7 +60,11 @@ export class SpeciesService {
         Object.assign(data, { avatar });
       }
 
-      return await this.speciesModel.create({ ...data });
+      const species = await this.speciesModel.create({ ...data });
+
+      const sizes = await Promise.all(data.size.map(size => this.sizeService.post({ ...size, speciesId: species.id })));
+
+      return { species, sizes };
     } catch (error) {
       throw new HttpException(error, 400);
     }
@@ -80,6 +87,14 @@ export class SpeciesService {
     } catch (error) {
       throw new HttpException(error, 400);
     }
+  }
+
+  async putSizes(id: number, sizeId: number, data: TUpdateSize) {
+    trimObj(data);
+
+    await this.findById(id);
+
+    return await this.sizeService.put(id, sizeId, data);
   }
 
   async delete(id: number) {

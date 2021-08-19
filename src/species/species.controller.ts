@@ -3,7 +3,8 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { SpeciesService } from './species.service';
-import { CreateSpecies, FilterSpecies, Species } from './species.swagger';
+import { CreateSpecies, FilterSpecies, Species, UpdateSpecies } from './species.swagger';
+import { UpdateSize } from '../size/size.swagger';
 
 @ApiTags('Species')
 @Controller('species')
@@ -107,12 +108,63 @@ export class SpeciesController {
       }
     }
   })
-  @ApiBody({ type: Species })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({ type: UpdateSpecies })
   @ApiParam({ name: 'id', required: true })
   @Put(':id')
   @UseInterceptors(FileInterceptor('media'))
   async update(@Param('id') id: number, @Body() data: TUpdateSpecies, @UploadedFile() media?: Express.MulterS3.File) {
     return await this.speciesService.put(id, data, media);
+  }
+
+  @ApiOkResponse({ description: 'Success' })
+  @ApiBadRequestResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 400,
+        },
+        message: {
+          type: 'string',
+          oneOf: [
+            { example: 'Porte já existente para essa espécie' },
+            { example: 'Valor inválido' },
+            { example: 'Peso Inicial não pode ser maior ou igual ao Peso Final' },
+            { example: 'Campo "Nome" não pode ser vazio' },
+            { example: 'Campo "Peso Inicial" não pode ser vazio' },
+            { example: 'Campo "Peso Final" não pode ser vazio' },
+          ]
+        },
+      }
+    }
+  })
+  @ApiNotFoundResponse({
+    description: 'Not Found',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 404,
+        },
+        message: {
+          type: 'string',
+          oneOf: [
+            { example: 'Espécie não encontrada' },
+            { example: 'Porte não encontrado' },
+          ]
+        },
+      }
+    }
+  })
+  @ApiBody({ type: UpdateSize })
+  @ApiParam({ name: 'id', required: true })
+  @ApiParam({ name: 'sizeId', required: true })
+  @Put(':id/size/:sizeId')
+  async updateSize(@Param() params: { id: number, sizeId: number; }, @Body() data: TUpdateSize) {
+    return await this.speciesService.putSizes(params.id, params.sizeId, data);
   }
 
   @ApiNoContentResponse({ description: 'No Content' })
