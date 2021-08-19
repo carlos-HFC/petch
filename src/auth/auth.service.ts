@@ -16,13 +16,19 @@ export class AuthService {
   async login(data: TLogin) {
     trimObj(data);
 
-    const user = await this.userService.findByEmail(data.email);
+    try {
+      const user = await this.userService.findByEmail(data.email);
 
-    if (!user || !(await user.checkPass(data.password))) throw new HttpException('As credenciais estão incorretas', 400);
+      if (!user || !(await user.checkPass(data.password))) throw new HttpException('As credenciais estão incorretas', 400);
 
-    const token = this.createTokenJwt(user);
+      if (!user.emailVerified) throw new HttpException('E-mail não verificado', 400);
 
-    return { token };
+      const token = this.createTokenJwt(user);
+
+      return { token };
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
   }
 
   async validate(payload: { email: string; }) {
@@ -30,58 +36,66 @@ export class AuthService {
   }
 
   async forgotPassword(email: string) {
-    const user = await this.userService.findByEmail(email);
+    try {
+      const user = await this.userService.findByEmail(email);
 
-    if (!user) throw new HttpException('Usuário não encontrado', 404);
+      if (!user) throw new HttpException('Usuário não encontrado', 404);
 
-    const token = createTokenHEX(), now = new Date().setHours(new Date().getHours() + 1);
+      const token = createTokenHEX(), now = new Date().setHours(new Date().getHours() + 1);
 
-    await user.update({
-      tokenResetPassword: token,
-      tokenResetPasswordExpires: now.toString(),
-    });
+      await user.update({
+        tokenResetPassword: token,
+        tokenResetPasswordExpires: now.toString(),
+      });
 
-    return { token };
+      return { token };
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
   }
 
   async resetPassword(data: TResetPassword) {
     trimObj(data);
 
-    const user = await this.userService.findByEmail(data.email);
+    try {
+      const user = await this.userService.findByEmail(data.email);
 
-    switch (true) {
-      case !user:
-        throw new HttpException('Usuário não encontrado', 404);
-      case !data.token:
-        throw new HttpException('Token é obrigatório', 400);
-      case data.token !== user.tokenResetPassword:
-        throw new HttpException('Token inválido', 400);
-      case isAfter(new Date(), Number(user.tokenResetPasswordExpires)):
-        throw new HttpException('Token expirou', 400);
-      default:
-        break;
+      switch (true) {
+        case !user:
+          throw new HttpException('Usuário não encontrado', 404);
+        case !data.token:
+          throw new HttpException('Token é obrigatório', 400);
+        case data.token !== user.tokenResetPassword:
+          throw new HttpException('Token inválido', 400);
+        case isAfter(new Date(), Number(user.tokenResetPasswordExpires)):
+          throw new HttpException('Token expirou', 400);
+        default:
+          break;
+      }
+
+      if (!data.password) throw new HttpException('Nova senha é obrigatória', 400);
+
+      switch (true) {
+        case await user.checkPass(data.password):
+          throw new HttpException('Nova senha não pode ser igual a senha atual', 400);
+        case data.password && !data.confirmPassword:
+          throw new HttpException('Confirmação de senha é obrigatória', 400);
+        case data.password !== data.confirmPassword:
+          throw new HttpException('Nova senha e confirmação de senha não correspondem', 400);
+        default:
+          break;
+      }
+
+      validatePassword(data.password);
+
+      await user.update({
+        ...data,
+        tokenResetPassword: null,
+        tokenResetPasswordExpires: null,
+      });
+    } catch (error) {
+      throw new HttpException(error, 400);
     }
-
-    switch (true) {
-      case !data.password:
-        throw new HttpException('Nova senha é obrigatória', 400);
-      case await user.checkPass(data.password):
-        throw new HttpException('Nova senha não pode ser igual a senha atual', 400);
-      case data.password && !data.confirmPassword:
-        throw new HttpException('Confirmação de senha é obrigatória', 400);
-      case data.password !== data.confirmPassword:
-        throw new HttpException('Nova senha e confirmação de senha não correspondem', 400);
-      default:
-        break;
-    }
-
-    validatePassword(data.password);
-
-    await user.update({
-      ...data,
-      tokenResetPassword: null,
-      tokenResetPasswordExpires: null,
-    });
   }
 
   async register(data: TCreateUser, media?: Express.MulterS3.File) {
@@ -97,17 +111,29 @@ export class AuthService {
   async googleLogin(data: TGoogleLogin) {
     trimObj(data);
 
-    const [userByGoogle, userByEmail] = await Promise.all([
-      this.userService.findByGoogleId(data.googleId),
-      this.userService.findByEmail(data.email),
-    ]);
+    try {
+      const [userByGoogle, userByEmail] = await Promise.all([
+        this.userService.findByGoogleId(data.googleId),
+        this.userService.findByEmail(data.email)
+      ]);
 
-    if (userByGoogle || userByEmail) {
-      await userByGoogle.update({ ...data });
+      if (!userByGoogle && userByEmail) {
+        await userByEmail.update({ ...data });
 
-      const token = this.createTokenJwt(userByGoogle);
+        const token = this.createTokenJwt(userByEmail);
 
-      return { token };
+        return { token };
+      }
+
+      if (userByGoogle) {
+        await userByGoogle.update({ ...data });
+
+        const token = this.createTokenJwt(userByGoogle);
+
+        return { token };
+      }
+    } catch (error) {
+      throw new HttpException(error, 400);
     }
   }
 }

@@ -1,10 +1,10 @@
 import { Body, Controller, HttpCode, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
-import { CreateUser, User } from 'src/user/user.swagger';
 
 import { AuthService } from './auth.service';
 import { GoogleLogin, Login, ResetPassword } from './auth.swagger';
+import { CreateUser, User } from '../user/user.swagger';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -38,6 +38,7 @@ export class AuthController {
           oneOf: [
             { example: 'As credenciais estão incorretas' },
             { example: 'E-mail inválido' },
+            { example: 'E-mail não verificado' },
           ]
         },
       }
@@ -69,13 +70,6 @@ export class AuthController {
         statusCode: {
           type: 'number',
           example: 400,
-        },
-        message: {
-          type: 'string',
-          oneOf: [
-            { example: 'As credenciais estão incorretas' },
-            { example: 'E-mail inválido' },
-          ]
         },
       }
     }

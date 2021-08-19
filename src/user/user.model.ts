@@ -67,7 +67,7 @@ export class User extends Model {
 
   @NotEmpty({ msg: "Campo 'Gênero' não pode ser vazio" })
   @Column({
-    type: DataType.STRING,
+    type: DataType.ENUM('M', 'F', 'O'),
     allowNull: false,
   })
   gender: string;
