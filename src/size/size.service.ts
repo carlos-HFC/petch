@@ -20,7 +20,7 @@ export class SizeService {
   }
 
   async findBySize(speciesId: number, size: number) {
-    const sizes = await this.sizeModel.findOne({
+    return await this.sizeModel.findOne({
       where: {
         speciesId,
         [$.and]: {
@@ -29,8 +29,6 @@ export class SizeService {
         }
       }
     });
-
-    return sizes;
   }
 
   async findById(id: number) {

@@ -3,10 +3,10 @@ import { InjectModel } from '@nestjs/sequelize';
 
 import { Pet } from './pet.model';
 import { OngService } from '../ong/ong.service';
+import { SizeService } from '../size/size.service';
 import { SpeciesService } from '../species/species.service';
 import { trimObj } from '../utils';
 import { UploadService } from '../upload.service';
-import { SizeService } from 'src/size/size.service';
 
 @Injectable()
 export class PetService {
@@ -15,8 +15,8 @@ export class PetService {
     private readonly petModel: typeof Pet,
     private ongService: OngService,
     private speciesService: SpeciesService,
+    private sizeService: SizeService,
     private uploadService: UploadService,
-    private sizeService: SizeService
   ) { }
 
   async get() {
@@ -44,8 +44,9 @@ export class PetService {
 
       if (images.length === 0) throw new HttpException('O Pet deve conter, pelo menos, uma foto', 400);
 
-      const photos = (await Promise.all(images.map(img => this.uploadService.uploadFile(img))))
-        .map(photo => photo.url).toString();
+      const photos = (await Promise.all(
+        images.map(img => this.uploadService.uploadFile(img))
+      )).map(photo => photo.url).toString();
 
       Object.assign(data, { photos });
 

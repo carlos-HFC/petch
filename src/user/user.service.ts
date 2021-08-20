@@ -79,17 +79,13 @@ export class UserService {
       const birth = parseISO(data.birthday);
 
       if (!isAdmin) {
-        if (data.password) {
-          if (data.password !== data.confirmPassword) throw new HttpException('Senhas não correspondem', 400);
-          validatePassword(data.password);
-        } else {
-          if (!data.googleId) throw new HttpException('A senha é obrigatória', 400);
-        }
+        if (data.password && data.password !== data.confirmPassword) throw new HttpException('Senhas não correspondem', 400);
+        validatePassword(data.password);
+
+        if (!data.googleId) throw new HttpException('A senha é obrigatória', 400);
       }
 
-      if (isAdmin) {
-        data.password = randomBytes(5).toString('hex');
-      }
+      if (isAdmin) data.password = randomBytes(5).toString('hex');
 
       switch (true) {
         case !isValid(birth):
@@ -169,7 +165,10 @@ export class UserService {
         Object.assign(data, { avatar });
       }
 
-      await user.update({ ...data });
+      await user.update({
+        ...data,
+        emailVerified: data.email && false
+      });
     } catch (error) {
       throw new HttpException(error, 400);
     }
