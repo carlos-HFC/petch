@@ -167,7 +167,8 @@ export class UserService {
 
       await user.update({
         ...data,
-        emailVerified: data.email && false
+        emailVerified: data.email && false,
+        tokenVerificationEmail: data.email && createTokenHEX(),
       });
     } catch (error) {
       throw new HttpException(error, 400);
