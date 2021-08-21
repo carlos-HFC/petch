@@ -25,7 +25,9 @@ export class AuthService {
 
       const token = this.createTokenJwt(user);
 
-      return { token };
+      const { exp } = await this.jwtService.verifyAsync(token);
+
+      return { token, expires: exp * 1000 };
     } catch (error) {
       throw new HttpException(error, 400);
     }
