@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { SolicitationTypes } from './solicitationTypes.model';
 import { SolicitationTypesService } from './solicitationTypes.service';
@@ -11,6 +11,7 @@ export class SolicitationTypesController {
     private solicitationTypesService: SolicitationTypesService
   ) { }
 
+  @ApiOperation({ summary: 'Listar todos os tipos de solicitação' })
   @ApiOkResponse({ type: [SolicitationTypes], description: 'Success' })
   @ApiQuery({ name: 'name', enum: ['Elogios', 'Dúvidas', 'Reclamações'], required: false })
   @Get()
@@ -18,6 +19,7 @@ export class SolicitationTypesController {
     return await this.solicitationTypesService.get(name);
   }
 
+  @ApiOperation({ summary: 'Listar um tipo de solicitação pelo ID' })
   @ApiOkResponse({ type: SolicitationTypes, description: 'Success' })
   @ApiNotFoundResponse({
     description: 'Not Found',

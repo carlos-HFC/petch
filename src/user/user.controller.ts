@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 
 import { UserService } from './user.service';
@@ -16,6 +16,7 @@ export class UserController {
     private userService: UserService
   ) { }
 
+  @ApiOperation({ summary: 'Listar todos os usuários' })
   @ApiOkResponse({ type: [User], description: 'Success' })
   @ApiUnauthorizedResponse({
     schema: {
@@ -56,6 +57,7 @@ export class UserController {
     return await this.userService.get(query);
   }
 
+  @ApiOperation({ summary: 'Listar um usuário pelo ID' })
   @ApiOkResponse({ type: [User], description: 'Success' })
   @ApiUnauthorizedResponse({
     schema: {
@@ -113,6 +115,7 @@ export class UserController {
     return await this.userService.findById(id, inactives);
   }
 
+  @ApiOperation({ summary: 'Cadastrar um novo admin' })
   @ApiCreatedResponse({ type: User, description: 'Created' })
   @ApiBadRequestResponse({
     schema: {
@@ -183,6 +186,7 @@ export class UserController {
     return await this.userService.post(data, true, media);
   }
 
+  @ApiOperation({ summary: 'Editar os próprios dados' })
   @ApiOkResponse({ description: 'Success' })
   @ApiBadRequestResponse({
     schema: {
@@ -241,6 +245,7 @@ export class UserController {
     return await this.userService.put(req.user, data, media);
   }
 
+  @ApiOperation({ summary: 'Reativar um usuário' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiUnauthorizedResponse({
     schema: {
@@ -298,6 +303,7 @@ export class UserController {
     return await this.userService.restore(id);
   }
 
+  @ApiOperation({ summary: 'Inativar um usuário' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiUnauthorizedResponse({
     schema: {
@@ -355,6 +361,7 @@ export class UserController {
     return await this.userService.delete(id);
   }
 
+  @ApiOperation({ summary: 'Verificar o e-mail cadastrado' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiBadRequestResponse({
     schema: {

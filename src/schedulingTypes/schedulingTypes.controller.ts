@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { SchedulingTypes } from './schedulingTypes.model';
 import { SchedulingTypesService } from './schedulingTypes.service';
@@ -11,6 +11,7 @@ export class SchedulingTypesController {
     private schedulingTypesService: SchedulingTypesService
   ) { }
 
+  @ApiOperation({ summary: 'Listar todos os tipos de agendamento' })
   @ApiOkResponse({ type: [SchedulingTypes], description: 'Success' })
   @ApiQuery({ name: 'name', enum: ['Vacina', 'Banho', 'Medicação'], required: false })
   @Get()
@@ -18,6 +19,7 @@ export class SchedulingTypesController {
     return await this.schedulingTypesService.get(name);
   }
 
+  @ApiOperation({ summary: 'Listar um tipo de agendamento pelo ID' })
   @ApiOkResponse({ type: SchedulingTypes, description: 'Success' })
   @ApiNotFoundResponse({
     description: 'Not Found',

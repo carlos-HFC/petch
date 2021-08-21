@@ -12,6 +12,7 @@ export class GiftController {
     private giftService: GiftService
   ) { }
 
+  @ApiOperation({ summary: 'Listar todos os brindes' })
   @ApiOkResponse({ type: [Gift], description: 'Success' })
   @ApiQuery({ type: FilterGift, required: false })
   @Get()
@@ -19,6 +20,7 @@ export class GiftController {
     return await this.giftService.get(query);
   }
 
+  @ApiOperation({ summary: 'Listar um brinde pelo ID' })
   @ApiOkResponse({ type: Gift, description: 'Success' })
   @ApiNotFoundResponse({
     schema: {
@@ -42,6 +44,7 @@ export class GiftController {
     return await this.giftService.findById(id, inactives);
   }
 
+  @ApiOperation({ summary: 'Cadastrar um novo brinde' })
   @ApiCreatedResponse({ type: Gift, description: 'Created' })
   @ApiBadRequestResponse({
     schema: {
@@ -113,6 +116,7 @@ export class GiftController {
     return await this.giftService.put(id, data, media);
   }
 
+  @ApiOperation({ summary: 'Reativar um brinde' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiNotFoundResponse({
     schema: {
@@ -136,6 +140,7 @@ export class GiftController {
     return await this.giftService.restore(id);
   }
 
+  @ApiOperation({ summary: 'Inativar um brinde' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiNotFoundResponse({
     schema: {

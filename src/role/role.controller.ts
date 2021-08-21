@@ -1,5 +1,5 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { ApiParam, ApiTags, ApiQuery, ApiOkResponse, ApiNotFoundResponse } from '@nestjs/swagger';
+import { ApiParam, ApiTags, ApiQuery, ApiOkResponse, ApiNotFoundResponse, ApiOperation } from '@nestjs/swagger';
 
 import { Role } from './role.model';
 import { RoleService } from './role.service';
@@ -11,6 +11,7 @@ export class RoleController {
     private roleService: RoleService
   ) { }
 
+  @ApiOperation({ summary: 'Listar todas funções do sistema' })
   @ApiOkResponse({ type: [Role], description: 'Success' })
   @ApiQuery({ name: 'name', enum: ['Admin', 'Adotante'], required: false })
   @Get()
@@ -18,6 +19,7 @@ export class RoleController {
     return await this.roleService.get(name);
   }
 
+  @ApiOperation({ summary: 'Listar uma função do sistema pelo ID' })
   @ApiOkResponse({ type: Role, description: 'Success' })
   @ApiNotFoundResponse({
     description: 'Not Found',

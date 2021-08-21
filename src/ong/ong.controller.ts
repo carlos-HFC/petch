@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { OngService } from './ong.service';
 import { CreateOng, FilterOng, Ong, UpdateOng } from './ong.swagger';
@@ -12,6 +12,7 @@ export class OngController {
     private ongService: OngService
   ) { }
 
+  @ApiOperation({ summary: 'Listar todas as ONGs' })
   @ApiOkResponse({ type: [Ong], description: 'Success' })
   @ApiQuery({ type: FilterOng, required: false })
   @Get()
@@ -19,6 +20,7 @@ export class OngController {
     return await this.ongService.get(query);
   }
 
+  @ApiOperation({ summary: 'Listar uma ONG pelo ID' })
   @ApiOkResponse({ type: Ong, description: 'Success' })
   @ApiNotFoundResponse({
     description: 'Not Found',
@@ -43,6 +45,7 @@ export class OngController {
     return await this.ongService.findById(id, inactives);
   }
 
+  @ApiOperation({ summary: 'Cadastar uma nova ONG' })
   @ApiCreatedResponse({ type: Ong, description: 'Created' })
   @ApiBadRequestResponse({
     schema: {
@@ -73,6 +76,7 @@ export class OngController {
     return await this.ongService.post(data, media);
   }
 
+  @ApiOperation({ summary: 'Editar uma ONG' })
   @ApiOkResponse({ description: 'Success' })
   @ApiBadRequestResponse({
     schema: {
@@ -120,6 +124,7 @@ export class OngController {
     return await this.ongService.put(id, data, media);
   }
 
+  @ApiOperation({ summary: 'Inativar uma ONG' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiNotFoundResponse({
     description: 'Not Found',

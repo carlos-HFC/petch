@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { SpeciesService } from './species.service';
 import { CreateSpecies, FilterSpecies, Species, UpdateSpecies } from './species.swagger';
@@ -13,6 +13,7 @@ export class SpeciesController {
     private speciesService: SpeciesService
   ) { }
 
+  @ApiOperation({ summary: 'Listar todas as espécies' })
   @ApiOkResponse({ type: [Species], description: 'Success' })
   @ApiQuery({ type: FilterSpecies, required: false })
   @Get()
@@ -20,6 +21,7 @@ export class SpeciesController {
     return await this.speciesService.get(query);
   }
 
+  @ApiOperation({ summary: 'Listar uma espécies pelo ID' })
   @ApiOkResponse({ type: Species, description: 'Success' })
   @ApiNotFoundResponse({
     description: 'Not Found',
@@ -44,6 +46,7 @@ export class SpeciesController {
     return await this.speciesService.findById(id, inactives);
   }
 
+  @ApiOperation({ summary: 'Cadastrar uma nova espécie' })
   @ApiCreatedResponse({ type: Species, description: 'Created' })
   @ApiBadRequestResponse({
     schema: {
@@ -72,6 +75,7 @@ export class SpeciesController {
     return await this.speciesService.post(data, media);
   }
 
+  @ApiOperation({ summary: 'Editar uma espécie' })
   @ApiOkResponse({ description: 'Success' })
   @ApiBadRequestResponse({
     schema: {
@@ -117,6 +121,7 @@ export class SpeciesController {
     return await this.speciesService.put(id, data, media);
   }
 
+  @ApiOperation({ summary: 'Editar o porte de uma espécie' })
   @ApiOkResponse({ description: 'Success' })
   @ApiBadRequestResponse({
     schema: {
@@ -167,6 +172,7 @@ export class SpeciesController {
     return await this.speciesService.putSizes(params.id, params.sizeId, data);
   }
 
+  @ApiOperation({ summary: 'Inativar uma espécie' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiNotFoundResponse({
     description: 'Not Found',
@@ -191,6 +197,7 @@ export class SpeciesController {
     return await this.speciesService.delete(id);
   }
 
+  @ApiOperation({ summary: 'Reativar uma espécie' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiNotFoundResponse({
     description: 'Not Found',

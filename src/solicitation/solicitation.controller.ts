@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Post, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 
@@ -16,6 +16,7 @@ export class SolicitationController {
     private solicitationService: SolicitationService,
   ) { }
 
+  @ApiOperation({ summary: 'Listar todas as solicitações' })
   @ApiOkResponse({ type: [Solicitation], description: 'Success' })
   @ApiUnauthorizedResponse({
     schema: {
@@ -55,6 +56,7 @@ export class SolicitationController {
     return await this.solicitationService.get();
   }
 
+  @ApiOperation({ summary: 'Listar uma solicitação pelo ID' })
   @ApiOkResponse({ type: Solicitation, description: 'Success' })
   @ApiUnauthorizedResponse({
     schema: {
@@ -111,6 +113,7 @@ export class SolicitationController {
     return await this.solicitationService.findById(id);
   }
 
+  @ApiOperation({ summary: 'Cadastrar uma nova solicitação' })
   @ApiCreatedResponse({ type: Solicitation, description: 'Created' })
   @ApiBadRequestResponse({
     schema: {
@@ -159,6 +162,7 @@ export class SolicitationController {
     return await this.solicitationService.post(data, media, req.user);
   }
 
+  @ApiOperation({ summary: 'Inativar uma solicitação' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiUnauthorizedResponse({
     schema: {

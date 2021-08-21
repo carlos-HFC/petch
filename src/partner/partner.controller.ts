@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { PartnerService } from './partner.service';
 import { CreatePartner, FilterPartner, Partner, UpdatePartner } from './partner.swagger';
@@ -12,6 +12,7 @@ export class PartnerController {
     private partnerService: PartnerService
   ) { }
 
+  @ApiOperation({ summary: 'Listar todos os parceiros' })
   @ApiOkResponse({ type: [Partner], description: 'Success' })
   @ApiQuery({ type: FilterPartner, required: false })
   @Get()
@@ -19,6 +20,7 @@ export class PartnerController {
     return await this.partnerService.get(query);
   }
 
+  @ApiOperation({ summary: 'Listar um parceiro pelo ID' })
   @ApiOkResponse({ type: Partner, description: 'Success' })
   @ApiNotFoundResponse({
     description: 'Not Found',
@@ -43,6 +45,7 @@ export class PartnerController {
     return await this.partnerService.findById(id, inactives);
   }
 
+  @ApiOperation({ summary: 'Cadastrar um novo parceiro' })
   @ApiCreatedResponse({ type: Partner, description: 'Created' })
   @ApiBadRequestResponse({
     schema: {
@@ -70,6 +73,7 @@ export class PartnerController {
     return await this.partnerService.post(data, media);
   }
 
+  @ApiOperation({ summary: 'Editar um parceiro' })
   @ApiOkResponse({ description: 'Success' })
   @ApiBadRequestResponse({
     schema: {
@@ -98,6 +102,7 @@ export class PartnerController {
     return await this.partnerService.put(id, data, media);
   }
 
+  @ApiOperation({ summary: 'Inativar um parceiro' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiNotFoundResponse({
     description: 'Not Found',
@@ -122,6 +127,7 @@ export class PartnerController {
     return await this.partnerService.delete(id);
   }
 
+  @ApiOperation({ summary: 'Reativar um parceiro' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiNotFoundResponse({
     description: 'Not Found',

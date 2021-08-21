@@ -1,6 +1,6 @@
 import { Body, Controller, HttpCode, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
 import { GoogleLogin, Login, ResetPassword } from './auth.swagger';
@@ -13,6 +13,7 @@ export class AuthController {
     private authService: AuthService
   ) { }
 
+  @ApiOperation({ summary: 'Efetuar login com e-mail e senha' })
   @ApiOkResponse({
     description: 'Success',
     schema: {
@@ -21,7 +22,11 @@ export class AuthController {
         token: {
           type: 'string',
           example: '456fda'
-        }
+        },
+        expires: {
+          type: 'number',
+          example: 126354894809
+        },
       }
     }
   })
@@ -51,6 +56,7 @@ export class AuthController {
     return await this.authService.login(data);
   }
 
+  @ApiOperation({ summary: 'Efetuar login com Google' })
   @ApiOkResponse({
     description: 'Success',
     schema: {
@@ -59,7 +65,11 @@ export class AuthController {
         token: {
           type: 'string',
           example: '456fda'
-        }
+        },
+        expires: {
+          type: 'number',
+          example: 126354894809
+        },
       }
     }
   })
@@ -81,6 +91,7 @@ export class AuthController {
     return await this.authService.googleLogin(data);
   }
 
+  @ApiOperation({ summary: 'Registrar-se' })
   @ApiCreatedResponse({ type: User, description: 'Created' })
   @ApiBadRequestResponse({
     schema: {
@@ -117,6 +128,7 @@ export class AuthController {
     return await this.authService.register(data, media);
   }
 
+  @ApiOperation({ summary: 'Solicitar troca de senha por esquecimento' })
   @ApiOkResponse({ description: 'Success' })
   @ApiBadRequestResponse({
     schema: {
@@ -165,6 +177,7 @@ export class AuthController {
     return await this.authService.forgotPassword(data.email);
   }
 
+  @ApiOperation({ summary: 'Reiniciar a senha a partir de seu esquecimento' })
   @ApiOkResponse({ description: 'Success' })
   @ApiBadRequestResponse({
     schema: {
