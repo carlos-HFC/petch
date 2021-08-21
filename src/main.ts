@@ -20,7 +20,7 @@ async function bootstrap() {
     .setDescription('Swagger do Petch')
     .setVersion('1.0.0')
     .addServer('http://localhost:8000', 'Servidor de desenvolvimento')
-    .addServer('https://petch-teste.herokuapp.com', 'Servidor de produção')
+    .addServer('https://petch-dev.herokuapp.com', 'Servidor de produção')
     .addBearerAuth({ type: 'http', in: 'header' })
     .addTag('Auth', 'Login dos usuários, registro de novos adotantes, reinicialização de senha')
     .addTag('Gifts', 'Armazenar os brindes que o adotante escolherá ao adotar um pet')
