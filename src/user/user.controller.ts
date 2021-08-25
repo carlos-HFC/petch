@@ -245,6 +245,61 @@ export class UserController {
     return await this.userService.put(req.user, data, media);
   }
 
+  @ApiOperation({ summary: 'Verificar o e-mail cadastrado' })
+  @ApiNoContentResponse({ description: 'No Content' })
+  @ApiBadRequestResponse({
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 400,
+        },
+        message: {
+          type: 'string',
+          oneOf: [
+            { example: 'Token inválido' },
+            { example: 'Usuário já confirmado' },
+            { example: 'E-mail inválido' },
+            { example: 'Token não informado' },
+            { example: 'E-mail não informado' },
+          ]
+        },
+      }
+    }
+  })
+  @ApiNotFoundResponse({
+    description: 'Not Found',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 404
+        },
+        message: {
+          type: 'string',
+          example: 'Usuário não encontrado',
+        },
+      }
+    }
+  })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        tokenVerificationEmail: {
+          type: 'string'
+        }
+      }
+    }
+  })
+  @ApiQuery({ name: 'email' })
+  @Patch('/confirm')
+  async confirmRegister(@Query('email') email: string, @Body() data: { tokenVerificationEmail: string; }) {
+    return await this.userService.confirmRegister(email, data.tokenVerificationEmail);
+  }
+
   @ApiOperation({ summary: 'Reativar um usuário' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiUnauthorizedResponse({
@@ -359,60 +414,5 @@ export class UserController {
   @HttpCode(204)
   async delete(@Param('id') id: number) {
     return await this.userService.delete(id);
-  }
-
-  @ApiOperation({ summary: 'Verificar o e-mail cadastrado' })
-  @ApiNoContentResponse({ description: 'No Content' })
-  @ApiBadRequestResponse({
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 400,
-        },
-        message: {
-          type: 'string',
-          oneOf: [
-            { example: 'Token inválido' },
-            { example: 'Usuário já confirmado' },
-            { example: 'E-mail inválido' },
-            { example: 'Token não informado' },
-            { example: 'E-mail não informado' },
-          ]
-        },
-      }
-    }
-  })
-  @ApiNotFoundResponse({
-    description: 'Not Found',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 404
-        },
-        message: {
-          type: 'string',
-          example: 'Usuário não encontrado',
-        },
-      }
-    }
-  })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        tokenVerificationEmail: {
-          type: 'string'
-        }
-      }
-    }
-  })
-  @ApiQuery({ name: 'email' })
-  @Patch('/confirm')
-  async confirmRegister(@Query('email') email: string, @Body() data: { tokenVerificationEmail: string; }) {
-    return await this.userService.confirmRegister(email, data.tokenVerificationEmail);
   }
 }

@@ -24,15 +24,11 @@ export class PetService {
   }
 
   async findById(id: number) {
-    const num = (/([\d]{0,})([\.{1}])?([\d]+)/g);
-
     const pet = await this.petModel.findByPk(id);
 
     if (!pet) throw new HttpException('Pet não encontrado', 404);
 
-    const size = await this.sizeService.findBySize(pet.speciesId, Number(pet.weight.match(num).join('')));
-
-    return { ...pet.toJSON(), size };
+    return pet;
   }
 
   async post(data: TCreatePet, images?: Express.MulterS3.File[]) {
@@ -58,7 +54,7 @@ export class PetService {
     }
   }
 
-  async put(id: number, data: object) {
+  async put(id: number, data: TUpdatePet) {
     trimObj(data);
 
     try {

@@ -5,6 +5,7 @@ import { differenceInCalendarYears, isValid, parseISO } from 'date-fns';
 import { Op as $ } from 'sequelize';
 
 import { User } from './user.model';
+import { MailService } from '../mail/mail.service';
 import { RoleService } from '../role/role.service';
 import { UploadService } from '../upload.service';
 import { createTokenHEX, trimObj, validateCEP, validateCPF, validateEmail, validatePassword, validatePhone } from '../utils';
@@ -16,6 +17,7 @@ export class UserService {
     private readonly userModel: typeof User,
     private roleService: RoleService,
     private uploadService: UploadService,
+    private mailService: MailService
   ) { }
 
   async get(query?: TFilterUser) {
@@ -170,6 +172,8 @@ export class UserService {
         emailVerified: data.email && false,
         tokenVerificationEmail: data.email && createTokenHEX(),
       });
+
+      if (data.email) await this.mailService.newUser(user);
     } catch (error) {
       throw new HttpException(error, 400);
     }
@@ -208,5 +212,7 @@ export class UserService {
       tokenVerificationEmail: null,
       emailVerified: true
     });
+
+    await this.mailService.emailConfirmed(user);
   }
 }

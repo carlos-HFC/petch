@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { SequelizeModule } from '@nestjs/sequelize';
+import { SendGridModule } from '@ntegral/nestjs-sendgrid';
 import { SeederModule } from 'nestjs-sequelize-seeder';
 
 import { AuthModule } from './auth/auth.module';
 import { GiftModule } from './gift/gift.module';
+import { MailModule } from './mail/mail.module';
 import { OngModule } from './ong/ong.module';
 import { PartnerModule } from './partner/partner.module';
 import { PetModule } from './pet/pet.module';
@@ -49,6 +51,9 @@ import { UserModule } from './user/user.module';
     SeederModule.forRoot({
       runOnlyIfTableIsEmpty: true,
     }),
+    SendGridModule.forRoot({
+      apiKey: process.env.MAIL_KEY
+    }),
     RoleModule,
     SpeciesModule,
     SolicitationTypesModule,
@@ -60,6 +65,7 @@ import { UserModule } from './user/user.module';
     GiftModule,
     SolicitationModule,
     PetModule,
+    MailModule
   ],
   controllers: [],
   providers: [UploadService],

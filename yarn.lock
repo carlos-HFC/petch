@@ -734,6 +734,14 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@ntegral/nestjs-sendgrid@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@ntegral/nestjs-sendgrid/-/nestjs-sendgrid-1.0.0.tgz#3b6c5a8df84830e48e31f2f7d4c85c0182116390"
+  integrity sha512-M7/xkb6nr++dZJi4+t1PAhygarNNWe3u0n1I5EXD6u3EsnLu7bHl23RTy3X9C/7zPLSg31AhNp5mv6IO4nYlew==
+  dependencies:
+    "@sendgrid/mail" "^7.0.1"
+    deepmerge "^4.2.2"
+
 "@nuxtjs/opencollective@0.3.2":
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/@nuxtjs/opencollective/-/opencollective-0.3.2.tgz#620ce1044f7ac77185e825e1936115bb38e2681c"
@@ -750,6 +758,29 @@
   dependencies:
     "@angular-devkit/core" "11.2.6"
     "@angular-devkit/schematics" "11.2.6"
+
+"@sendgrid/client@^7.4.6":
+  version "7.4.6"
+  resolved "https://registry.yarnpkg.com/@sendgrid/client/-/client-7.4.6.tgz#c7b5a6fc0c12e48fcc77faf183f0a99f5cc8ec52"
+  integrity sha512-g3vjDyN1hDTKwPe9THGNuf4HKkx+cC3dSOM7SM88Pg6Q9SRI+GDGzsdnGRfFFpsdHBVVrHCSk0n2f4YZVCv4zA==
+  dependencies:
+    "@sendgrid/helpers" "^7.4.6"
+    axios "^0.21.1"
+
+"@sendgrid/helpers@^7.4.6":
+  version "7.4.6"
+  resolved "https://registry.yarnpkg.com/@sendgrid/helpers/-/helpers-7.4.6.tgz#0fed40aeb9738a0d698ec2ce311c73f7460cfd72"
+  integrity sha512-Vvt4d60fkU/DPSwMyxXtlnbw4/B+5Y9eeYnygTxhmw8TNzUhdPphr7SaRSperWJ8P1VeQZzobvQNyMj5E7A3UA==
+  dependencies:
+    deepmerge "^4.2.2"
+
+"@sendgrid/mail@^7.0.1", "@sendgrid/mail@^7.4.6":
+  version "7.4.6"
+  resolved "https://registry.yarnpkg.com/@sendgrid/mail/-/mail-7.4.6.tgz#497e59ac415bf19561293c1fe92c5ef86eee7fae"
+  integrity sha512-1HTW5Iu1oKw5r8cltAPfVFbaJjjIrWmYR8WP0I8br01ImUhy1/42vGCVl6QWkPP6pcAfsWNIrjSPx20ZcVNvVQ==
+  dependencies:
+    "@sendgrid/client" "^7.4.6"
+    "@sendgrid/helpers" "^7.4.6"
 
 "@sinonjs/commons@^1.7.0":
   version "1.8.3"
@@ -1563,7 +1594,7 @@ aws-sdk@*, aws-sdk@^2.37.0, aws-sdk@^2.943.0:
     uuid "3.3.2"
     xml2js "0.4.19"
 
-axios@0.21.1:
+axios@0.21.1, axios@^0.21.1:
   version "0.21.1"
   resolved "https://registry.yarnpkg.com/axios/-/axios-0.21.1.tgz#22563481962f4d6bde9a76d516ef0e5d3c09b2b8"
   integrity sha512-dKQiRHxGD9PPRIUNIWvZhPTPpl1rf/OxTYKsqKUDjBwYylTvV7SjSHJb9ratfyzM6wCdLCOYLzs73qpg5c4iGA==
