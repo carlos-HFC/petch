@@ -5,7 +5,12 @@ import { BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Mode
 import { Role } from '../role/role.model';
 
 @DefaultScope(() => ({
-  include: [Role]
+  include: [
+    {
+      model: Role,
+      attributes: ['name']
+    }
+  ]
 }))
 @Table({ paranoid: true })
 export class User extends Model {

@@ -2,7 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { randomBytes } from 'crypto';
 import { differenceInCalendarYears, isValid, parseISO } from 'date-fns';
-import { Op as $ } from 'sequelize';
+import { col, where } from 'sequelize';
 
 import { User } from './user.model';
 import { MailService } from '../mail/mail.service';
@@ -21,15 +21,15 @@ export class UserService {
   ) { }
 
   async get(query?: TFilterUser) {
-    const where = {};
+    const options = {};
 
-    if (query.uf) Object.assign(where, { uf: query.uf.toUpperCase() });
-    if (query.gender) Object.assign(where, { gender: query.gender.toUpperCase() });
-    if (query.googleId) Object.assign(where, { googleId: { [$.not]: null } });
+    if (query.gender) Object.assign(options, { gender: query.gender.toUpperCase() });
+    if (query.role) Object.assign(options, { role: where(col('role.name'), query.role) });
 
     return await this.userModel.findAll({
       paranoid: !query.inactives,
-      where
+      where: options,
+      attributes: ['id', 'name', 'email', 'avatar', 'role.name', 'deletedAt'],
     });
   }
 

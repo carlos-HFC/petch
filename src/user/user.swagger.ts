@@ -1,4 +1,4 @@
-import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
+import { ApiProperty, OmitType, PartialType, PickType } from '@nestjs/swagger';
 
 import { Role } from '../role/role.model';
 
@@ -66,7 +66,7 @@ export class User {
   @ApiProperty({ type: 'number' })
   roleId: number;
 
-  @ApiProperty({ type: Role })
+  @ApiProperty({ type: Role, required: false })
   role: Role;
 
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
@@ -77,6 +77,18 @@ export class User {
 
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   deletedAt: Date | null;
+}
+
+export class IndexUser extends PickType(User, ['id', 'name', 'email', 'avatar', 'deletedAt']) {
+  @ApiProperty({
+    type: 'object',
+    properties: {
+      name: {
+        type: 'string', enum: ['Admin', 'Adotante']
+      }
+    }
+  })
+  role: object;
 }
 
 export class CreateUser extends OmitType(User, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'hash', 'avatar', 'tokenResetPassword', 'tokenResetPasswordExpires', 'tokenVerificationEmail', 'emailVerified', 'roleId', 'role']) {
@@ -99,11 +111,8 @@ export class FilterUser {
   @ApiProperty({ type: 'string', enum: ['M', 'F', 'O'], required: false })
   gender?: string;
 
-  @ApiProperty({ type: 'boolean', required: false })
-  googleId?: boolean;
-
-  @ApiProperty({ type: 'string', required: false })
-  uf?: string;
+  @ApiProperty({ type: 'string', enum: ['Admin', 'Adotante'], required: false })
+  role?: string;
 
   @ApiProperty({ type: 'boolean', required: false })
   inactives?: boolean;

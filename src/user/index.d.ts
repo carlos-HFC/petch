@@ -1,5 +1,5 @@
 type TCreateUser = {
-  googleId?: string
+  googleId?: string;
   name: string;
   email: string;
   password: string;
@@ -21,8 +21,8 @@ type TUpdateUser = Partial<TCreateUser> & {
 };
 
 type TFilterUser = {
-  gender?: string
-  googleId?: boolean
-  uf?: string
-  inactives?: boolean
-}
+  gender?: string;
+  uf?: string;
+  inactives?: boolean;
+  role?: 'Admin' | 'Adotante';
+};

@@ -4,7 +4,7 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedR
 import { Request } from 'express';
 
 import { UserService } from './user.service';
-import { CreateUser, FilterUser, UpdateUser, User } from './user.swagger';
+import { CreateUser, FilterUser, IndexUser, UpdateUser, User } from './user.swagger';
 import { JwtAuthGuard } from '../auth/auth.guard';
 import { RoleGuard } from '../role/role.guard';
 import { RoleDecorator } from '../role/role.decorator';
@@ -17,7 +17,7 @@ export class UserController {
   ) { }
 
   @ApiOperation({ summary: 'Listar todos os usuários' })
-  @ApiOkResponse({ type: [User], description: 'Success' })
+  @ApiOkResponse({ type: [IndexUser], description: 'Success' })
   @ApiUnauthorizedResponse({
     schema: {
       type: 'object',
@@ -50,8 +50,8 @@ export class UserController {
   })
   @ApiQuery({ type: FilterUser, required: false })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @RoleDecorator('admin')
+  // @UseGuards(JwtAuthGuard, RoleGuard)
+  // @RoleDecorator('admin')
   @Get()
   async index(@Query() query: TFilterUser) {
     return await this.userService.get(query);
