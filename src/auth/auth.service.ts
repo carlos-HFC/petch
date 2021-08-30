@@ -23,11 +23,9 @@ export class AuthService {
 
       if (!user.emailVerified) throw new HttpException('E-mail não verificado', 400);
 
-      const token = this.createTokenJwt(user);
+      const { token, expires } = await this.createTokenJwt(user);
 
-      const { exp } = await this.jwtService.verifyAsync(token);
-
-      return { token, expires: exp * 1000 };
+      return { token, expires };
     } catch (error) {
       throw new HttpException(error, 400);
     }
@@ -106,8 +104,12 @@ export class AuthService {
     await this.userService.post(data, false, media);
   }
 
-  private createTokenJwt(user: User) {
-    return this.jwtService.sign({ id: user.id, email: user.email, role: user.role.name, cpf: user.cpf, password: user.hash, google: user.googleId });
+  private async createTokenJwt(user: User) {
+    const token = this.jwtService.sign({ id: user.id, email: user.email, role: user.role.name, cpf: user.cpf, password: user.hash, google: user.googleId });
+
+    const { exp } = await this.jwtService.verifyAsync(token);
+
+    return { token, expires: exp * 1000 };
   }
 
   async googleLogin(data: TGoogleLogin) {
@@ -122,17 +124,17 @@ export class AuthService {
       if (!userByGoogle && userByEmail) {
         await userByEmail.update({ ...data });
 
-        const token = this.createTokenJwt(userByEmail);
+        const { token, expires } = await this.createTokenJwt(userByEmail);
 
-        return { token };
+        return { token, expires };
       }
 
       if (userByGoogle) {
         await userByGoogle.update({ ...data });
 
-        const token = this.createTokenJwt(userByGoogle);
+        const { token, expires } = await this.createTokenJwt(userByGoogle);
 
-        return { token };
+        return { token, expires };
       }
     } catch (error) {
       throw new HttpException(error, 400);
