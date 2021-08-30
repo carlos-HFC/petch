@@ -29,7 +29,7 @@ export class UserService {
     return await this.userModel.findAll({
       paranoid: !query.inactives,
       where: options,
-      attributes: ['id', 'name', 'email', 'avatar', 'role.name', 'deletedAt'],
+      attributes: ['id', 'name', 'email', 'avatar', 'deletedAt'],
     });
   }
 
