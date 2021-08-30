@@ -4,7 +4,7 @@ import { Size } from '../size/size.model';
 import { capitalizeFirstLetter } from '../utils';
 
 @DefaultScope(() => ({
-  include: [Size]
+  // include: [Size]
 }))
 @Table({ paranoid: true })
 export class Species extends Model {
@@ -17,7 +17,7 @@ export class Species extends Model {
   name: string;
 
   @Column(DataType.STRING)
-  avatar: string;
+  image: string;
 
   @HasMany(() => Size)
   sizes: Size[];

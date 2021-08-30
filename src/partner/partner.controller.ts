@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { PartnerService } from './partner.service';
-import { CreatePartner, FilterPartner, Partner, UpdatePartner } from './partner.swagger';
+import { CreatePartner, FilterPartner, IndexPartner, Partner, UpdatePartner } from './partner.swagger';
 
 @ApiTags('Partners')
 @Controller('partners')
@@ -13,7 +13,7 @@ export class PartnerController {
   ) { }
 
   @ApiOperation({ summary: 'Listar todos os parceiros' })
-  @ApiOkResponse({ type: [Partner], description: 'Success' })
+  @ApiOkResponse({ type: [IndexPartner], description: 'Success' })
   @ApiQuery({ type: FilterPartner, required: false })
   @Get()
   async index(@Query() query?: TFilterPartner) {

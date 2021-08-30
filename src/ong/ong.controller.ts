@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { OngService } from './ong.service';
-import { CreateOng, FilterOng, Ong, UpdateOng } from './ong.swagger';
+import { CreateOng, FilterOng, IndexOng, Ong, UpdateOng } from './ong.swagger';
 
 @ApiTags('ONGs')
 @Controller('ongs')
@@ -13,7 +13,7 @@ export class OngController {
   ) { }
 
   @ApiOperation({ summary: 'Listar todas as ONGs' })
-  @ApiOkResponse({ type: [Ong], description: 'Success' })
+  @ApiOkResponse({ type: [IndexOng], description: 'Success' })
   @ApiQuery({ type: FilterOng, required: false })
   @Get()
   async index(@Query() query?: TFilterOng) {

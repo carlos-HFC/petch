@@ -1,4 +1,4 @@
-import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
+import { ApiProperty, OmitType, PartialType, PickType } from '@nestjs/swagger';
 
 export class Ong {
   @ApiProperty({ type: 'integer', uniqueItems: true, readOnly: true })
@@ -10,8 +10,11 @@ export class Ong {
   @ApiProperty({ type: 'string', uniqueItems: true })
   email: string;
 
+  @ApiProperty({ type: 'string' })
+  responsible: string;
+
   @ApiProperty({ type: 'string', required: false })
-  logo: string;
+  image: string;
 
   @ApiProperty({ type: 'string' })
   phone1: string;
@@ -53,7 +56,9 @@ export class Ong {
   deletedAt: Date | null;
 }
 
-export class CreateOng extends OmitType(Ong, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'logo']) {
+export class IndexOng extends PickType(Ong, ['id', 'name', 'email', 'phone1', 'responsible', 'city', 'uf', 'deletedAt']) { }
+
+export class CreateOng extends OmitType(Ong, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'image']) {
   @ApiProperty({ type: 'string', format: 'binary', required: false })
   media: string;
 }

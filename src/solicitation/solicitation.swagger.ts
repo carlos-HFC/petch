@@ -1,4 +1,4 @@
-import { ApiProperty, OmitType, PickType } from '@nestjs/swagger';
+import { ApiProperty, OmitType } from '@nestjs/swagger';
 
 import { SolicitationTypes } from '../solicitationTypes/solicitationTypes.model';
 import { User } from '../user/user.swagger';
@@ -22,7 +22,7 @@ export class Solicitation {
   @ApiProperty({ type: 'number' })
   solicitationTypeId: number;
 
-  @ApiProperty({ type: SolicitationTypes })
+  @ApiProperty({ type: SolicitationTypes, required: false })
   solicitationType: SolicitationTypes;
 
   @ApiProperty({ type: 'number', required: false })

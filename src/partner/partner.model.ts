@@ -106,7 +106,7 @@ export class Partner extends Model {
   uf: string;
 
   @Column(DataType.STRING)
-  logo: string;
+  image: string;
 
   @BeforeSave
   static async formatData(partner: Partner) {

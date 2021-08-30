@@ -47,8 +47,8 @@ export class GiftService {
       if (data.partnerId) await this.partnerService.findById(data.partnerId);
 
       if (media) {
-        const file = (await this.uploadService.uploadFile(media)).url;
-        Object.assign(data, { media: file });
+        const image = (await this.uploadService.uploadFile(media)).url;
+        Object.assign(data, { image });
       }
 
       const gift = await this.giftModel.create({ ...data });
@@ -68,8 +68,8 @@ export class GiftService {
       if (data.partnerId) await this.partnerService.findById(data.partnerId);
 
       if (media) {
-        const file = (await this.uploadService.uploadFile(media)).url;
-        Object.assign(data, { media: file });
+        const image = (await this.uploadService.uploadFile(media)).url;
+        Object.assign(data, { image });
       }
 
       await gift.update({ ...data });

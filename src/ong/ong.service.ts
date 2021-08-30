@@ -24,7 +24,8 @@ export class OngService {
     if (query.coverage) {
       const ongs = await this.ongModel.findAll({
         paranoid: !query.inactives,
-        where
+        where,
+        attributes: ['id', 'name', 'email', 'phone1', 'responsible', 'city', 'uf', 'deletedAt']
       });
 
       const states = query.coverage.toUpperCase().split(',').map(cov => cov.trim());
@@ -36,7 +37,8 @@ export class OngService {
 
     return await this.ongModel.findAll({
       paranoid: !query.inactives,
-      where
+      where,
+      attributes: ['id', 'name', 'email', 'phone1', 'responsible', 'city', 'uf', 'deletedAt']
     });
   }
 
@@ -69,16 +71,16 @@ export class OngService {
     trimObj(data);
 
     try {
-      validateCEP(data.cep);
-      validatePhone(data.phone1);
+      if (data.cep) validateCEP(data.cep);
+      if (data.phone1) validatePhone(data.phone1);
       if (data.phone2) validatePhone(data.phone2);
       if (data.phone3) validatePhone(data.phone3);
 
       if (await this.findByEmail(data.email) || await this.findByName(data.name)) throw new HttpException('ONG já cadastrada', 400);
 
       if (media) {
-        const logo = (await this.uploadService.uploadFile(media)).url;
-        Object.assign(data, { logo });
+        const image = (await this.uploadService.uploadFile(media)).url;
+        Object.assign(data, { image });
       }
 
       const ong = await this.ongModel.create({ ...data });
@@ -109,8 +111,8 @@ export class OngService {
       }
 
       if (media) {
-        const logo = (await this.uploadService.uploadFile(media)).url;
-        Object.assign(data, { logo });
+        const image = (await this.uploadService.uploadFile(media)).url;
+        Object.assign(data, { image });
       }
 
       await ong.update({ ...data });

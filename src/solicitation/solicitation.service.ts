@@ -40,8 +40,8 @@ export class SolicitationService {
       }
 
       if (user) {
-        if (data.name) delete data.name;
-        if (data.email) delete data.email;
+        if (data.name) data.name = null;
+        if (data.email) data.email = null;
 
         const solicitation = await this.solicitationModel.create({
           ...data,

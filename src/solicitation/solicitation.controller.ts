@@ -49,8 +49,8 @@ export class SolicitationController {
     }
   })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @RoleDecorator('admin')
+  // @UseGuards(JwtAuthGuard, RoleGuard)
+  // @RoleDecorator('admin')
   @Get()
   async index() {
     return await this.solicitationService.get();

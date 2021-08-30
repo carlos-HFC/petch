@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { GiftService } from './gift.service';
-import { CreateGift, FilterGift, Gift, UpdateGift } from './gift.swagger';
+import { CreateGift, FilterGift, Gift, IndexGift, UpdateGift } from './gift.swagger';
 
 @ApiTags('Gifts')
 @Controller('gifts')
@@ -13,7 +13,7 @@ export class GiftController {
   ) { }
 
   @ApiOperation({ summary: 'Listar todos os brindes' })
-  @ApiOkResponse({ type: [Gift], description: 'Success' })
+  @ApiOkResponse({ type: [IndexGift], description: 'Success' })
   @ApiQuery({ type: FilterGift, required: false })
   @Get()
   async index(@Query() query: TFilterGift) {

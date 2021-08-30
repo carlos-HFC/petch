@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { SpeciesService } from './species.service';
-import { CreateSpecies, FilterSpecies, Species, UpdateSpecies } from './species.swagger';
+import { CreateSpecies, FilterSpecies, IndexSpecies, Species, UpdateSpecies } from './species.swagger';
 import { UpdateSize } from '../size/size.swagger';
 
 @ApiTags('Species')
@@ -14,14 +14,14 @@ export class SpeciesController {
   ) { }
 
   @ApiOperation({ summary: 'Listar todas as espécies' })
-  @ApiOkResponse({ type: [Species], description: 'Success' })
+  @ApiOkResponse({ type: [IndexSpecies], description: 'Success' })
   @ApiQuery({ type: FilterSpecies, required: false })
   @Get()
   async index(@Query() query?: TFilterSpecies) {
     return await this.speciesService.get(query);
   }
 
-  @ApiOperation({ summary: 'Listar uma espécies pelo ID' })
+  @ApiOperation({ summary: 'Listar uma espécie pelo ID' })
   @ApiOkResponse({ type: Species, description: 'Success' })
   @ApiNotFoundResponse({
     description: 'Not Found',

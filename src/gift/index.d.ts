@@ -1,6 +1,7 @@
 type TCreateGift = {
   name: string;
   description: string;
+  coverage: string;
   partnerId?: number;
   color?: string;
   size?: string;

@@ -1,4 +1,4 @@
-import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
+import { ApiProperty, OmitType, PartialType, PickType } from '@nestjs/swagger';
 
 export class Partner {
   @ApiProperty({ uniqueItems: true, type: 'integer', readOnly: true })
@@ -53,7 +53,7 @@ export class Partner {
   uf: string;
 
   @ApiProperty({ type: 'string', required: false })
-  logo: string;
+  image: string;
 
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   createdAt: Date;
@@ -65,9 +65,14 @@ export class Partner {
   deletedAt: Date | null;
 }
 
-export class CreatePartner extends OmitType(Partner, ['createdAt', 'updatedAt', 'deletedAt', 'id']) { }
+export class IndexPartner extends PickType(Partner, ['id', 'fantasyName', 'cnpj', 'email', 'phone1', 'responsible', 'deletedAt']) { }
 
-export class UpdatePartner extends PartialType(Partner) { }
+export class CreatePartner extends OmitType(Partner, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'image']) {
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
+  media: string;
+}
+
+export class UpdatePartner extends PartialType(CreatePartner) { }
 
 export class FilterPartner {
   @ApiProperty({ type: 'boolean', required: false })

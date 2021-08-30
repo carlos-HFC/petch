@@ -1,5 +1,7 @@
 import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
 
+import { Partner } from '../partner/partner.swagger';
+
 export class Gift {
   @ApiProperty({ uniqueItems: true, type: 'integer', readOnly: true })
   id: number;
@@ -23,7 +25,16 @@ export class Gift {
   taste: string;
 
   @ApiProperty({ type: 'string', required: false })
-  media: string;
+  coverage: string;
+
+  @ApiProperty({ type: 'string', required: false })
+  image: string;
+
+  @ApiProperty({ type: 'number', required: false })
+  partnerId: number;
+
+  @ApiProperty({ type: Partner, required: false })
+  partner: Partner;
 
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   createdAt: Date;
@@ -35,7 +46,19 @@ export class Gift {
   deletedAt: Date | null;
 }
 
-export class CreateGift extends OmitType(Gift, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'media']) {
+export class IndexGift extends OmitType(Gift, ['createdAt', 'updatedAt', 'image', 'partner']) {
+  @ApiProperty({
+    type: 'object',
+    properties: {
+      fantasyName: {
+        type: 'string'
+      }
+    }
+  })
+  partner: object;
+}
+
+export class CreateGift extends OmitType(Gift, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'image', 'partner']) {
   @ApiProperty({ type: 'string', format: 'binary', required: false })
   media: string;
 }

@@ -23,7 +23,8 @@ export class PartnerService {
 
     return await this.partnerModel.findAll({
       paranoid: !query.inactives,
-      where
+      where,
+      attributes: ['id', 'fantasyName', 'cnpj', 'email', 'phone1', 'responsible', 'deletedAt']
     });
   }
 
@@ -65,16 +66,16 @@ export class PartnerService {
     trimObj(data);
 
     try {
-      validateCEP(data.cep);
-      validatePhone(data.phone1);
+      if (data.cep) validateCEP(data.cep);
+      if (data.phone1) validatePhone(data.phone1);
       if (data.phone2) validatePhone(data.phone2);
       if (data.phone3) validatePhone(data.phone3);
 
       if (await this.findByEmail(data.email) || await this.findByCNPJ(data.cnpj) || await this.findByStateRegistration(data.stateRegistration)) throw new HttpException('Parceiro já cadastrado', 400);
 
       if (media) {
-        const logo = (await this.uploadService.uploadFile(media)).url;
-        Object.assign(data, { logo });
+        const image = (await this.uploadService.uploadFile(media)).url;
+        Object.assign(data, { image });
       }
 
       const partner = await this.partnerModel.create({ ...data });
@@ -109,13 +110,13 @@ export class PartnerService {
       }
 
       if (media) {
-        const logo = (await this.uploadService.uploadFile(media)).url;
-        Object.assign(data, { logo });
+        const image = (await this.uploadService.uploadFile(media)).url;
+        Object.assign(data, { image });
       }
 
       await partner.update({ ...data });
     } catch (error) {
-      throw new HttpException(error, 400)
+      throw new HttpException(error, 400);
     }
   }
 

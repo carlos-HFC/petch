@@ -24,7 +24,7 @@ export class PartnerSeed implements OnSeederInit {
         district: 'Vila Vermelha',
         city: 'São Paulo',
         uf: 'SP',
-        logo: 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1150&q=80'
+        image: 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1150&q=80'
       },
       {
         fantasyName: 'Photografia Sublime',
@@ -42,7 +42,7 @@ export class PartnerSeed implements OnSeederInit {
         district: 'Loteamento Cidade Jardim',
         city: 'Catanduva',
         uf: 'SP',
-        logo: 'https://images.unsplash.com/photo-1484239398315-f1681ef72fe6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1050&q=80'
+        image: 'https://images.unsplash.com/photo-1484239398315-f1681ef72fe6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1050&q=80'
       },
       {
         fantasyName: 'Focinhos e Patas',
@@ -59,7 +59,7 @@ export class PartnerSeed implements OnSeederInit {
         complement: '15 andar',
         city: 'São Paulo',
         uf: 'SP',
-        logo: 'https://images.unsplash.com/photo-1606425271394-c3ca9aa1fc06?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cGF3fGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
+        image: 'https://images.unsplash.com/photo-1606425271394-c3ca9aa1fc06?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cGF3fGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
       {
         fantasyName: 'PetPlace',
@@ -76,7 +76,7 @@ export class PartnerSeed implements OnSeederInit {
         district: 'Passo do Gado',
         city: 'Tubarão',
         uf: 'SC',
-        logo: 'https://images.unsplash.com/photo-1494947665470-20322015e3a8?ixid=MnwxMjA3fDB8MHxzZWFyY2h8OXx8ZG9nc3xlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
+        image: 'https://images.unsplash.com/photo-1494947665470-20322015e3a8?ixid=MnwxMjA3fDB8MHxzZWFyY2h8OXx8ZG9nc3xlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
     ];
   }

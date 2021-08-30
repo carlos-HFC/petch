@@ -18,8 +18,15 @@ export class Ong extends Model {
   })
   email: string;
 
+  @NotEmpty({ msg: "Campo 'Responsável' não pode ser vazio" })
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  responsible: string;
+
   @Column(DataType.STRING)
-  logo: string;
+  image: string;
 
   @NotEmpty({ msg: "Campo 'Telefone 1' não pode ser vazio" })
   @Column({

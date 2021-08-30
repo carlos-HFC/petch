@@ -40,7 +40,14 @@ export class Gift extends Model {
   taste: string;
 
   @Column(DataType.STRING)
-  media: string;
+  image: string;
+
+  @NotEmpty({ msg: "Campo 'Abrangência' não pode ser vazio" })
+  @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  coverage: string;
 
   @ForeignKey(() => Partner)
   @Column
@@ -55,5 +62,6 @@ export class Gift extends Model {
     if (gift.weight) gift.weight = gift.weight.toUpperCase();
     if (gift.color) gift.color = capitalizeFirstLetter(gift.color);
     if (gift.taste) gift.taste = capitalizeFirstLetter(gift.taste);
+    if (gift.coverage) gift.coverage = gift.coverage.toUpperCase();
   }
 }

@@ -9,7 +9,7 @@ export class Species {
   name: string;
 
   @ApiProperty({ type: 'string', required: false })
-  avatar: string;
+  image: string;
 
   @ApiProperty({ type: [Size], required: false })
   sizes: Size[];
@@ -24,7 +24,9 @@ export class Species {
   deletedAt: Date | null;
 }
 
-export class CreateSpecies extends OmitType(Species, ['id', 'avatar', 'sizes', 'createdAt', 'updatedAt', 'deletedAt']) {
+export class IndexSpecies extends OmitType(Species, ['createdAt', 'updatedAt', 'image']) { }
+
+export class CreateSpecies extends OmitType(Species, ['id', 'image', 'sizes', 'createdAt', 'updatedAt', 'deletedAt']) {
   @ApiProperty({ type: [CreateSize] })
   size: CreateSize[];
 
@@ -32,7 +34,7 @@ export class CreateSpecies extends OmitType(Species, ['id', 'avatar', 'sizes', '
   media: string;
 }
 
-export class UpdateSpecies extends PartialType(OmitType(Species, ['id', 'avatar', 'sizes', 'createdAt', 'updatedAt', 'deletedAt'])) {
+export class UpdateSpecies extends PartialType(OmitType(Species, ['id', 'image', 'sizes', 'createdAt', 'updatedAt', 'deletedAt'])) {
   @ApiProperty({ type: 'string', format: 'binary', required: false })
   media: string;
 }
