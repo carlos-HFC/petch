@@ -4,9 +4,18 @@ import { Ong } from '../ong/ong.model';
 import { Species } from '../species/species.model';
 import { capitalizeFirstLetter } from '../utils';
 
-// @DefaultScope(() => ({
-//   include: [Ong, Species]
-// }))
+@DefaultScope(() => ({
+  include: [
+    {
+      model: Ong,
+      attributes: ['name']
+    },
+    {
+      model: Species,
+      attributes: ['name']
+    }
+  ]
+}))
 @Table({ paranoid: true })
 export class Pet extends Model {
   @Column({

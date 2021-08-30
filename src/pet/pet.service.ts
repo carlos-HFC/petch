@@ -20,11 +20,13 @@ export class PetService {
   ) { }
 
   async get() {
-    return await this.petModel.findAll();
+    return await this.petModel.findAll({
+      attributes: ['id', 'name', 'age', 'gender', 'weight']
+    });
   }
 
-  async findById(id: number) {
-    const pet = await this.petModel.findByPk(id);
+  async findById(id: number, inactives?: boolean) {
+    const pet = await this.petModel.findByPk(id, { paranoid: !inactives });
 
     if (!pet) throw new HttpException('Pet não encontrado', 404);
 
@@ -59,10 +61,25 @@ export class PetService {
 
     try {
       const pet = await this.findById(id);
+
+      if (data.ongId) await this.ongService.findById(data.ongId);
+      if (data.speciesId) await this.speciesService.findById(data.speciesId);
+
+      await pet.update({ ...data });
     } catch (error) {
       throw new HttpException(error, 400);
     }
   }
 
-  async delete() { }
+  async delete(id: number) {
+    const pet = await this.findById(id);
+
+    await pet.destroy();
+  }
+
+  async restore(id: number) {
+    const pet = await this.findById(id, true);
+
+    await pet.restore();
+  }
 }
