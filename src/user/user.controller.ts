@@ -58,7 +58,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Listar um usuário pelo ID' })
-  @ApiOkResponse({ type: [User], description: 'Success' })
+  @ApiOkResponse({ type: User, description: 'Success' })
   @ApiUnauthorizedResponse({
     schema: {
       type: 'object',
