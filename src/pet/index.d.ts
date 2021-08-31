@@ -12,3 +12,11 @@ type TCreatePet = {
 };
 
 type TUpdatePet = Partial<TCreatePet>;
+
+type TFilterPet = {
+  inactives?: boolean;
+  gender?: string;
+  age?: string;
+  ong?: string;
+  species?: string;
+};

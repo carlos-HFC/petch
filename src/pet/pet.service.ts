@@ -1,5 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { col, where } from 'sequelize';
 
 import { Pet } from './pet.model';
 import { OngService } from '../ong/ong.service';
@@ -19,9 +20,19 @@ export class PetService {
     private uploadService: UploadService,
   ) { }
 
-  async get() {
+  async get(query?: TFilterPet) {
+    trimObj(query);
+
+    const options = {};
+
+    if (query.gender) Object.assign(options, { gender: query.gender });
+    if (query.ong) Object.assign(options, { ong: where(col('ong.name'), query.ong.normalize()) });
+    if (query.species) Object.assign(options, { species: where(col('species.name'), query.species.normalize()) });
+
     return await this.petModel.findAll({
-      attributes: ['id', 'name', 'age', 'gender', 'weight']
+      paranoid: !query.inactives,
+      where: options,
+      attributes: ['id', 'name', 'age', 'gender', 'weight', 'deletedAt']
     });
   }
 
