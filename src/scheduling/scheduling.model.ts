@@ -1,36 +1,24 @@
-import { format, parseISO } from 'date-fns';
-import { BeforeSave, BelongsTo, Column, DataType, ForeignKey, Model, Table } from 'sequelize-typescript';
+import { BelongsTo, Column, DataType, ForeignKey, Model, NotEmpty, Table } from 'sequelize-typescript';
 
 import { SchedulingTypes } from '../schedulingTypes/schedulingTypes.model';
 import { User } from '../user/user.model';
 
 @Table({ paranoid: true })
 export class Scheduling extends Model {
+  @NotEmpty({ msg: "Campo 'Data' não pode ser vazio" })
   @Column({
-    type: DataType.STRING,
+    type: DataType.DATE,
     allowNull: false,
   })
-  date: string;
+  date: Date;
 
   @Column({
-    type: DataType.STRING,
-    allowNull: false,
+    type: DataType.DATE,
+    defaultValue: null,
   })
-  initHour: string;
+  canceledAt: Date;
 
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  endHour: string;
-
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: false,
-    defaultValue: false,
-  })
-  confirmed: boolean;
-
+  @NotEmpty({ msg: "Campo 'Tipo de Agendamento' não pode ser vazio" })
   @ForeignKey(() => SchedulingTypes)
   @Column({ allowNull: false })
   schedulingTypesId: number;
@@ -44,11 +32,4 @@ export class Scheduling extends Model {
 
   @BelongsTo(() => User)
   user: User;
-
-  @BeforeSave
-  static async formatData(scheduling: Scheduling) {
-    scheduling.date = format(parseISO(scheduling.date), 'yyyy-MM-dd');
-    scheduling.initHour = format(parseISO(scheduling.initHour), 'HH:mm');
-    scheduling.endHour = format(parseISO(scheduling.endHour), 'HH:mm');
-  }
 }
