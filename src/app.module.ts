@@ -1,10 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { APP_FILTER } from '@nestjs/core';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { SendGridModule } from '@ntegral/nestjs-sendgrid';
 import { SeederModule } from 'nestjs-sequelize-seeder';
 
 import { AuthModule } from './auth/auth.module';
+import { AllExceptionsFilter } from './exception.filter';
 import { GiftModule } from './gift/gift.module';
 import { MailModule } from './mail/mail.module';
 import { OngModule } from './ong/ong.module';
@@ -70,6 +72,12 @@ import { UserModule } from './user/user.module';
     SchedulingModule,
   ],
   controllers: [],
-  providers: [UploadService],
+  providers: [
+    UploadService,
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter
+    }
+  ],
 })
 export class AppModule { }
