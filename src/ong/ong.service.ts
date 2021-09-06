@@ -59,7 +59,7 @@ export class OngService {
   }
 
   async findByEmail(email: string) {
-    validateEmail(email);
+    // validateEmail(email);
     return await this.ongModel.findOne({
       where: {
         email: email.toLowerCase()
