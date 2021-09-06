@@ -25,7 +25,7 @@ export class OngService {
       const ongs = await this.ongModel.findAll({
         paranoid: !query.inactives,
         where,
-        attributes: ['id', 'name', 'email', 'phone1', 'responsible', 'city', 'uf', 'deletedAt']
+        attributes: ['id', 'name', 'email', 'phone1', 'responsible', 'cep', 'city', 'deletedAt']
       });
 
       const states = query.coverage.toUpperCase().split(',').map(cov => cov.trim());
@@ -38,7 +38,7 @@ export class OngService {
     return await this.ongModel.findAll({
       paranoid: !query.inactives,
       where,
-      attributes: ['id', 'name', 'email', 'phone1', 'responsible', 'city', 'uf', 'deletedAt']
+      attributes: ['id', 'name', 'email', 'phone1', 'responsible', 'cep', 'city', 'deletedAt']
     });
   }
 
@@ -59,7 +59,7 @@ export class OngService {
   }
 
   async findByEmail(email: string) {
-    // validateEmail(email);
+    validateEmail(email);
     return await this.ongModel.findOne({
       where: {
         email: email.toLowerCase()

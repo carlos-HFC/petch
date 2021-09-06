@@ -13,8 +13,9 @@ export function capitalizeFirstLetter(str: string) {
 }
 
 export function validateEmail(email: string) {
-  trimObj({ email });
   const regex = /\S+@\S+\.\S+/;
+
+  email = email.replace(/[\s]/g, '')
 
   if (!regex.test(email)) throw new HttpException('E-mail inválido', 400);
 }
