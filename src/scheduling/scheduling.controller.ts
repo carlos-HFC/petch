@@ -1,7 +1,8 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Req } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 
 import { SchedulingService } from './scheduling.service';
+import { JwtAuthGuard } from '../auth/auth.guard';
 
 @Controller('schedulings')
 export class SchedulingController {
@@ -24,15 +25,16 @@ export class SchedulingController {
     return await this.schedulingService.findById(id);
   }
 
-  // @UseGuards(JwtAuthGuard)
+  @UseGuards(JwtAuthGuard)
   @Post()
   async create(@Req() req: Request, @Body() data: TCreateScheduling) {
-    return await this.schedulingService.post(2, data);
+    return await this.schedulingService.post(req.user, data);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Put(':id')
   async cancelSchedule(@Req() req: Request, @Param('id') id: number) {
-    return await this.schedulingService.cancelSchedule(2, id);
+    return await this.schedulingService.cancelSchedule(req.user, id);
   }
 
   @Patch(':id')

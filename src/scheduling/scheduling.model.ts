@@ -1,8 +1,11 @@
-import { BelongsTo, Column, DataType, ForeignKey, Model, NotEmpty, Table } from 'sequelize-typescript';
+import { BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, NotEmpty, Table } from 'sequelize-typescript';
 
 import { SchedulingTypes } from '../schedulingTypes/schedulingTypes.model';
 import { User } from '../user/user.model';
 
+@DefaultScope(() => ({
+  include: [User, SchedulingTypes]
+}))
 @Table({ paranoid: true })
 export class Scheduling extends Model {
   @NotEmpty({ msg: "Campo 'Data' não pode ser vazio" })

@@ -55,4 +55,48 @@ export class MailService {
       throw new HttpException(error, 400);
     }
   }
+
+  async newScheduling(user: User, date: string, schedulingTypeName: string) {
+    const envelope = {
+      to: user.email,
+      from: "NoReply <projetopetch@gmail.com>"
+    };
+
+    try {
+      await this.client.send({
+        ...envelope,
+        subject: "Agendamento confirmado!!",
+        html: `<h2>Agendamento confirmado com sucesso!</h2>
+
+          <p>
+            <strong>Olá ${user.name},</strong>
+            o seu agendamento para ${schedulingTypeName}, marcado para o dia ${date}, foi confirmado com sucesso
+          </p>`
+      })
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
+  }
+  
+  async cancelScheduling(user: User, date: string, schedulingTypeName: string) {
+    const envelope = {
+      to: user.email,
+      from: "NoReply <projetopetch@gmail.com>"
+    };
+
+    try {
+      await this.client.send({
+        ...envelope,
+        subject: "Agendamento cancelado!!",
+        html: `<h2>Agendamento cancelado!</h2>
+
+          <p>
+            <strong>Olá ${user.name},</strong>
+            o seu agendamento para ${schedulingTypeName}, marcado para o dia ${date}, foi cancelado com sucesso
+          </p>`
+      })
+    } catch (error) {
+      throw new HttpException(error, 400);
+    }
+  }
 }

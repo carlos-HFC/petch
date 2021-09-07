@@ -1,10 +1,13 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { endOfDay, format, isAfter, isBefore, isValid, parseISO, setHours, setMinutes, setSeconds, startOfDay, startOfHour, startOfToday, subHours } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { Op as $ } from 'sequelize';
 
 import { Scheduling } from './scheduling.model';
+import { MailService } from '../mail/mail.service';
 import { SchedulingTypesService } from '../schedulingTypes/schedulingTypes.service';
+import { User } from '../user/user.model';
 import { trimObj } from '../utils';
 
 @Injectable()
@@ -12,7 +15,8 @@ export class SchedulingService {
   constructor(
     @InjectModel(Scheduling)
     private readonly schedulingModel: typeof Scheduling,
-    private schedulingTypesService: SchedulingTypesService
+    private schedulingTypesService: SchedulingTypesService,
+    private mailService: MailService
   ) { }
 
   async get(query?: TFilterScheduling) {
@@ -82,7 +86,7 @@ export class SchedulingService {
     return available;
   }
 
-  async post(userId: number, data: TCreateScheduling) {
+  async post(user: User, data: TCreateScheduling) {
     trimObj(data);
 
     const date = parseISO(data.date);
@@ -97,7 +101,7 @@ export class SchedulingService {
           break;
       }
 
-      await this.schedulingTypesService.getById(data.schedulingTypesId);
+      const schedulingType = await this.schedulingTypesService.getById(data.schedulingTypesId);
 
       const available = await this.schedulingModel.findOne({
         where: {
@@ -109,34 +113,40 @@ export class SchedulingService {
 
       if (available) throw new HttpException('Data de agendamento indisponível', 400);
 
+      const dateFormatted = format(date, "dd 'de' MMMM 'de' yyyy', às' HH:mm", { locale: ptBR });
+
+      await this.mailService.newScheduling(user, dateFormatted, schedulingType.name);
+
       return await this.schedulingModel.create({
         ...data,
-        userId
+        userId: user.id
       });
     } catch (error) {
       throw new HttpException(error, 400);
     }
   }
 
-  async put(id: number, data: object) { }
-
-  async cancelSchedule(userId: number, id: number) {
+  async cancelSchedule(user: User, id: number) {
     try {
       const scheduling = await this.schedulingModel.findOne({
         where: {
-          userId,
           id,
+          userId: user.id,
           canceledAt: null
         }
       });
 
-      const dateWithSub = subHours(scheduling.date, 2);
+      const cancelTimeLimit = subHours(scheduling.date, 1);
 
-      if (isBefore(dateWithSub, new Date())) throw new HttpException('Você só pode cancelar um agendamento com duas horas de antecedência', 400);
+      if (isBefore(cancelTimeLimit, new Date())) throw new HttpException('Você só pode cancelar um agendamento com duas horas de antecedência', 400);
 
-      await scheduling.update({
-        canceledAt: new Date()
-      });
+      const canceledAt = new Date();
+
+      const dateFormatted = format(canceledAt, "dd 'de' MMMM 'de' yyyy', às' HH:mm", { locale: ptBR });
+
+      await scheduling.update({ canceledAt });
+
+      await this.mailService.cancelScheduling(user, dateFormatted, scheduling.schedulingTypes.name);
     } catch (error) {
       throw new HttpException(error, 400);
     }
