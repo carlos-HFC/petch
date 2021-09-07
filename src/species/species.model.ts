@@ -4,7 +4,7 @@ import { Size } from '../size/size.model';
 import { capitalizeFirstLetter } from '../utils';
 
 @DefaultScope(() => ({
-  // include: [Size]
+  include: [Size]
 }))
 @Table({ paranoid: true })
 export class Species extends Model {
