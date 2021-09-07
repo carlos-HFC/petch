@@ -30,7 +30,7 @@ export class SpeciesService {
     return await this.speciesModel.findAll({
       paranoid: !query.inactives,
       where,
-      attributes: ['id', 'name', 'sizes', 'deletedAt']
+      attributes: ['id', 'name', 'deletedAt']
     });
   }
 
