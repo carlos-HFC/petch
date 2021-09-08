@@ -56,7 +56,7 @@ export class UserService {
 
     return await this.userModel.findOne({
       where: {
-        cpf: cpf.replace(/[\s-.]/g, '')
+        cpf: cpf.replace(/[-.]/g, '').trim()
       }
     });
   }
@@ -118,6 +118,7 @@ export class UserService {
 
       return user;
     } catch (error) {
+      console.log(error)
       await transaction.rollback();
       throw new HttpException(error, 400);
     }

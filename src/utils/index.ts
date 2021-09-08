@@ -15,15 +15,13 @@ export function capitalizeFirstLetter(str: string) {
 export function validateEmail(email: string) {
   const regex = /\S+@\S+\.\S+/;
 
-  email = email.replace(/[\s]/g, '')
-
-  if (!regex.test(email)) throw new HttpException('E-mail inválido', 400);
+  if (!regex.test(email.trim())) throw new HttpException('E-mail inválido', 400);
 }
 
 export function validateCEP(cep: string) {
   const regex = /[\d]/g;
 
-  cep = cep.replace(/[\s-]/g, '');
+  cep = cep.replace(/[-]/g, '').trim();
 
   if (!regex.test(cep) || cep.length !== 8) throw new HttpException("CEP inválido", 400);
 }
@@ -31,7 +29,7 @@ export function validateCEP(cep: string) {
 export function validateCPF(cpf: string) {
   let sum = 0, rest = 0;
 
-  cpf = cpf.replace(/[.-\s]/g, '');
+  cpf = cpf.replace(/[.-]/g, '').trim();
 
   switch (true) {
     case cpf === '00000000000':
@@ -75,7 +73,7 @@ export function validatePassword(password: string) {
 export function validatePhone(phone: string) {
   const regex = /[\d]/g;
 
-  phone = phone.replace(/[()-\s]/g, '');
+  phone = phone.replace(/[()-]/g, '').trim();
 
   if (!regex.test(phone) || phone.length < 10 || phone.length > 11) throw new HttpException('Número de telefone/celular inválido', 400);
 }
@@ -85,7 +83,7 @@ export function createTokenHEX() {
 }
 
 export function validateCNPJ(cnpj: string) {
-  cnpj = cnpj.replace(/[\/\s.-]/g, '');
+  cnpj = cnpj.replace(/[/\-]/g, '').trim();
 
   switch (true) {
     case cnpj.length !== 14:
