@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { randomBytes } from 'crypto';
 import { differenceInCalendarYears, isValid, parseISO } from 'date-fns';
 import { col, where } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
 
 import { User } from './user.model';
 import { MailService } from '../mail/mail.service';
@@ -17,7 +18,8 @@ export class UserService {
     private readonly userModel: typeof User,
     private roleService: RoleService,
     private uploadService: UploadService,
-    private mailService: MailService
+    private mailService: MailService,
+    private sequelize: Sequelize
   ) { }
 
   async get(query?: TFilterUser) {
@@ -71,6 +73,7 @@ export class UserService {
 
   async post(data: TCreateUser, isAdmin: boolean, media?: Express.MulterS3.File) {
     trimObj(data);
+    const transaction = await this.sequelize.transaction();
 
     try {
       if (data.cep) validateCEP(data.cep);
@@ -80,12 +83,12 @@ export class UserService {
 
       const birth = parseISO(data.birthday);
 
-      // if (!isAdmin) {
-      //   if (data.password && data.password !== data.confirmPassword) throw new HttpException('Senhas não correspondem', 400);
-      //   validatePassword(data.password);
+      if (!isAdmin) {
+        if (data.password && data.password !== data.confirmPassword) throw new HttpException('Senhas não correspondem', 400);
+        validatePassword(data.password);
 
-      //   if (!data.googleId) throw new HttpException('A senha é obrigatória', 400);
-      // }
+        if (!data.googleId) throw new HttpException('A senha é obrigatória', 400);
+      }
 
       if (isAdmin) data.password = randomBytes(5).toString('hex');
 
@@ -109,11 +112,13 @@ export class UserService {
         ...data,
         roleId: role.id,
         tokenVerificationEmail: createTokenHEX()
-      });
+      }, { transaction });
+
+      await transaction.commit();
 
       return user;
     } catch (error) {
-      console.log(error)
+      await transaction.rollback();
       throw new HttpException(error, 400);
     }
   }
