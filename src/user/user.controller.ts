@@ -108,8 +108,8 @@ export class UserController {
   @ApiParam({ name: 'id', required: true })
   @ApiQuery({ name: 'inactives', type: 'boolean', required: false })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @RoleDecorator('admin')
+  // @UseGuards(JwtAuthGuard, RoleGuard)
+  // @RoleDecorator('admin')
   @Get(':id')
   async byId(@Param('id') id: number, @Query('inactives') inactives: boolean) {
     return await this.userService.findById(id, inactives);
@@ -178,8 +178,8 @@ export class UserController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateUser })
   @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @RoleDecorator('admin')
+  // @UseGuards(JwtAuthGuard, RoleGuard)
+  // @RoleDecorator('admin')
   @Post()
   @UseInterceptors(FileInterceptor('media'))
   async create(@Body() data: TCreateUser, @UploadedFile() media?: Express.MulterS3.File) {

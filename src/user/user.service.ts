@@ -80,12 +80,12 @@ export class UserService {
 
       const birth = parseISO(data.birthday);
 
-      if (!isAdmin) {
-        if (data.password && data.password !== data.confirmPassword) throw new HttpException('Senhas não correspondem', 400);
-        validatePassword(data.password);
+      // if (!isAdmin) {
+      //   if (data.password && data.password !== data.confirmPassword) throw new HttpException('Senhas não correspondem', 400);
+      //   validatePassword(data.password);
 
-        if (!data.googleId) throw new HttpException('A senha é obrigatória', 400);
-      }
+      //   if (!data.googleId) throw new HttpException('A senha é obrigatória', 400);
+      // }
 
       if (isAdmin) data.password = randomBytes(5).toString('hex');
 
@@ -113,6 +113,7 @@ export class UserService {
 
       return user;
     } catch (error) {
+      console.log(error)
       throw new HttpException(error, 400);
     }
   }
