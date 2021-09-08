@@ -62,7 +62,7 @@ export class UserService {
   }
 
   async findByEmail(email: string) {
-    validateEmail(email);
+    // validateEmail(email);
 
     return await this.userModel.findOne({
       where: {
