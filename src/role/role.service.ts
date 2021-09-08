@@ -27,7 +27,7 @@ export class RoleService {
   async getByName(name: string) {
     return await this.roleModel.findOne({
       where: {
-        name: name.normalize().trim().toLowerCase()
+        name: name.normalize().trim()
       }
     });
   }
