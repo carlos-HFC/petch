@@ -98,7 +98,7 @@ export class UserService {
           break;
       }
 
-      const role = await this.roleService.getByName(isAdmin ? 'admin' : 'adotante');
+      const role = await this.roleService.getByName(isAdmin ? 'Admin' : 'Adotante');
 
       if (media) {
         const avatar = (await this.uploadService.uploadFile(media)).url;
