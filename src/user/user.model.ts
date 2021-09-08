@@ -1,6 +1,6 @@
 import { compare, hash } from 'bcrypt';
 import { format, parseISO } from 'date-fns';
-import { BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, NotEmpty, Table } from 'sequelize-typescript';
+import { AutoIncrement, BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, NotEmpty, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Role } from '../role/role.model';
 
@@ -14,6 +14,15 @@ import { Role } from '../role/role.model';
 }))
 @Table({ paranoid: true })
 export class User extends Model {
+  @PrimaryKey
+  @AutoIncrement
+  @Column({
+    allowNull: false,
+    autoIncrement: true,
+    primaryKey: true,
+  })
+  id: number;
+
   @Column({
     type: DataType.STRING,
     unique: true,
