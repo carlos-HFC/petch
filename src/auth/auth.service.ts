@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { isAfter } from 'date-fns';
+import { Sequelize } from 'sequelize-typescript';
 
 import { User } from '../user/user.model';
 import { UserService } from '../user/user.service';
@@ -11,6 +12,7 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private userService: UserService,
+    private sequelize: Sequelize
   ) { }
 
   async login(data: TLogin) {
@@ -23,9 +25,9 @@ export class AuthService {
 
       if (!user.emailVerified) throw new HttpException('E-mail não verificado', 400);
 
-      const { token, expires } = await this.createTokenJwt(user);
+      const auth = await this.createTokenJwt(user);
 
-      return { token, expires };
+      return auth;
     } catch (error) {
       throw new HttpException(error, 400);
     }
@@ -36,6 +38,8 @@ export class AuthService {
   }
 
   async forgotPassword(email: string) {
+    const transaction = await this.sequelize.transaction();
+
     try {
       const user = await this.userService.findByEmail(email);
 
@@ -46,16 +50,20 @@ export class AuthService {
       await user.update({
         tokenResetPassword: token,
         tokenResetPasswordExpires: now.toString(),
-      });
+      }, { transaction });
+
+      await transaction.commit();
 
       return { token };
     } catch (error) {
+      await transaction.rollback();
       throw new HttpException(error, 400);
     }
   }
 
   async resetPassword(data: TResetPassword) {
     trimObj(data);
+    const transaction = await this.sequelize.transaction();
 
     try {
       const user = await this.userService.findByEmail(data.email);
@@ -92,28 +100,30 @@ export class AuthService {
         ...data,
         tokenResetPassword: null,
         tokenResetPasswordExpires: null,
-      });
+      }, { transaction });
+
+      await transaction.commit();
     } catch (error) {
+      await transaction.rollback();
       throw new HttpException(error, 400);
     }
   }
 
   async register(data: TCreateUser, media?: Express.MulterS3.File) {
-    trimObj(data);
-
     await this.userService.post(data, false, media);
   }
 
   private async createTokenJwt(user: User) {
     const token = this.jwtService.sign({ id: user.id, email: user.email, role: user.role.name, cpf: user.cpf, password: user.hash, google: user.googleId });
 
-    const { exp } = await this.jwtService.verifyAsync(token);
+    const { role } = await this.jwtService.verifyAsync(token);
 
-    return { token, expires: exp * 1000 };
+    return { token, role };
   }
 
   async googleLogin(data: TGoogleLogin) {
     trimObj(data);
+    const transaction = await this.sequelize.transaction();
 
     try {
       const [userByGoogle, userByEmail] = await Promise.all([
@@ -121,22 +131,27 @@ export class AuthService {
         this.userService.findByEmail(data.email)
       ]);
 
-      if (!userByGoogle && userByEmail) {
-        await userByEmail.update({ ...data });
+      if (userByGoogle) {
+        await userByGoogle.update({ ...data }, { transaction });
 
-        const { token, expires } = await this.createTokenJwt(userByEmail);
+        const auth = await this.createTokenJwt(userByGoogle);
 
-        return { token, expires };
+        await transaction.commit();
+
+        return auth;
       }
 
-      if (userByGoogle) {
-        await userByGoogle.update({ ...data });
+      if (!userByGoogle && userByEmail) {
+        await userByEmail.update({ ...data }, { transaction });
 
-        const { token, expires } = await this.createTokenJwt(userByGoogle);
+        const auth = await this.createTokenJwt(userByEmail);
 
-        return { token, expires };
+        await transaction.commit();
+
+        return auth;
       }
     } catch (error) {
+      await transaction.rollback();
       throw new HttpException(error, 400);
     }
   }
