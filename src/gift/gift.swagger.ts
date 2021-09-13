@@ -25,9 +25,6 @@ export class Gift {
   taste: string;
 
   @ApiProperty({ type: 'string', required: false })
-  coverage: string;
-
-  @ApiProperty({ type: 'string', required: false })
   image: string;
 
   @ApiProperty({ type: 'number', required: false })
