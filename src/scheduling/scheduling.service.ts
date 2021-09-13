@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { endOfDay, format, isAfter, isBefore, isValid, parseISO, setHours, setMinutes, setSeconds, startOfDay, startOfHour, startOfToday, subHours } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Op as $ } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
 
 import { Scheduling } from './scheduling.model';
 import { MailService } from '../mail/mail.service';
@@ -16,7 +17,8 @@ export class SchedulingService {
     @InjectModel(Scheduling)
     private readonly schedulingModel: typeof Scheduling,
     private schedulingTypesService: SchedulingTypesService,
-    private mailService: MailService
+    private mailService: MailService,
+    private sequelize: Sequelize
   ) { }
 
   async get(query?: TFilterScheduling) {
@@ -88,6 +90,7 @@ export class SchedulingService {
 
   async post(user: User, data: TCreateScheduling) {
     trimObj(data);
+    const transaction = await this.sequelize.transaction();
 
     const date = parseISO(data.date);
 
@@ -117,16 +120,23 @@ export class SchedulingService {
 
       await this.mailService.newScheduling(user, dateFormatted, schedulingType.name);
 
-      return await this.schedulingModel.create({
+      const scheduling = await this.schedulingModel.create({
         ...data,
         userId: user.id
-      });
+      }, { transaction });
+
+      await transaction.commit();
+
+      return scheduling;
     } catch (error) {
+      await transaction.rollback();
       throw new HttpException(error, 400);
     }
   }
 
   async cancelSchedule(user: User, id: number) {
+    const transaction = await this.sequelize.transaction();
+
     try {
       const scheduling = await this.schedulingModel.findOne({
         where: {
@@ -144,10 +154,13 @@ export class SchedulingService {
 
       const dateFormatted = format(canceledAt, "dd 'de' MMMM 'de' yyyy', às' HH:mm", { locale: ptBR });
 
-      await scheduling.update({ canceledAt });
+      await scheduling.update({ canceledAt }, { transaction });
+
+      await transaction.commit();
 
       await this.mailService.cancelScheduling(user, dateFormatted, scheduling.schedulingTypes.name);
     } catch (error) {
+      await transaction.rollback();
       throw new HttpException(error, 400);
     }
   }

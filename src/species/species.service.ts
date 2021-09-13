@@ -1,6 +1,7 @@
 import { forwardRef, HttpException, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op as $ } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
 
 import { Species } from './species.model';
 import { SizeService } from '../size/size.service';
@@ -15,6 +16,7 @@ export class SpeciesService {
     private uploadService: UploadService,
     @Inject(forwardRef(() => SizeService))
     private sizeService: SizeService,
+    private sequelize: Sequelize
   ) { }
 
   async get(query?: TFilterSpecies) {
@@ -52,6 +54,7 @@ export class SpeciesService {
 
   async post(data: TCreateSpecies, media?: Express.MulterS3.File) {
     trimObj(data);
+    const transaction = await this.sequelize.transaction();
 
     try {
       if (data.name && await this.findByName(data.name)) throw new HttpException('Espécie já cadastrada', 400);
@@ -61,18 +64,22 @@ export class SpeciesService {
         Object.assign(data, { image });
       }
 
-      const species = await this.speciesModel.create({ ...data });
+      const species = await this.speciesModel.create({ ...data }, { transaction });
 
       const sizes = await Promise.all(data.size.map(size => this.sizeService.post({ ...size, speciesId: species.id })));
 
+      await transaction.commit();
+
       return { species, sizes };
     } catch (error) {
+      await transaction.rollback();
       throw new HttpException(error, 400);
     }
   }
 
   async put(id: number, data: TUpdateSpecies, media?: Express.MulterS3.File) {
     trimObj(data);
+    const transaction = await this.sequelize.transaction();
 
     try {
       const species = await this.findById(id);
@@ -84,8 +91,11 @@ export class SpeciesService {
         Object.assign(data, { image });
       }
 
-      await species.update({ ...data });
+      await species.update({ ...data }, { transaction });
+
+      await transaction.commit();
     } catch (error) {
+      await transaction.rollback();
       throw new HttpException(error, 400);
     }
   }

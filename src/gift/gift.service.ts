@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op as $ } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
 
 import { Gift } from './gift.model';
 import { PartnerService } from '../partner/partner.service';
@@ -13,7 +14,8 @@ export class GiftService {
     @InjectModel(Gift)
     private readonly giftModel: typeof Gift,
     private partnerService: PartnerService,
-    private uploadService: UploadService
+    private uploadService: UploadService,
+    private sequelize: Sequelize
   ) { }
 
   async get(query?: TFilterGift) {
@@ -28,7 +30,8 @@ export class GiftService {
 
     return await this.giftModel.findAll({
       paranoid: !query.inactives,
-      where
+      where,
+      attributes: ['id', 'name', 'description', 'deletedAt']
     });
   }
 
@@ -42,6 +45,7 @@ export class GiftService {
 
   async post(data: TCreateGift, media?: Express.MulterS3.File) {
     trimObj(data);
+    const transaction = await this.sequelize.transaction();
 
     try {
       if (data.partnerId) await this.partnerService.findById(data.partnerId);
@@ -51,16 +55,20 @@ export class GiftService {
         Object.assign(data, { image });
       }
 
-      const gift = await this.giftModel.create({ ...data });
+      const gift = await this.giftModel.create({ ...data }, { transaction });
+
+      await transaction.commit();
 
       return gift;
     } catch (error) {
+      await transaction.rollback();
       throw new HttpException(error, 400);
     }
   }
 
   async put(id: number, data: TUpdateGift, media?: Express.MulterS3.File) {
     trimObj(data);
+    const transaction = await this.sequelize.transaction();
 
     try {
       const gift = await this.findById(id);
@@ -72,8 +80,11 @@ export class GiftService {
         Object.assign(data, { image });
       }
 
-      await gift.update({ ...data });
+      await gift.update({ ...data }, { transaction });
+
+      await transaction.commit();
     } catch (error) {
+      await transaction.rollback();
       throw new HttpException(error, 400);
     }
   }

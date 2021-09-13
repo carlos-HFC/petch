@@ -62,7 +62,7 @@ export class UserService {
   }
 
   async findByEmail(email: string) {
-    // validateEmail(email);
+    validateEmail(email);
 
     return await this.userModel.findOne({
       where: {
@@ -118,7 +118,6 @@ export class UserService {
 
       return user;
     } catch (error) {
-      console.log(error)
       await transaction.rollback();
       throw new HttpException(error, 400);
     }
@@ -126,6 +125,7 @@ export class UserService {
 
   async put(user: User, data: TUpdateUser, media?: Express.MulterS3.File) {
     trimObj(data);
+    const transaction = await this.sequelize.transaction();
 
     try {
       if (data.cep) validateCEP(data.cep);
@@ -178,10 +178,13 @@ export class UserService {
         ...data,
         emailVerified: data.email && false,
         tokenVerificationEmail: data.email && createTokenHEX(),
-      });
+      }, { transaction });
+
+      await transaction.commit();
 
       if (data.email) await this.mailService.newUser(user);
     } catch (error) {
+      await transaction.rollback();
       throw new HttpException(error, 400);
     }
   }
@@ -202,24 +205,32 @@ export class UserService {
     if (!email) throw new HttpException('E-mail não informdo', 400);
     if (!tokenVerificationEmail) throw new HttpException('Token não informdo', 400);
 
-    const user = await this.findByEmail(email);
+    const transaction = await this.sequelize.transaction();
 
-    switch (true) {
-      case !user:
-        throw new HttpException('Usuário não encontrado', 404);
-      case user.emailVerified:
-        throw new HttpException('Usuário já confirmado', 400);
-      case user.tokenVerificationEmail !== tokenVerificationEmail:
-        throw new HttpException('Token inválido', 400);
-      default:
-        break;
+    try {
+      const user = await this.findByEmail(email);
+
+      switch (true) {
+        case !user:
+          throw new HttpException('Usuário não encontrado', 404);
+        case user.emailVerified:
+          throw new HttpException('Usuário já confirmado', 400);
+        case user.tokenVerificationEmail !== tokenVerificationEmail:
+          throw new HttpException('Token inválido', 400);
+        default:
+          break;
+      }
+
+      await user.update({
+        tokenVerificationEmail: null,
+        emailVerified: true
+      }, { transaction });
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw new HttpException(error, 400);
     }
 
-    await user.update({
-      tokenVerificationEmail: null,
-      emailVerified: true
-    });
-
-    await this.mailService.emailConfirmed(user);
   }
 }

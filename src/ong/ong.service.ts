@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Op as $ } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
 
 import { Ong } from './ong.model';
 import { UploadService } from '../upload.service';
@@ -11,7 +12,8 @@ export class OngService {
   constructor(
     @InjectModel(Ong)
     private readonly ongModel: typeof Ong,
-    private uploadService: UploadService
+    private uploadService: UploadService,
+    private sequelize: Sequelize
   ) { }
 
   async get(query?: TFilterOng) {
@@ -69,6 +71,7 @@ export class OngService {
 
   async post(data: TCreateOng, media?: Express.MulterS3.File) {
     trimObj(data);
+    const transaction = await this.sequelize.transaction();
 
     try {
       if (data.cep) validateCEP(data.cep);
@@ -83,16 +86,20 @@ export class OngService {
         Object.assign(data, { image });
       }
 
-      const ong = await this.ongModel.create({ ...data });
+      const ong = await this.ongModel.create({ ...data }, { transaction });
+
+      await transaction.commit();
 
       return ong;
     } catch (error) {
+      await transaction.rollback();
       throw new HttpException(error, 400);
     }
   }
 
   async put(id: number, data: TUpdateOng, media?: Express.MulterS3.File) {
     trimObj(data);
+    const transaction = await this.sequelize.transaction();
 
     try {
       if (data.cep) validateCEP(data.cep);
@@ -115,8 +122,11 @@ export class OngService {
         Object.assign(data, { image });
       }
 
-      await ong.update({ ...data });
+      await ong.update({ ...data }, { transaction });
+
+      await transaction.commit();
     } catch (error) {
+      await transaction.rollback();
       throw new HttpException(error, 400);
     }
   }

@@ -1,5 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
+import { Sequelize } from 'sequelize-typescript';
 
 import { Solicitation } from './solicitation.model';
 import { SolicitationTypesService } from '../solicitationTypes/solicitationTypes.service';
@@ -13,7 +14,8 @@ export class SolicitationService {
     @InjectModel(Solicitation)
     private readonly solicitationModel: typeof Solicitation,
     private solicitationTypeService: SolicitationTypesService,
-    private uploadService: UploadService
+    private uploadService: UploadService,
+    private sequelize: Sequelize
   ) { }
 
   async get() {
@@ -30,6 +32,7 @@ export class SolicitationService {
 
   async post(data: TCreateSolicitation, media?: Express.MulterS3.File, user?: User) {
     trimObj(data);
+    const transaction = await this.sequelize.transaction();
 
     try {
       await this.solicitationTypeService.findById(data.solicitationTypeId);
@@ -40,13 +43,15 @@ export class SolicitationService {
       }
 
       if (user) {
-        if (data.name) data.name = null;
-        if (data.email) data.email = null;
+        data.name = null;
+        data.email = null;
 
         const solicitation = await this.solicitationModel.create({
           ...data,
           userId: user.id
-        });
+        }, { transaction });
+
+        await transaction.commit();
 
         return solicitation;
       }
@@ -54,10 +59,13 @@ export class SolicitationService {
       if (!data.email) throw new HttpException('E-mail é obrigatório', 400);
       validateEmail(data.email);
 
-      const solicitation = await this.solicitationModel.create({ ...data });
+      const solicitation = await this.solicitationModel.create({ ...data }, { transaction });
+
+      await transaction.commit();
 
       return solicitation;
     } catch (error) {
+      await transaction.rollback();
       throw new HttpException(error, 400);
     }
   }

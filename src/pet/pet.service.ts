@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { col, where } from 'sequelize';
+import { Sequelize } from 'sequelize-typescript';
 
 import { Pet } from './pet.model';
 import { OngService } from '../ong/ong.service';
@@ -18,6 +19,7 @@ export class PetService {
     private speciesService: SpeciesService,
     private sizeService: SizeService,
     private uploadService: UploadService,
+    private sequelize: Sequelize
   ) { }
 
   async get(query?: TFilterPet) {
@@ -46,6 +48,7 @@ export class PetService {
 
   async post(data: TCreatePet, images?: Express.MulterS3.File[]) {
     trimObj(data);
+    const transaction = await this.sequelize.transaction();
 
     try {
       if (data.ongId) await this.ongService.findById(data.ongId);
@@ -59,16 +62,20 @@ export class PetService {
 
       Object.assign(data, { photos });
 
-      const pet = await this.petModel.create({ ...data });
+      const pet = await this.petModel.create({ ...data }, { transaction });
+
+      await transaction.commit();
 
       return pet;
     } catch (error) {
+      await transaction.rollback();
       throw new HttpException(error, 400);
     }
   }
 
   async put(id: number, data: TUpdatePet) {
     trimObj(data);
+    const transaction = await this.sequelize.transaction();
 
     try {
       const pet = await this.findById(id);
@@ -76,8 +83,11 @@ export class PetService {
       if (data.ongId) await this.ongService.findById(data.ongId);
       if (data.speciesId) await this.speciesService.findById(data.speciesId);
 
-      await pet.update({ ...data });
+      await pet.update({ ...data }, { transaction });
+
+      await transaction.commit();
     } catch (error) {
+      await transaction.rollback();
       throw new HttpException(error, 400);
     }
   }
