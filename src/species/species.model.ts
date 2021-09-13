@@ -1,13 +1,19 @@
-import { BeforeSave, Column, DataType, DefaultScope, HasMany, Model, NotEmpty, Table } from 'sequelize-typescript';
+import { AutoIncrement, BeforeSave, Column, DataType, DefaultScope, HasMany, Model, NotEmpty, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Size } from '../size/size.model';
 import { capitalizeFirstLetter } from '../utils';
 
 @DefaultScope(() => ({
-  include: [Size]
+  include: [Size],
+  order: [['id', 'asc']]
 }))
 @Table({ paranoid: true })
 export class Species extends Model {
+  @PrimaryKey
+  @AutoIncrement
+  @Column
+  id: number;
+
   @NotEmpty({ msg: "Campo 'Nome' não pode ser vazio" })
   @Column({
     type: DataType.STRING,

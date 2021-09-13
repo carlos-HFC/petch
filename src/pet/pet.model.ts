@@ -1,4 +1,4 @@
-import { BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, Table } from 'sequelize-typescript';
+import { AutoIncrement, BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Ong } from '../ong/ong.model';
 import { Species } from '../species/species.model';
@@ -14,10 +14,16 @@ import { capitalizeFirstLetter } from '../utils';
       model: Species,
       attributes: ['name']
     }
-  ]
+  ],
+  order: [['id', 'asc']]
 }))
 @Table({ paranoid: true })
 export class Pet extends Model {
+  @PrimaryKey
+  @AutoIncrement
+  @Column
+  id: number;
+
   @Column({
     type: DataType.STRING,
   })

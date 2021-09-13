@@ -10,17 +10,14 @@ import { Role } from '../role/role.model';
       model: Role,
       attributes: ['name']
     }
-  ]
+  ],
+  order: [['id', 'asc']]
 }))
 @Table({ paranoid: true })
 export class User extends Model {
   @PrimaryKey
   @AutoIncrement
-  @Column({
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
-  })
+  @Column
   id: number;
 
   @Column({

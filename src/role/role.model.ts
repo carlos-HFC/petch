@@ -1,16 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Column, DataType, Model, Table } from 'sequelize-typescript';
+import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
 @Table({ paranoid: true })
 export class Role extends Model {
   @ApiProperty({ uniqueItems: true, type: 'integer', readOnly: true })
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
-    unique: true
-  })
+  @PrimaryKey
+  @AutoIncrement
+  @Column
   id: number;
 
   @ApiProperty({ type: 'string' })

@@ -1,13 +1,19 @@
-import { BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, NotEmpty, Table } from 'sequelize-typescript';
+import { AutoIncrement, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, NotEmpty, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { SchedulingTypes } from '../schedulingTypes/schedulingTypes.model';
 import { User } from '../user/user.model';
 
 @DefaultScope(() => ({
-  include: [User, SchedulingTypes]
+  include: [User, SchedulingTypes],
+  order: [['id', 'asc']]
 }))
 @Table({ paranoid: true })
 export class Scheduling extends Model {
+  @PrimaryKey
+  @AutoIncrement
+  @Column
+  id: number;
+
   @NotEmpty({ msg: "Campo 'Data' não pode ser vazio" })
   @Column({
     type: DataType.DATE,

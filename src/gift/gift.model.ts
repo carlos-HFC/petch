@@ -1,4 +1,4 @@
-import { BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, NotEmpty, Table } from 'sequelize-typescript';
+import { AutoIncrement, BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, NotEmpty, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { Partner } from '../partner/partner.model';
 import { capitalizeFirstLetter } from '../utils';
@@ -7,12 +7,19 @@ import { capitalizeFirstLetter } from '../utils';
   include: [
     {
       model: Partner,
-      attributes: ['fantasyName']
+      attributes: ['fantasyName'],
+      paranoid: true,
     }
-  ]
+  ],
+  order: [['id', 'asc']]
 }))
 @Table({ paranoid: true })
 export class Gift extends Model {
+  @PrimaryKey
+  @AutoIncrement
+  @Column
+  id: number;
+
   @NotEmpty({ msg: "Campo 'Nome' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
@@ -42,15 +49,8 @@ export class Gift extends Model {
   @Column(DataType.STRING)
   image: string;
 
-  @NotEmpty({ msg: "Campo 'Abrangência' não pode ser vazio" })
-  @Column({
-    type: DataType.STRING,
-    allowNull: false,
-  })
-  coverage: string;
-
   @ForeignKey(() => Partner)
-  @Column
+  @Column({ allowNull: false })
   partnerId: number;
 
   @BelongsTo(() => Partner)
@@ -62,6 +62,5 @@ export class Gift extends Model {
     if (gift.weight) gift.weight = gift.weight.toUpperCase();
     if (gift.color) gift.color = capitalizeFirstLetter(gift.color);
     if (gift.taste) gift.taste = capitalizeFirstLetter(gift.taste);
-    if (gift.coverage) gift.coverage = gift.coverage.toUpperCase();
   }
 }

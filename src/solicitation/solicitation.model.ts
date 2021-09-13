@@ -1,19 +1,28 @@
-import { BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, NotEmpty, Table } from 'sequelize-typescript';
+import { AutoIncrement, BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, NotEmpty, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { SolicitationTypes } from '../solicitationTypes/solicitationTypes.model';
 import { User } from '../user/user.model';
 
 @DefaultScope(() => ({
   include: [
-    SolicitationTypes,
+    {
+      model: SolicitationTypes,
+      attributes: ['name']
+    },
     {
       model: User,
-      attributes: ['id', 'name', 'email']
+      attributes: ['name', 'email']
     }
-  ]
+  ],
+  order: [['id', 'asc']]
 }))
 @Table({ paranoid: true })
 export class Solicitation extends Model {
+  @PrimaryKey
+  @AutoIncrement
+  @Column
+  id: number;
+
   @Column(DataType.STRING)
   name: string;
 

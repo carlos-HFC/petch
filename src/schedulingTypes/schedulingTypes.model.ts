@@ -1,18 +1,14 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { BeforeSave, Column, DataType, Model, Table } from 'sequelize-typescript';
+import { AutoIncrement, BeforeSave, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript';
 
 import { capitalizeFirstLetter } from '../utils';
 
 @Table({ paranoid: true })
 export class SchedulingTypes extends Model {
   @ApiProperty({ uniqueItems: true, type: 'integer', readOnly: true })
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-    autoIncrement: true,
-    primaryKey: true,
-    unique: true
-  })
+  @PrimaryKey
+  @AutoIncrement
+  @Column
   id: number;
 
   @ApiProperty({ type: 'string' })

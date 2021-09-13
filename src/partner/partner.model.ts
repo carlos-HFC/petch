@@ -1,7 +1,17 @@
-import { BeforeSave, Column, DataType, Model, NotEmpty, Table } from 'sequelize-typescript';
+import { AutoIncrement, BeforeSave, Column, DataType, DefaultScope, HasMany, Model, NotEmpty, PrimaryKey, Table } from 'sequelize-typescript';
 
+import { Gift } from '../gift/gift.model';
+
+@DefaultScope(() => ({
+  order: [['id', 'asc']]
+}))
 @Table({ paranoid: true })
 export class Partner extends Model {
+  @PrimaryKey
+  @AutoIncrement
+  @Column
+  id: number;
+
   @NotEmpty({ msg: "Campo 'Nome Fantasia' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
@@ -107,6 +117,9 @@ export class Partner extends Model {
 
   @Column(DataType.STRING)
   image: string;
+
+  @HasMany(() => Gift)
+  gifts: Gift[]
 
   @BeforeSave
   static async formatData(partner: Partner) {
