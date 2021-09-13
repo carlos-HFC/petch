@@ -12,24 +12,23 @@ export class MailService {
 
   async newUser(user: User) {
     const envelope = {
-      to: user.email,
+      templateId: "d-33ea0599dc0948e083afc24ed51c69ab",
       from: "NoReply <projetopetch@gmail.com>"
     };
 
     try {
       await this.client.send({
         ...envelope,
-        subject: "Bem-Vindo(a) ao Petch!!",
-        html: `
-          <h1>BEM-VINDO(A) AO PETCH</h1>
-
-          <p>
-            <strong>Olá ${user.name},</strong>
-            por favor, confirme o seu e-mail com o token abaixo.
-          </p>
-
-          <strong>${user.tokenVerificationEmail}</strong>
-        `
+        personalizations: [
+          {
+            to: user.email,
+            dynamicTemplateData: {
+              subject: "Bem-Vindo(a) ao Petch!!",
+              name: user.name,
+              token: user.tokenVerificationEmail
+            }
+          }
+        ],
       });
     } catch (error) {
       throw new HttpException(error, 400);
@@ -37,13 +36,17 @@ export class MailService {
   }
 
   async emailConfirmed(user: User) {
+    const envelope = {
+      to: user.email,
+      from: "NoReply <projetopetch@gmail.com>"
+    };
+
     try {
       await this.client.send({
-        from: "NoReply <projetopetch@gmail.com>",
+        ...envelope,
         subject: "Confirmação de e-mail",
-        to: user.email,
         html: `
-          <h3>Obrigado</h3>
+          <h2>Obrigado</h2>
 
           <p>
             <strong>Olá ${user.name},</strong>
@@ -72,12 +75,12 @@ export class MailService {
             <strong>Olá ${user.name},</strong>
             o seu agendamento para ${schedulingTypeName}, marcado para o dia ${date}, foi confirmado com sucesso
           </p>`
-      })
+      });
     } catch (error) {
       throw new HttpException(error, 400);
     }
   }
-  
+
   async cancelScheduling(user: User, date: string, schedulingTypeName: string) {
     const envelope = {
       to: user.email,
@@ -94,7 +97,7 @@ export class MailService {
             <strong>Olá ${user.name},</strong>
             o seu agendamento para ${schedulingTypeName}, marcado para o dia ${date}, foi cancelado com sucesso
           </p>`
-      })
+      });
     } catch (error) {
       throw new HttpException(error, 400);
     }
