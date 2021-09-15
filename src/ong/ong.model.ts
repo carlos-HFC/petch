@@ -1,13 +1,16 @@
-import { AutoIncrement, BeforeSave, Column, DataType, DefaultScope, Model, NotEmpty, PrimaryKey, Table } from 'sequelize-typescript';
+import { BeforeSave, Column, DataType, DefaultScope, Model, NotEmpty, Table } from 'sequelize-typescript';
 
 @DefaultScope(() => ({
   order: [['id', 'asc']]
 }))
 @Table({ paranoid: true })
 export class Ong extends Model {
-  @PrimaryKey
-  @AutoIncrement
-  @Column
+  @Column({
+    primaryKey: true,
+    allowNull: false,
+    autoIncrement: true,
+    autoIncrementIdentity: true,
+  })
   id: number;
 
   @NotEmpty({ msg: "Campo 'Nome' não pode ser vazio" })
