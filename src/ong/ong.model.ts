@@ -6,6 +6,7 @@ import { BeforeSave, Column, DataType, DefaultScope, Model, NotEmpty, Table } fr
 @Table({ paranoid: true })
 export class Ong extends Model {
   @Column({
+    type: DataType.INTEGER,
     primaryKey: true,
     allowNull: false,
     autoIncrement: true,
