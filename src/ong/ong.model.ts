@@ -1,4 +1,4 @@
-import { BeforeSave, Column, DataType, DefaultScope, Model, NotEmpty, Table } from 'sequelize-typescript';
+import { AfterSync, BeforeSave, Column, DataType, DefaultScope, Model, Table } from 'sequelize-typescript';
 
 @DefaultScope(() => ({
   order: [['id', 'asc']]
@@ -10,11 +10,9 @@ export class Ong extends Model {
     primaryKey: true,
     allowNull: false,
     autoIncrement: true,
-    autoIncrementIdentity: true,
   })
   id: number;
 
-  @NotEmpty({ msg: "Campo 'Nome' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -22,7 +20,6 @@ export class Ong extends Model {
   })
   name: string;
 
-  @NotEmpty({ msg: "Campo 'E-mail' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -30,7 +27,6 @@ export class Ong extends Model {
   })
   email: string;
 
-  @NotEmpty({ msg: "Campo 'Responsável' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -40,7 +36,6 @@ export class Ong extends Model {
   @Column(DataType.STRING)
   image: string;
 
-  @NotEmpty({ msg: "Campo 'Telefone 1' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false
@@ -53,21 +48,18 @@ export class Ong extends Model {
   @Column(DataType.STRING)
   phone3: string;
 
-  @NotEmpty({ msg: "Campo 'CEP' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
   cep: string;
 
-  @NotEmpty({ msg: "Campo 'Endereço' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
   address: string;
 
-  @NotEmpty({ msg: "Campo 'Bairro' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false
@@ -77,29 +69,76 @@ export class Ong extends Model {
   @Column(DataType.STRING)
   complement: string;
 
-  @NotEmpty({ msg: "Campo 'Cidade' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
   city: string;
 
-  @NotEmpty({ msg: "Campo 'UF' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
   uf: string;
 
-  @NotEmpty({ msg: "Campo 'Abrangência' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   coverage: string;
 
+  @AfterSync
+  static async createAll() {
+    return await Ong.bulkCreate([
+      {
+        name: 'Dogs do Coração',
+        email: 'doguineos@dogscore.com',
+        image: 'https://images.unsplash.com/photo-1612536057832-2ff7ead58194?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8ZG9nJTIwaGVhcnR8ZW58MHx8MHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+        phone1: '1128169333',
+        phone2: '11985856127',
+        cep: '05850245',
+        address: 'Rua Francisco Soares de Farias, 939',
+        district: 'Parque Santo Antônio',
+        city: 'São Paulo',
+        uf: 'SP',
+        coverage: 'SP, RJ, MG, ES',
+        responsible: 'Raimunda Renata Brito'
+      },
+      {
+        name: 'Pet Place',
+        email: 'place@petplace.com.br',
+        image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGV0JTIwcGxhY3xlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+        phone1: '4829542922',
+        phone2: '48995972859',
+        cep: '88106692',
+        address: 'Rua Salvador Silva Porto, 838',
+        district: 'Forquilhinha',
+        city: 'São José',
+        uf: 'SC',
+        coverage: 'SC, PR, SP',
+        responsible: 'Jaqueline Aparecida Pereira'
+      },
+      {
+        name: 'ONG Melhor Amigo',
+        email: 'OMA@melhoramigo.com.br',
+        image: 'https://images.unsplash.com/photo-1607163365613-c281acde5012?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGV0JTIwZnJpZW5kfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
+        phone1: '8827492520',
+        phone2: '88994753142',
+        phone3: '8825555591',
+        cep: '62030705',
+        address: 'Rua Pricesa do Norte, 904',
+        district: 'Cidade Pedro Mendes Carneiro',
+        city: 'Sobral',
+        uf: 'CE',
+        coverage: 'CE, PE',
+        responsible: 'Francisco Davi Diogo de Paula'
+      },
+    ], { ignoreDuplicates: true });
+  }
+
   @BeforeSave
   static async formatData(ong: Ong) {
+    ong.email = ong.email.toLowerCase();
     ong.coverage = ong.coverage.toUpperCase();
     ong.uf = ong.uf.toUpperCase();
     ong.cep = ong.cep.replace(/[\s-]/g, '');

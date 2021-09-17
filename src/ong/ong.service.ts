@@ -3,9 +3,10 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Op as $ } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
+import { TFilterOng, TCreateOng, TUpdateOng } from './ong.dto';
 import { Ong } from './ong.model';
 import { UploadService } from '../upload.service';
-import { trimObj, validateCEP, validateEmail, validatePhone } from '../utils';
+import { convertBool, trimObj } from '../utils';
 
 @Injectable()
 export class OngService {
@@ -23,29 +24,29 @@ export class OngService {
     if (query.name) Object.assign(where, { name: { [$.startsWith]: query.name.normalize().toLowerCase() } });
     if (query.uf) Object.assign(where, { uf: query.uf.toUpperCase() });
 
-    if (query.coverage) {
-      const ongs = await this.ongModel.findAll({
-        paranoid: !query.inactives,
-        where,
-        attributes: ['id', 'name', 'email', 'phone1', 'responsible', 'cep', 'city', 'deletedAt']
-      });
+    // if (query.coverage) {
+    //   const ongs = await this.ongModel.findAll({
+    //     paranoid: !convertBool(query.inactives),
+    //     where,
+    //     attributes: ['id', 'name', 'email', 'phone1', 'responsible', 'cep', 'city', 'deletedAt']
+    //   });
 
-      const states = query.coverage.toUpperCase().split(',').map(cov => cov.trim());
+    //   const states = query.coverage.toUpperCase().split(',').map(cov => cov.trim());
 
-      const ongsFiltered = states.flatMap(state => ongs.filter(ong => ong.coverage.includes(state)));
+    //   const ongsFiltered = states.flatMap(state => ongs.filter(ong => ong.coverage.includes(state)));
 
-      return [...new Map(ongsFiltered.map(ong => [ong['id'], ong])).values()].sort((a, b) => a.id < b.id ? - 1 : 1);
-    }
+    //   return [...new Map(ongsFiltered.map(ong => [ong['id'], ong])).values()].sort((a, b) => a.id < b.id ? - 1 : 1);
+    // }
 
     return await this.ongModel.findAll({
-      paranoid: !query.inactives,
+      paranoid: !convertBool(query.inactives),
       where,
       attributes: ['id', 'name', 'email', 'phone1', 'responsible', 'cep', 'city', 'deletedAt']
     });
   }
 
-  async findById(id: number, inactives?: boolean) {
-    const ong = await this.ongModel.findByPk(id, { paranoid: !inactives });
+  async findById(id: number, inactives?: 'true' | 'false') {
+    const ong = await this.ongModel.findByPk(id, { paranoid: !convertBool(inactives) });
 
     if (!ong) throw new HttpException('ONG não encontrada', 404);
 
@@ -61,7 +62,6 @@ export class OngService {
   }
 
   async findByEmail(email: string) {
-    validateEmail(email);
     return await this.ongModel.findOne({
       where: {
         email: email.toLowerCase()
@@ -74,11 +74,6 @@ export class OngService {
     const transaction = await this.sequelize.transaction();
 
     try {
-      if (data.cep) validateCEP(data.cep);
-      if (data.phone1) validatePhone(data.phone1);
-      if (data.phone2) validatePhone(data.phone2);
-      if (data.phone3) validatePhone(data.phone3);
-
       if (await this.findByEmail(data.email) || await this.findByName(data.name)) throw new HttpException('ONG já cadastrada', 400);
 
       if (media) {
@@ -102,11 +97,6 @@ export class OngService {
     const transaction = await this.sequelize.transaction();
 
     try {
-      if (data.cep) validateCEP(data.cep);
-      if (data.phone1) validatePhone(data.phone1);
-      if (data.phone2) validatePhone(data.phone2);
-      if (data.phone3) validatePhone(data.phone3);
-
       const ong = await this.findById(id);
 
       if (data.email && data.email !== ong.email) {
@@ -131,15 +121,12 @@ export class OngService {
     }
   }
 
-  async delete(id: number) {
-    const ong = await this.findById(id);
+  async activeInactive(id: number, status: 'true' | 'false') {
+    const st = convertBool(status);
 
-    await ong.destroy();
-  }
+    const ong = await this.findById(id, 'true');
 
-  async restore(id: number) {
-    const ong = await this.findById(id, true);
-
-    await ong.restore();
+    if (!st) return await ong.destroy()
+    return await ong.restore()
   }
 }

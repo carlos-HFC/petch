@@ -2,8 +2,8 @@ import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, Uploa
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
+import { IndexOng, Ong, TCreateOng, TFilterOng, TUpdateOng } from './ong.dto';
 import { OngService } from './ong.service';
-import { CreateOng, FilterOng, IndexOng, Ong, UpdateOng } from './ong.swagger';
 
 @ApiTags('ONGs')
 @Controller('ongs')
@@ -14,7 +14,6 @@ export class OngController {
 
   @ApiOperation({ summary: 'Listar todas as ONGs' })
   @ApiOkResponse({ type: [IndexOng], description: 'Success' })
-  @ApiQuery({ type: FilterOng, required: false })
   @Get()
   async index(@Query() query?: TFilterOng) {
     return await this.ongService.get(query);
@@ -39,9 +38,9 @@ export class OngController {
     }
   })
   @ApiParam({ name: 'id', required: true })
-  @ApiQuery({ name: 'inactives', type: 'string', required: false })
+  @ApiQuery({ name: 'inactives', type: 'string', enum: ['true', 'false'], required: false })
   @Get(':id')
-  async byId(@Param('id') id: number, @Query('inactives') inactives?: boolean) {
+  async byId(@Param('id') id: number, @Query() { inactives }: Pick<TFilterOng, 'inactives'>) {
     return await this.ongService.findById(id, inactives);
   }
 
@@ -69,7 +68,7 @@ export class OngController {
     }
   })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: CreateOng })
+  @ApiBody({ type: TCreateOng })
   @Post()
   @UseInterceptors(FileInterceptor('media'))
   async create(@Body() data: TCreateOng, @UploadedFile() media?: Express.MulterS3.File) {
@@ -117,14 +116,14 @@ export class OngController {
   })
   @ApiConsumes('multipart/form-data')
   @ApiParam({ name: 'id', required: true })
-  @ApiBody({ type: UpdateOng })
+  @ApiBody({ type: TUpdateOng })
   @Put(':id')
   @UseInterceptors(FileInterceptor('media'))
   async update(@Param('id') id: number, @Body() data: TUpdateOng, @UploadedFile() media?: Express.MulterS3.File) {
     return await this.ongService.put(id, data, media);
   }
 
-  @ApiOperation({ summary: 'Inativar uma ONG' })
+  @ApiOperation({ summary: 'Ativar e inativar uma ONG' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiNotFoundResponse({
     description: 'Not Found',
@@ -143,9 +142,10 @@ export class OngController {
     }
   })
   @ApiParam({ name: 'id', required: true })
+  @ApiQuery({ name: 'status', type: 'string', enum: ['true', 'false'], required: true })
   @Delete(':id')
   @HttpCode(204)
-  async delete(@Param('id') id: number) {
-    return await this.ongService.delete(id);
+  async activeInactive(@Param('id') id: number, @Query('status') status) {
+    return await this.ongService.activeInactive(id, status);
   }
 }
