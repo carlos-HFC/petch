@@ -1,6 +1,6 @@
 import { ApiProperty, OmitType, PickType } from '@nestjs/swagger';
 
-import { Ong } from '../ong/ong.swagger';
+import { Ong } from '../ong/ong.dto';
 import { Species } from '../species/species.swagger';
 
 export class Pet {
