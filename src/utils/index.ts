@@ -73,7 +73,7 @@ export function validatePassword(password: string) {
 export function validatePhone(phone: string) {
   const regex = /[\d]/g;
 
-  phone = phone.replace(/[()-]/g, '').trim();
+  phone = phone.replace(/[()-\s]/g, '');
 
   if (!regex.test(phone) || phone.length < 10 || phone.length > 11) throw new HttpException('Número de telefone/celular inválido', 400);
 }
@@ -83,7 +83,7 @@ export function createTokenHEX() {
 }
 
 export function validateCNPJ(cnpj: string) {
-  cnpj = cnpj.replace(/[/\-]/g, '').trim();
+  cnpj = cnpj.replace(/[/\-.]/g, '').trim();
 
   switch (true) {
     case cnpj.length !== 14:
@@ -145,4 +145,13 @@ export function validateCNPJ(cnpj: string) {
   }
 
   if (v2 !== Number(cnpj[13])) throw new HttpException('CNPJ inválido', 400);
+}
+
+export function convertBool(value: string): boolean {
+  const values = {
+    'true': true,
+    'false': false
+  };
+
+  return values[value];
 }
