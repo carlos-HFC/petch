@@ -63,7 +63,7 @@ export class Pet extends Model {
     type: DataType.STRING,
     allowNull: false,
   })
-  photos: string;
+  image: string;
 
   @Column({
     type: DataType.BOOLEAN,
