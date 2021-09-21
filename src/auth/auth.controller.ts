@@ -2,8 +2,9 @@ import { Body, Controller, HttpCode, Post, UploadedFile, UseInterceptors } from 
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
+import { TForgotPassword, TGoogleLogin, TLogin, TResetPassword } from './auth.dto';
 import { AuthService } from './auth.service';
-import { GoogleLogin, Login, ResetPassword } from './auth.swagger';
+import { config } from '../multer';
 import { CreateUser, User } from '../user/user.swagger';
 
 @ApiTags('Auth')
@@ -23,14 +24,15 @@ export class AuthController {
           type: 'string',
           example: '456fda'
         },
-        expires: {
-          type: 'number',
-          example: 126354894809
+        role: {
+          type: 'string',
+          example: 'Admin'
         },
       }
     }
   })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
@@ -41,6 +43,7 @@ export class AuthController {
         message: {
           type: 'string',
           oneOf: [
+            { example: 'Campo "X" é obrigatório' },
             { example: 'As credenciais estão incorretas' },
             { example: 'E-mail inválido' },
             { example: 'E-mail não verificado' },
@@ -49,7 +52,7 @@ export class AuthController {
       }
     }
   })
-  @ApiBody({ type: Login })
+  @ApiBody({ type: TLogin })
   @Post('login')
   @HttpCode(200)
   async login(@Body() data: TLogin) {
@@ -66,14 +69,15 @@ export class AuthController {
           type: 'string',
           example: '456fda'
         },
-        expires: {
-          type: 'number',
-          example: 126354894809
+        role: {
+          type: 'string',
+          example: 'Admin'
         },
       }
     }
   })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
@@ -81,10 +85,33 @@ export class AuthController {
           type: 'number',
           example: 400,
         },
+        message: {
+          type: 'string',
+          oneOf: [
+            { example: 'Campo "X" é obrigatório' },
+            { example: 'E-mail inválido' },
+          ]
+        },
       }
     }
   })
-  @ApiBody({ type: GoogleLogin })
+  @ApiNotFoundResponse({
+    description: 'Not Found',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 404
+        },
+        message: {
+          type: 'string',
+          example: 'Usuário não encontrado',
+        },
+      }
+    }
+  })
+  @ApiBody({ type: TGoogleLogin })
   @Post('/login/google')
   @HttpCode(200)
   async googleLogin(@Body() data: TGoogleLogin) {
@@ -94,6 +121,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Registrar-se' })
   @ApiCreatedResponse({ type: User, description: 'Created' })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
@@ -123,7 +151,7 @@ export class AuthController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateUser })
   @Post('register')
-  @UseInterceptors(FileInterceptor('media'))
+  @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
   async register(@Body() data: TCreateUser, @UploadedFile() media: Express.MulterS3.File) {
     return await this.authService.register(data, media);
   }
@@ -131,6 +159,7 @@ export class AuthController {
   @ApiOperation({ summary: 'Solicitar troca de senha por esquecimento' })
   @ApiOkResponse({ description: 'Success' })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
@@ -140,7 +169,10 @@ export class AuthController {
         },
         message: {
           type: 'string',
-          example: 'E-mail inválido'
+          oneOf: [
+            { example: 'E-mail é obrigatório' },
+            { example: 'E-mail inválido' },
+          ]
         },
       }
     }
@@ -161,25 +193,17 @@ export class AuthController {
       }
     }
   })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        email: {
-          type: 'string'
-        }
-      }
-    }
-  })
+  @ApiBody({ type: TForgotPassword })
   @Post('forgot')
   @HttpCode(200)
-  async forgot(@Body() data: { email: string; }) {
-    return await this.authService.forgotPassword(data.email);
+  async forgot(@Body() data: TForgotPassword) {
+    return await this.authService.forgotPassword(data);
   }
 
   @ApiOperation({ summary: 'Reiniciar a senha a partir de seu esquecimento' })
   @ApiOkResponse({ description: 'Success' })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
@@ -190,13 +214,11 @@ export class AuthController {
         message: {
           type: 'string',
           oneOf: [
+            { example: 'Campo "X" é obrigatório' },
             { example: 'E-mail inválido' },
-            { example: 'Token é obrigatório' },
             { example: 'Token inválido' },
             { example: 'Token expirou' },
-            { example: 'Nova senha é obrigatória' },
             { example: 'Nova senha não pode ser igual a senha atual' },
-            { example: 'Confirmação de senha é obrigatória' },
             { example: 'Nova senha e confirmação de senha não correspodem' },
             { example: 'Senha muito curta' },
             { example: 'Senha precisa ter uma letra maiúscula, uma letra minúscula, um caractere especial e um número' },
@@ -221,7 +243,7 @@ export class AuthController {
       }
     }
   })
-  @ApiBody({ type: ResetPassword })
+  @ApiBody({ type: TResetPassword })
   @Post('reset')
   @HttpCode(200)
   async reset(@Body() data: TResetPassword) {

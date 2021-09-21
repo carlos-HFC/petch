@@ -3,9 +3,10 @@ import { JwtService } from '@nestjs/jwt';
 import { isAfter } from 'date-fns';
 import { Sequelize } from 'sequelize-typescript';
 
+import { TForgotPassword, TGoogleLogin, TLogin, TResetPassword } from './auth.dto';
 import { User } from '../user/user.model';
 import { UserService } from '../user/user.service';
-import { createTokenHEX, trimObj, validatePassword } from '../utils';
+import { createTokenHEX, trimObj } from '../utils';
 
 @Injectable()
 export class AuthService {
@@ -37,7 +38,7 @@ export class AuthService {
     return await this.userService.findByEmail(payload.email);
   }
 
-  async forgotPassword(email: string) {
+  async forgotPassword({ email }: TForgotPassword) {
     const transaction = await this.sequelize.transaction();
 
     try {
@@ -71,30 +72,15 @@ export class AuthService {
       switch (true) {
         case !user:
           throw new HttpException('Usuário não encontrado', 404);
-        case !data.token:
-          throw new HttpException('Token é obrigatório', 400);
         case data.token !== user.tokenResetPassword:
           throw new HttpException('Token inválido', 400);
         case isAfter(new Date(), Number(user.tokenResetPasswordExpires)):
           throw new HttpException('Token expirou', 400);
-        default:
-          break;
-      }
-
-      if (!data.password) throw new HttpException('Nova senha é obrigatória', 400);
-
-      switch (true) {
         case await user.checkPass(data.password):
           throw new HttpException('Nova senha não pode ser igual a senha atual', 400);
-        case data.password && !data.confirmPassword:
-          throw new HttpException('Confirmação de senha é obrigatória', 400);
-        case data.password !== data.confirmPassword:
-          throw new HttpException('Nova senha e confirmação de senha não correspondem', 400);
         default:
           break;
       }
-
-      validatePassword(data.password);
 
       await user.update({
         ...data,
@@ -130,6 +116,8 @@ export class AuthService {
         this.userService.findByGoogleId(data.googleId),
         this.userService.findByEmail(data.email)
       ]);
+
+      if (!userByGoogle && !userByEmail) throw new HttpException('Usuário não encontrado', 404);
 
       if (userByGoogle) {
         await userByGoogle.update({ ...data }, { transaction });
