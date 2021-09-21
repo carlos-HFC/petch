@@ -34,7 +34,6 @@ export class PetService {
     return await this.petModel.findAll({
       paranoid: !query.inactives,
       where: options,
-      attributes: ['id', 'name', 'age', 'gender', 'weight', 'deletedAt']
     });
   }
 
@@ -46,7 +45,7 @@ export class PetService {
     return pet;
   }
 
-  async post(data: TCreatePet, images?: Express.MulterS3.File[]) {
+  async post(data: TCreatePet, media: Express.MulterS3.File) {
     trimObj(data);
     const transaction = await this.sequelize.transaction();
 
@@ -54,13 +53,12 @@ export class PetService {
       if (data.ongId) await this.ongService.findById(data.ongId);
       if (data.speciesId) await this.speciesService.findById(data.speciesId);
 
-      if (images.length === 0) throw new HttpException('O Pet deve conter, pelo menos, uma foto', 400);
+      if (!media) throw new HttpException('O Pet deve conter uma foto', 400);
 
-      const photos = (await Promise.all(
-        images.map(img => this.uploadService.uploadFile(img))
-      )).map(photo => photo.url).toString();
-
-      Object.assign(data, { photos });
+      if (media) {
+        const image = (await this.uploadService.uploadFile(media)).url
+        Object.assign(data,{image})
+      }
 
       const pet = await this.petModel.create({ ...data }, { transaction });
 

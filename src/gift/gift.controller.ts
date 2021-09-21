@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
+import { TCreateGift, TFilterGift, Gift, IndexGift, TUpdateGift } from './gift.dto';
 import { GiftService } from './gift.service';
-import { CreateGift, FilterGift, Gift, IndexGift, UpdateGift } from './gift.swagger';
+import { config } from '../multer';
 
 @ApiTags('Gifts')
 @Controller('gifts')
@@ -14,9 +15,8 @@ export class GiftController {
 
   @ApiOperation({ summary: 'Listar todos os brindes' })
   @ApiOkResponse({ type: [IndexGift], description: 'Success' })
-  @ApiQuery({ type: FilterGift, required: false })
   @Get()
-  async index(@Query() query: TFilterGift) {
+  async index(@Query() query?: TFilterGift) {
     return await this.giftService.get(query);
   }
 
@@ -38,9 +38,9 @@ export class GiftController {
     }
   })
   @ApiParam({ name: 'id', required: true })
-  @ApiQuery({ name: 'inactives', type: 'boolean', required: false })
+  @ApiQuery({ name: 'inactives', type: 'string', enum: ['true', 'false'], required: false })
   @Get(':id')
-  async byId(@Param('id') id: number, @Query('inactives') inactives: boolean) {
+  async byId(@Param('id') id: number, @Query() { inactives }: Pick<TFilterGift, 'inactives'>) {
     return await this.giftService.findById(id, inactives);
   }
 
@@ -58,16 +58,32 @@ export class GiftController {
           type: 'string',
           oneOf: [
             { example: 'Arquivo não suportado' },
-            { example: 'Campo "X" não pode ser vazio' },
+            { example: 'Campo "X" é obrigatório' },
           ]
         },
       }
     }
   })
+  @ApiNotFoundResponse({
+    description: 'Not Found',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 404,
+        },
+        message: {
+          type: 'string',
+          example: 'Parceiro não encontrado',
+        },
+      }
+    }
+  })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: CreateGift })
+  @ApiBody({ type: TCreateGift })
   @Post()
-  @UseInterceptors(FileInterceptor('media'))
+  @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
   async create(@Body() data: TCreateGift, @UploadedFile() media?: Express.MulterS3.File) {
     return await this.giftService.post(data, media);
   }
@@ -86,7 +102,7 @@ export class GiftController {
           type: 'string',
           oneOf: [
             { example: 'Arquivo não suportado' },
-            { example: 'Campo "X" não pode ser vazio' },
+            { example: 'Campo "X" é obrigatório' },
           ]
         },
       }
@@ -102,21 +118,24 @@ export class GiftController {
         },
         message: {
           type: 'string',
-          example: 'Brinde não encontrado',
+          oneOf: [
+            { example: 'Brinde não encontrado' },
+            { example: 'Parceiro não encontrado' },
+          ]
         },
       }
     }
   })
   @ApiConsumes('multipart/form-data')
   @ApiParam({ name: 'id', required: true })
-  @ApiBody({ type: UpdateGift })
+  @ApiBody({ type: TUpdateGift })
   @Put(':id')
-  @UseInterceptors(FileInterceptor('media'))
+  @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
   async update(@Param('id') id: number, @Body() data: TUpdateGift, @UploadedFile() media?: Express.MulterS3.File) {
     return await this.giftService.put(id, data, media);
   }
 
-  @ApiOperation({ summary: 'Reativar um brinde' })
+  @ApiOperation({ summary: 'Ativar e inativar um brinde' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiNotFoundResponse({
     schema: {
@@ -134,33 +153,10 @@ export class GiftController {
     }
   })
   @ApiParam({ name: 'id', required: true })
-  @Patch(':id')
-  @HttpCode(204)
-  async restore(@Param('id') id: number) {
-    return await this.giftService.restore(id);
-  }
-
-  @ApiOperation({ summary: 'Inativar um brinde' })
-  @ApiNoContentResponse({ description: 'No Content' })
-  @ApiNotFoundResponse({
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 404,
-        },
-        message: {
-          type: 'string',
-          example: 'Brinde não encontrado',
-        },
-      }
-    }
-  })
-  @ApiParam({ name: 'id', required: true })
+  @ApiQuery({ name: 'status', type: 'string', enum: ['true', 'false'], required: true })
   @Delete(':id')
   @HttpCode(204)
-  async delete(@Param('id') id: number) {
-    return await this.giftService.delete(id);
+  async activeInactive(@Param('id') id: number, @Query() { inactives: status }: Pick<TFilterGift, 'inactives'>) {
+    return await this.giftService.activeInactive(id, status);
   }
 }

@@ -89,7 +89,7 @@ export class Ong extends Model {
 
   @AfterSync
   static async createAll() {
-    return await Ong.bulkCreate([
+    process.env.NODE_ENV !== 'dev' && await this.bulkCreate([
       {
         name: 'Dogs do Coração',
         email: 'doguineos@dogscore.com',
@@ -142,8 +142,8 @@ export class Ong extends Model {
     ong.coverage = ong.coverage.toUpperCase();
     ong.uf = ong.uf.toUpperCase();
     ong.cep = ong.cep.replace(/[\s-]/g, '');
-    ong.phone1 = ong.phone1.replace(/[\s()-]/g, '');
-    if (ong.phone2) ong.phone2 = ong.phone2.replace(/[\s()-]/g, '');
-    if (ong.phone3) ong.phone3 = ong.phone3.replace(/[\s()-]/g, '');
+    ong.phone1 = ong.phone1.replace(/(55)?[\s-+()]/g, '');
+    if (ong.phone2) ong.phone2 = ong.phone2.replace(/(55)?[\s-+()]/g, '');
+    if (ong.phone3) ong.phone3 = ong.phone3.replace(/(55)?[\s-+()]/g, '');
   }
 }

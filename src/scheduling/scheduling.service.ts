@@ -10,6 +10,7 @@ import { MailService } from '../mail/mail.service';
 import { SchedulingTypesService } from '../schedulingTypes/schedulingTypes.service';
 import { User } from '../user/user.model';
 import { trimObj } from '../utils';
+import { TCreateScheduling } from './scheduling.dto';
 
 @Injectable()
 export class SchedulingService {
@@ -54,14 +55,16 @@ export class SchedulingService {
 
     switch (true) {
       case !date:
-        throw new HttpException('Há campos em branco', 400);
+        throw new HttpException('Data é obrigatória', 400);
       case !isValid(searchDate):
         throw new HttpException('Data inválida', 400);
       case isBefore(startOfDay(searchDate), startOfToday()):
-        throw new HttpException('Você não pode agendar com uma data passada', 400);
+        throw new HttpException('Impossível agendar em uma data passada', 400);
       default:
         break;
     }
+
+    await this.schedulingTypesService.getById(schedulingTypesId)
 
     const schedulings = await this.schedulingModel.findAll({
       where: {
@@ -81,7 +84,7 @@ export class SchedulingService {
         time,
         value: format(value, "yyyy-MM-dd'T'HH:mm:ssxxx"),
         available: isAfter(subHours(value, 1), new Date()) && !schedulings.find(sch => format(sch.date, "HH:mm") === time),
-        limitHour: format(subHours(value, 1), "HH:mm:ss")
+        limitHour: format(subHours(value, 1), "HH:mm")
       };
     });
 
@@ -96,8 +99,6 @@ export class SchedulingService {
 
     try {
       switch (true) {
-        case !isValid(date):
-          throw new HttpException('Data inválida', 400);
         case isBefore(date, new Date()):
           throw new HttpException('Data passada não permitida', 400);
         default:
@@ -122,7 +123,7 @@ export class SchedulingService {
 
       const scheduling = await this.schedulingModel.create({
         ...data,
-        userId: user.id
+        userId: 2
       }, { transaction });
 
       await transaction.commit();
@@ -146,9 +147,11 @@ export class SchedulingService {
         }
       });
 
+      if (!scheduling) throw new HttpException('Agendamento não encontrado', 404);
+
       const cancelTimeLimit = subHours(scheduling.date, 1);
 
-      if (isBefore(cancelTimeLimit, new Date())) throw new HttpException('Você só pode cancelar um agendamento com duas horas de antecedência', 400);
+      if (isBefore(cancelTimeLimit, new Date())) throw new HttpException('Você só pode cancelar um agendamento com uma hora de antecedência', 400);
 
       const canceledAt = new Date();
 

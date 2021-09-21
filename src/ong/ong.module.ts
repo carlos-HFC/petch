@@ -10,7 +10,7 @@ import { UploadService } from '../upload.service';
 
 @Module({
   imports: [
-    // SeederModule.forFeature([OngSeed]),
+    SeederModule.forFeature([OngSeed]),
     SequelizeModule.forFeature([Ong])
   ],
   controllers: [OngController],

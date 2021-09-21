@@ -3,10 +3,11 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Op as $ } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
+import { TCreateGift, TFilterGift, TUpdateGift } from './gift.dto';
 import { Gift } from './gift.model';
 import { PartnerService } from '../partner/partner.service';
 import { UploadService } from '../upload.service';
-import { trimObj } from '../utils';
+import { convertBool, trimObj } from '../utils';
 
 @Injectable()
 export class GiftService {
@@ -22,21 +23,17 @@ export class GiftService {
     trimObj(query);
     const where = {};
 
-    if (query.name) Object.assign(where, {
-      name: {
-        [$.startsWith]: query.name.normalize().toLowerCase()
-      }
-    });
+    if (query.name) Object.assign(where, { name: { [$.startsWith]: query.name.normalize().toLowerCase() } });
 
     return await this.giftModel.findAll({
-      paranoid: !query.inactives,
+      paranoid: !convertBool(query.inactives),
       where,
-      attributes: ['id', 'name', 'description', 'deletedAt']
+      attributes: ['id', 'name', 'description', 'image', 'deletedAt']
     });
   }
 
-  async findById(id: number, inactives?: boolean) {
-    const gift = await this.giftModel.findByPk(id, { paranoid: !inactives });
+  async findById(id: number, inactives?: 'true' | 'false') {
+    const gift = await this.giftModel.findByPk(id, { paranoid: !convertBool(inactives) });
 
     if (!gift) throw new HttpException('Brinde não encontrado', 404);
 
@@ -51,7 +48,7 @@ export class GiftService {
       if (data.partnerId) await this.partnerService.findById(data.partnerId);
 
       if (media) {
-        const image = (await this.uploadService.uploadFile(media)).url;
+        const image = (await this.uploadService.uploadFile(media)).url
         Object.assign(data, { image });
       }
 
@@ -76,7 +73,7 @@ export class GiftService {
       if (data.partnerId) await this.partnerService.findById(data.partnerId);
 
       if (media) {
-        const image = (await this.uploadService.uploadFile(media)).url;
+        const image = (await this.uploadService.uploadFile(media)).url
         Object.assign(data, { image });
       }
 
@@ -89,15 +86,12 @@ export class GiftService {
     }
   }
 
-  async delete(id: number) {
-    const gift = await this.findById(id);
+  async activeInactive(id: number, status: 'true' | 'false') {
+    const st = convertBool(status);
 
-    await gift.destroy();
-  }
+    const gift = await this.findById(id, 'true');
 
-  async restore(id: number) {
-    const gift = await this.findById(id, true);
-
-    await gift.restore();
+    if (!st) return await gift.destroy();
+    return await gift.restore();
   }
 }

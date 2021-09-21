@@ -1,12 +1,9 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AutoIncrement, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { AfterSync, Column, DataType, Model, Table } from 'sequelize-typescript';
 
 @Table({ paranoid: true })
 export class Role extends Model {
   @ApiProperty({ uniqueItems: true, type: 'integer', readOnly: true })
-  @PrimaryKey
-  @AutoIncrement
-  @Column
   id: number;
 
   @ApiProperty({ type: 'string' })
@@ -24,4 +21,12 @@ export class Role extends Model {
 
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   deletedAt: Date | null;
+
+  @AfterSync
+  static async createAll() {
+    process.env.NODE_ENV !== 'dev' && await this.bulkCreate([
+      { name: "Admin" },
+      { name: "Adotante" },
+    ], { ignoreDuplicates: true });
+  }
 }

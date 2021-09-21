@@ -32,7 +32,7 @@ export class SchedulingTypesController {
         },
         message: {
           type: 'string',
-          example: 'Tipo de agendamento não encontrada',
+          example: 'Tipo de agendamento não encontrado',
         },
       }
     }

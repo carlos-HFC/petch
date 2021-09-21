@@ -1,15 +1,20 @@
-import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
+import { ApiProperty, OmitType, PartialType, PickType } from '@nestjs/swagger';
+import { IsNotEmpty, IsString } from 'class-validator';
 
-import { Partner } from '../partner/partner.swagger';
+import { Partner } from '../partner/partner.dto';
 
 export class Gift {
   @ApiProperty({ uniqueItems: true, type: 'integer', readOnly: true })
   id: number;
 
   @ApiProperty({ type: 'string' })
+  @IsNotEmpty({ message: 'Nome é obrigatório' })
+  @IsString()
   name: string;
 
   @ApiProperty({ type: 'string' })
+  @IsNotEmpty({ message: 'Descrição é obrigatório' })
+  @IsString()
   description: string;
 
   @ApiProperty({ type: 'string', required: false })
@@ -27,7 +32,8 @@ export class Gift {
   @ApiProperty({ type: 'string', required: false })
   image: string;
 
-  @ApiProperty({ type: 'number', required: false })
+  @ApiProperty({ type: 'number' })
+  @IsNotEmpty({ message: 'Parceiro é obrigatório' })
   partnerId: number;
 
   @ApiProperty({ type: Partner, required: false })
@@ -43,7 +49,7 @@ export class Gift {
   deletedAt: Date | null;
 }
 
-export class IndexGift extends OmitType(Gift, ['createdAt', 'updatedAt', 'image', 'partner']) {
+export class IndexGift extends PickType(Gift, ['id', 'name', 'description', 'image', 'deletedAt']) {
   @ApiProperty({
     type: 'object',
     properties: {
@@ -55,17 +61,17 @@ export class IndexGift extends OmitType(Gift, ['createdAt', 'updatedAt', 'image'
   partner: object;
 }
 
-export class CreateGift extends OmitType(Gift, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'image', 'partner']) {
+export class TCreateGift extends OmitType(Gift, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'image', 'partner']) {
   @ApiProperty({ type: 'string', format: 'binary', required: false })
   media: string;
 }
 
-export class UpdateGift extends PartialType(CreateGift) { }
+export class TUpdateGift extends PartialType(TCreateGift) { }
 
-export class FilterGift {
-  @ApiProperty({ type: 'boolean', required: false })
-  inactives: boolean;
+export class TFilterGift {
+  @ApiProperty({ type: 'string', enum: ['true', 'false'], required: false })
+  inactives?: 'true' | 'false';
 
   @ApiProperty({ type: 'string', required: false })
-  name: string;
+  name?: string;
 }

@@ -1,32 +1,22 @@
-import { AutoIncrement, BeforeSave, Column, DataType, DefaultScope, HasMany, Model, NotEmpty, PrimaryKey, Table } from 'sequelize-typescript';
-
-import { Gift } from '../gift/gift.model';
+import { AfterSync, BeforeSave, Column, DataType, DefaultScope, Model, Table } from 'sequelize-typescript';
 
 @DefaultScope(() => ({
   order: [['id', 'asc']]
 }))
 @Table({ paranoid: true })
 export class Partner extends Model {
-  @PrimaryKey
-  @AutoIncrement
-  @Column
-  id: number;
-
-  @NotEmpty({ msg: "Campo 'Nome Fantasia' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   fantasyName: string;
 
-  @NotEmpty({ msg: "Campo 'Razão Social' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   companyName: string;
 
-  @NotEmpty({ msg: "Campo 'CNPJ' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -34,7 +24,6 @@ export class Partner extends Model {
   })
   cnpj: string;
 
-  @NotEmpty({ msg: "Campo 'Inscrição Estadual' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -42,14 +31,12 @@ export class Partner extends Model {
   })
   stateRegistration: string;
 
-  @NotEmpty({ msg: "Campo 'Responsável' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   responsible: string;
 
-  @NotEmpty({ msg: "Campo 'E-mail' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -57,14 +44,12 @@ export class Partner extends Model {
   })
   email: string;
 
-  @NotEmpty({ msg: "Campo 'Website' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   website: string;
 
-  @NotEmpty({ msg: "Campo 'Telefone 1' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false
@@ -77,21 +62,18 @@ export class Partner extends Model {
   @Column(DataType.STRING)
   phone3: string;
 
-  @NotEmpty({ msg: "Campo 'CEP' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
   cep: string;
 
-  @NotEmpty({ msg: "Campo 'Endereço' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
   address: string;
 
-  @NotEmpty({ msg: "Campo 'Bairro' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false
@@ -101,14 +83,12 @@ export class Partner extends Model {
   @Column(DataType.STRING)
   complement: string;
 
-  @NotEmpty({ msg: "Campo 'Cidade' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false
   })
   city: string;
 
-  @NotEmpty({ msg: "Campo 'UF' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false
@@ -118,8 +98,80 @@ export class Partner extends Model {
   @Column(DataType.STRING)
   image: string;
 
-  @HasMany(() => Gift)
-  gifts: Gift[]
+  @AfterSync
+  static async createAll() {
+    process.env.NODE_ENV !== 'dev' && await this.bulkCreate([
+      {
+        fantasyName: 'Petz',
+        companyName: 'Petz Com. e Ind. de Produtos LTDA.',
+        cnpj: '05875578000105',
+        stateRegistration: '987178808780',
+        responsible: 'João Osvaldo Lima',
+        email: 'financeiro@petzltda.com.br',
+        website: 'https://petz.com.br',
+        phone1: '1138376789',
+        phone2: '11988525083',
+        cep: '04298090',
+        address: 'Rua Bertolina Maria, 561',
+        district: 'Vila Vermelha',
+        city: 'São Paulo',
+        uf: 'SP',
+        image: 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1150&q=80'
+      },
+      {
+        fantasyName: 'Photografia Sublime',
+        companyName: 'Photografia Sublime ME',
+        cnpj: '69334805000178',
+        stateRegistration: '752415244087',
+        responsible: 'Eliane Fátima Cavalcanti',
+        email: 'photo@sublime.com.br',
+        website: 'https://photografiasublime.com.br',
+        phone1: '1728728306',
+        phone2: '17997510090',
+        phone3: '17997519955',
+        cep: '15810476',
+        address: 'Rua Caldas Novas, 885',
+        district: 'Loteamento Cidade Jardim',
+        city: 'Catanduva',
+        uf: 'SP',
+        image: 'https://images.unsplash.com/photo-1484239398315-f1681ef72fe6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1050&q=80'
+      },
+      {
+        fantasyName: 'Focinhos e Patas',
+        companyName: 'Focinhos e Patas Com. de Produtos LTDA.',
+        cnpj: '74010830000136',
+        stateRegistration: '175559121958',
+        responsible: 'Jorge Kaique das Neves',
+        email: 'vendas@focinhospatas.com.br',
+        website: 'https://focinhospatas.com.br',
+        phone1: '1138224867',
+        cep: '05568010',
+        address: 'Rua Severiano Leite da Silva, 233',
+        district: 'Jardim São Jorge',
+        complement: '15 andar',
+        city: 'São Paulo',
+        uf: 'SP',
+        image: 'https://images.unsplash.com/photo-1606425271394-c3ca9aa1fc06?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cGF3fGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
+      },
+      {
+        fantasyName: 'PetPlace',
+        companyName: 'PetPlace Produtos Licenciados LTDA.',
+        cnpj: '25759326000128',
+        stateRegistration: '635503786',
+        responsible: 'Francisco Gael das Neves',
+        email: 'comunicacoes@petplace.com.br',
+        website: 'https://petplace.com.br',
+        phone1: '4829027084',
+        phone2: '48982086019',
+        cep: '88706-203',
+        address: 'Rua Santilino Antônio de Medeiros, 768',
+        district: 'Passo do Gado',
+        city: 'Tubarão',
+        uf: 'SC',
+        image: 'https://images.unsplash.com/photo-1494947665470-20322015e3a8?ixid=MnwxMjA3fDB8MHxzZWFyY2h8OXx8ZG9nc3xlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
+      },
+    ], { ignoreDuplicates: true });
+  }
 
   @BeforeSave
   static async formatData(partner: Partner) {
@@ -128,9 +180,9 @@ export class Partner extends Model {
     partner.cep = partner.cep.replace(/[\s-]/g, '');
     partner.stateRegistration = partner.stateRegistration.replace(/[\s.]/g, '');
     partner.cnpj = partner.cnpj.replace(/[\/\s-.]/g, '');
-    partner.phone1 = partner.phone1.replace(/[\s()-]/g, '');
-    if (partner.phone2) partner.phone2 = partner.phone2.replace(/[\s()-]/g, '');
-    if (partner.phone3) partner.phone3 = partner.phone3.replace(/[\s()-]/g, '');
+    partner.phone1 = partner.phone1.replace(/(55)?[\s-+()]/g, '');
+    if (partner.phone2) partner.phone2 = partner.phone2.replace(/(55)?[\s-+()]/g, '');
+    if (partner.phone3) partner.phone3 = partner.phone3.replace(/(55)?[\s-+()]/g, '');
     if (!partner.website.includes('https://')) partner.website = `https://${partner.website}`;
   }
 }

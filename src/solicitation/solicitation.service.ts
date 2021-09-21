@@ -38,7 +38,7 @@ export class SolicitationService {
       await this.solicitationTypeService.findById(data.solicitationTypeId);
 
       if (media) {
-        const image = (await this.uploadService.uploadFile(media)).url;
+        const image = (await this.uploadService.uploadFile(media)).url
         Object.assign(data, { image });
       }
 

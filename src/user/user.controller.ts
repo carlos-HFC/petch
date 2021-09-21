@@ -6,6 +6,7 @@ import { Request } from 'express';
 import { UserService } from './user.service';
 import { CreateUser, FilterUser, IndexUser, UpdateUser, User } from './user.swagger';
 import { JwtAuthGuard } from '../auth/auth.guard';
+import { config } from '../multer';
 import { RoleGuard } from '../role/role.guard';
 import { RoleDecorator } from '../role/role.decorator';
 
@@ -19,6 +20,7 @@ export class UserController {
   @ApiOperation({ summary: 'Listar todos os usuários' })
   @ApiOkResponse({ type: [IndexUser], description: 'Success' })
   @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
     schema: {
       type: 'object',
       properties: {
@@ -34,6 +36,7 @@ export class UserController {
     }
   })
   @ApiForbiddenResponse({
+    description: 'Forbidden',
     schema: {
       type: 'object',
       properties: {
@@ -60,6 +63,7 @@ export class UserController {
   @ApiOperation({ summary: 'Listar um usuário pelo ID' })
   @ApiOkResponse({ type: User, description: 'Success' })
   @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
     schema: {
       type: 'object',
       properties: {
@@ -75,6 +79,7 @@ export class UserController {
     }
   })
   @ApiForbiddenResponse({
+    description: 'Forbidden',
     schema: {
       type: 'object',
       properties: {
@@ -146,6 +151,7 @@ export class UserController {
     }
   })
   @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
     schema: {
       type: 'object',
       properties: {
@@ -161,6 +167,7 @@ export class UserController {
     }
   })
   @ApiForbiddenResponse({
+    description: 'Forbidden',
     schema: {
       type: 'object',
       properties: {
@@ -181,7 +188,7 @@ export class UserController {
   // @UseGuards(JwtAuthGuard, RoleGuard)
   // @RoleDecorator('admin')
   @Post()
-  @UseInterceptors(FileInterceptor('media'))
+  @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
   async create(@Body() data: TCreateUser, @UploadedFile() media?: Express.MulterS3.File) {
     return await this.userService.post(data, true, media);
   }
@@ -240,7 +247,7 @@ export class UserController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Put()
-  @UseInterceptors(FileInterceptor('media'))
+  @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
   async update(@Req() req: Request, @Body() data: TUpdateUser, @UploadedFile() media?: Express.MulterS3.File) {
     return await this.userService.put(req.user, data, media);
   }
@@ -303,6 +310,7 @@ export class UserController {
   @ApiOperation({ summary: 'Reativar um usuário' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
     schema: {
       type: 'object',
       properties: {
@@ -318,6 +326,7 @@ export class UserController {
     }
   })
   @ApiForbiddenResponse({
+    description: 'Forbidden',
     schema: {
       type: 'object',
       properties: {
@@ -361,6 +370,7 @@ export class UserController {
   @ApiOperation({ summary: 'Inativar um usuário' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
     schema: {
       type: 'object',
       properties: {
@@ -376,6 +386,7 @@ export class UserController {
     }
   })
   @ApiForbiddenResponse({
+    description: 'Forbidden',
     schema: {
       type: 'object',
       properties: {

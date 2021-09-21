@@ -6,6 +6,7 @@ import { Request } from 'express';
 import { SolicitationService } from './solicitation.service';
 import { CreateSolicitation, Solicitation } from './solicitation.swagger';
 import { JwtAuthGuard, OptionalAuthGuard } from '../auth/auth.guard';
+import { config } from '../multer';
 import { RoleDecorator } from '../role/role.decorator';
 import { RoleGuard } from '../role/role.guard';
 
@@ -157,7 +158,7 @@ export class SolicitationController {
   @ApiBearerAuth()
   @UseGuards(OptionalAuthGuard)
   @Post()
-  @UseInterceptors(FileInterceptor('media'))
+  @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
   async create(@Body() data: TCreateSolicitation, @UploadedFile() media: Express.MulterS3.File, @Req() req: Request) {
     return await this.solicitationService.post(data, media, req.user);
   }

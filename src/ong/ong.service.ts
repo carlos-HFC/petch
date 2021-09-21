@@ -41,7 +41,7 @@ export class OngService {
     return await this.ongModel.findAll({
       paranoid: !convertBool(query.inactives),
       where,
-      attributes: ['id', 'name', 'email', 'phone1', 'responsible', 'cep', 'city', 'deletedAt']
+      attributes: ['id', 'name', 'email', 'phone1', 'responsible', 'image', 'cep', 'city', 'deletedAt']
     });
   }
 
@@ -126,7 +126,7 @@ export class OngService {
 
     const ong = await this.findById(id, 'true');
 
-    if (!st) return await ong.destroy()
-    return await ong.restore()
+    if (!st) return await ong.destroy();
+    return await ong.restore();
   }
 }

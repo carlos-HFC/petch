@@ -32,7 +32,7 @@ export class SpeciesService {
     return await this.speciesModel.findAll({
       paranoid: !query.inactives,
       where,
-      attributes: ['id', 'name', 'deletedAt']
+      attributes: ['id', 'name', 'image', 'deletedAt']
     });
   }
 
@@ -60,7 +60,7 @@ export class SpeciesService {
       if (data.name && await this.findByName(data.name)) throw new HttpException('Espécie já cadastrada', 400);
 
       if (media) {
-        const image = (await this.uploadService.uploadFile(media)).url;
+        const image = (await this.uploadService.uploadFile(media)).url
         Object.assign(data, { image });
       }
 
@@ -87,7 +87,7 @@ export class SpeciesService {
       if (data.name && await this.findByName(data.name)) throw new HttpException('Espécie já cadastrada', 400);
 
       if (media) {
-        const image = (await this.uploadService.uploadFile(media)).url;
+        const image = (await this.uploadService.uploadFile(media)).url
         Object.assign(data, { image });
       }
 

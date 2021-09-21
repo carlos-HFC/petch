@@ -6,8 +6,8 @@ import { GiftController } from './gift.controller';
 import { Gift } from './gift.model';
 import { GiftSeed } from './gift.seed';
 import { GiftService } from './gift.service';
+import { PartnerModule } from '../partner/partner.module';
 import { UploadService } from '../upload.service';
-import { PartnerModule } from 'src/partner/partner.module';
 
 @Module({
   imports: [

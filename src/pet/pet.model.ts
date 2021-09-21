@@ -1,4 +1,4 @@
-import { AutoIncrement, BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, PrimaryKey, Table } from 'sequelize-typescript';
+import { BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, Table } from 'sequelize-typescript';
 
 import { Ong } from '../ong/ong.model';
 import { Species } from '../species/species.model';
@@ -19,11 +19,6 @@ import { capitalizeFirstLetter } from '../utils';
 }))
 @Table({ paranoid: true })
 export class Pet extends Model {
-  @PrimaryKey
-  @AutoIncrement
-  @Column
-  id: number;
-
   @Column({
     type: DataType.STRING,
   })
@@ -93,9 +88,9 @@ export class Pet extends Model {
   @BeforeSave
   static async formatData(pet: Pet) {
     pet.gender = pet.gender.toUpperCase();
-    if (pet.name) pet.name = capitalizeFirstLetter(pet.name);
-    if (pet.breed) pet.breed = capitalizeFirstLetter(pet.breed);
     pet.color = capitalizeFirstLetter(pet.color);
     pet.description = capitalizeFirstLetter(pet.description);
+    if (pet.name) pet.name = capitalizeFirstLetter(pet.name);
+    if (pet.breed) pet.breed = capitalizeFirstLetter(pet.breed);
   }
 }

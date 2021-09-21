@@ -1,9 +1,10 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query, UploadedFiles, UseInterceptors } from '@nestjs/common';
-import { FilesInterceptor } from '@nestjs/platform-express';
+import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { PetService } from './pet.service';
 import { CreatePet, FilterPet, IndexPet, Pet, UpdatePet } from './pet.swagger';
+import { config } from '../multer';
 
 @ApiTags('Pets')
 @Controller('pets')
@@ -60,7 +61,7 @@ export class PetController {
           oneOf: [
             { example: 'Arquivo não suportado' },
             { example: 'Campo "X" não pode ser vazio' },
-            { example: 'O Pet deve conter, pelo menos, uma foto' },
+            { example: 'O Pet deve conter uma foto' },
           ]
         },
       }
@@ -88,9 +89,9 @@ export class PetController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreatePet })
   @Post()
-  @UseInterceptors(FilesInterceptor('images'))
-  async create(@Body() data: TCreatePet, @UploadedFiles() images?: Express.MulterS3.File[]) {
-    return await this.petService.post(data, images);
+  @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
+  async create(@Body() data: TCreatePet, @UploadedFile() media: Express.MulterS3.File) {
+    return await this.petService.post(data, media);
   }
 
   @ApiOperation({ summary: 'Editar um pet' })
@@ -108,7 +109,7 @@ export class PetController {
           oneOf: [
             { example: 'Arquivo não suportado' },
             { example: 'Campo "X" não pode ser vazio' },
-            { example: 'O Pet deve conter, pelo menos, uma foto' },
+            { example: 'O Pet deve conter uma foto' },
           ]
         },
       }
@@ -153,8 +154,8 @@ export class PetController {
   @ApiBody({ type: UpdatePet })
   @ApiParam({ name: 'id', required: true })
   @Put(':id')
-  @UseInterceptors(FilesInterceptor('images'))
-  async update(@Param('id') id: number, @Body() data: TCreatePet, @UploadedFiles() images?: Express.MulterS3.File[]) {
+  @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
+  async update(@Param('id') id: number, @Body() data: TCreatePet, @UploadedFile() media: Express.MulterS3.File) {
     return await this.petService.put(id, data);
   }
 

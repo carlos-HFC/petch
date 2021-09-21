@@ -4,6 +4,7 @@ import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoC
 
 import { IndexOng, Ong, TCreateOng, TFilterOng, TUpdateOng } from './ong.dto';
 import { OngService } from './ong.service';
+import { config } from '../multer';
 
 @ApiTags('ONGs')
 @Controller('ongs')
@@ -57,11 +58,12 @@ export class OngController {
         message: {
           type: 'string',
           oneOf: [
+            { example: 'Arquivo não suportado' },
             { example: 'CEP inválido' },
             { example: 'E-mail inválido' },
-            { example: 'Número de telefone/celular inválido' },
+            { example: 'Telefone inválido' },
             { example: 'ONG já cadastrada' },
-            { example: 'Campo "X" não pode ser vazio' },
+            { example: 'Campo "X" é obrigatório' },
           ]
         },
       }
@@ -70,7 +72,7 @@ export class OngController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: TCreateOng })
   @Post()
-  @UseInterceptors(FileInterceptor('media'))
+  @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
   async create(@Body() data: TCreateOng, @UploadedFile() media?: Express.MulterS3.File) {
     return await this.ongService.post(data, media);
   }
@@ -88,11 +90,12 @@ export class OngController {
         message: {
           type: 'string',
           oneOf: [
+            { example: 'Arquivo não suportado' },
             { example: 'CEP inválido' },
             { example: 'E-mail inválido' },
-            { example: 'Número de telefone/celular inválido' },
+            { example: 'Telefone inválido' },
             { example: 'ONG já cadastrada' },
-            { example: 'Campo "X" não pode ser vazio' },
+            { example: 'Campo "X" é obrigatório' },
           ]
         },
       }
@@ -118,7 +121,7 @@ export class OngController {
   @ApiParam({ name: 'id', required: true })
   @ApiBody({ type: TUpdateOng })
   @Put(':id')
-  @UseInterceptors(FileInterceptor('media'))
+  @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
   async update(@Param('id') id: number, @Body() data: TUpdateOng, @UploadedFile() media?: Express.MulterS3.File) {
     return await this.ongService.put(id, data, media);
   }
@@ -145,7 +148,7 @@ export class OngController {
   @ApiQuery({ name: 'status', type: 'string', enum: ['true', 'false'], required: true })
   @Delete(':id')
   @HttpCode(204)
-  async activeInactive(@Param('id') id: number, @Query('status') status) {
+  async activeInactive(@Param('id') id: number, @Query() { inactives: status }: Pick<TFilterOng, 'inactives'>) {
     return await this.ongService.activeInactive(id, status);
   }
 }

@@ -1,14 +1,34 @@
 import { ApiProperty, OmitType, PartialType, PickType } from '@nestjs/swagger';
-import { IsEmail, IsNotEmpty, IsPhoneNumber, IsPostalCode, IsString, ValidateIf } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsPhoneNumber, IsPostalCode, IsString, IsUrl, ValidateIf } from 'class-validator';
 
-export class Ong {
-  @ApiProperty({ type: 'integer', uniqueItems: true, readOnly: true })
-  id: string;
+export class Partner {
+  @ApiProperty({ uniqueItems: true, type: 'integer', readOnly: true })
+  id: number;
+
+  @ApiProperty({ type: 'string' })
+  @IsNotEmpty({ message: 'Nome Fantasia é obrigatório' })
+  @IsString()
+  fantasyName: string;
+
+  @ApiProperty({ type: 'string' })
+  @IsNotEmpty({ message: 'Razão Social é obrigatória' })
+  @IsString()
+  companyName: string;
 
   @ApiProperty({ type: 'string', uniqueItems: true })
-  @IsNotEmpty({ message: 'Nome é obrigatório' })
+  @IsNotEmpty({ message: 'CNPJ é obrigatório' })
   @IsString()
-  name: string;
+  cnpj: string;
+
+  @ApiProperty({ type: 'string', uniqueItems: true })
+  @IsNotEmpty({ message: 'Inscrição Estadual é obrigatória' })
+  @IsString()
+  stateRegistration: string;
+
+  @ApiProperty({ type: 'string' })
+  @IsNotEmpty({ message: 'Responsável é obrigatório' })
+  @IsString()
+  responsible: string;
 
   @ApiProperty({ type: 'string', uniqueItems: true })
   @IsNotEmpty({ message: 'E-mail é obrigatório' })
@@ -17,12 +37,10 @@ export class Ong {
   email: string;
 
   @ApiProperty({ type: 'string' })
-  @IsNotEmpty({ message: 'Responsável é obrigatório' })
+  @IsNotEmpty({ message: 'Website é obrigatório' })
+  @IsUrl({}, { message: 'Website inválido' })
   @IsString()
-  responsible: string;
-
-  @ApiProperty({ type: 'string', required: false })
-  image: string;
+  website: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Telefone é obrigatório' })
@@ -69,10 +87,8 @@ export class Ong {
   @IsString()
   uf: string;
 
-  @ApiProperty({ type: 'string' })
-  @IsNotEmpty({ message: 'Abrangência é obrigatória' })
-  @IsString()
-  coverage: string;
+  @ApiProperty({ type: 'string', required: false })
+  image: string;
 
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   createdAt: Date;
@@ -84,25 +100,22 @@ export class Ong {
   deletedAt: Date | null;
 }
 
-export class IndexOng extends PickType(Ong, ['id', 'name', 'email', 'phone1', 'responsible', 'image', 'cep', 'city', 'deletedAt']) { }
+export class IndexPartner extends PickType(Partner, ['id', 'fantasyName', 'cnpj', 'email', 'phone1', 'responsible', 'image', 'deletedAt']) { }
 
-export class TCreateOng extends OmitType(Ong, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'image']) {
+export class TCreatePartner extends OmitType(Partner, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'image']) {
   @ApiProperty({ type: 'string', format: 'binary', required: false })
   media: string;
 }
 
-export class TUpdateOng extends PartialType(TCreateOng) { }
+export class TUpdatePartner extends PartialType(TCreatePartner) { }
 
-export class TFilterOng {
+export class TFilterPartner {
+  @ApiProperty({ type: 'string', enum: ['true', 'false'], required: false })
+  inactives?: 'true' | 'false';
+
   @ApiProperty({ type: 'string', required: false })
-  name?: string;
+  fantasyName?: string;
 
   @ApiProperty({ type: 'string', required: false })
   uf?: string;
-
-  @ApiProperty({ type: 'string', required: false })
-  coverage?: string;
-
-  @ApiProperty({ type: 'string', enum: ['true', 'false'], required: false })
-  inactives?: 'true' | 'false';
 }

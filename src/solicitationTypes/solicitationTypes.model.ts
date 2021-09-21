@@ -1,21 +1,13 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AutoIncrement, BeforeSave, Column, DataType, Model, PrimaryKey, Table } from 'sequelize-typescript';
-
-import { capitalizeFirstLetter } from '../utils';
+import { AfterSync, Column, DataType, Model, Table } from 'sequelize-typescript';
 
 @Table({ paranoid: true })
 export class SolicitationTypes extends Model {
   @ApiProperty({ uniqueItems: true, type: 'integer', readOnly: true })
-  @PrimaryKey
-  @AutoIncrement
-  @Column
   id: number;
 
-
   @ApiProperty({ type: 'string' })
-  @Column({
-    type: DataType.STRING
-  })
+  @Column(DataType.STRING)
   name: string;
 
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
@@ -27,8 +19,12 @@ export class SolicitationTypes extends Model {
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   deletedAt: Date | null;
 
-  @BeforeSave
-  static async upperFirst(solicitationTypes: SolicitationTypes) {
-    return solicitationTypes.name = capitalizeFirstLetter(solicitationTypes.name);
+  @AfterSync
+  static async createAll() {
+    process.env.NODE_ENV !== 'dev' && await this.bulkCreate([
+      { name: "Elogio" },
+      { name: "Reclamação" },
+      { name: "Dúvida" },
+    ], { ignoreDuplicates: true });
   }
 }

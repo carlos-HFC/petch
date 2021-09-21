@@ -53,7 +53,6 @@ export class UserService {
 
   async findByCPF(cpf: string) {
     validateCPF(cpf);
-
     return await this.userModel.findOne({
       where: {
         cpf: cpf.replace(/[-.]/g, '').trim()
@@ -63,7 +62,6 @@ export class UserService {
 
   async findByEmail(email: string) {
     validateEmail(email);
-
     return await this.userModel.findOne({
       where: {
         email: email.trim().toLowerCase()
@@ -104,7 +102,7 @@ export class UserService {
       const role = await this.roleService.getByName(isAdmin ? 'Admin' : 'Adotante');
 
       if (media) {
-        const avatar = (await this.uploadService.uploadFile(media)).url;
+        const avatar = (await this.uploadService.uploadFile(media)).url
         Object.assign(data, { avatar });
       }
 
@@ -170,7 +168,7 @@ export class UserService {
       }
 
       if (media) {
-        const avatar = (await this.uploadService.uploadFile(media)).url;
+        const avatar = (await this.uploadService.uploadFile(media)).url
         Object.assign(data, { avatar });
       }
 

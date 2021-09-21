@@ -4,6 +4,7 @@ import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoC
 
 import { SpeciesService } from './species.service';
 import { CreateSpecies, FilterSpecies, IndexSpecies, Species, UpdateSpecies } from './species.swagger';
+import { config } from '../multer';
 import { UpdateSize } from '../size/size.swagger';
 
 @ApiTags('Species')
@@ -70,7 +71,7 @@ export class SpeciesController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: CreateSpecies })
   @Post()
-  @UseInterceptors(FileInterceptor('media'))
+  @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
   async create(@Body() data: TCreateSpecies, @UploadedFile() media?: Express.MulterS3.File) {
     return await this.speciesService.post(data, media);
   }
@@ -116,7 +117,7 @@ export class SpeciesController {
   @ApiBody({ type: UpdateSpecies })
   @ApiParam({ name: 'id', required: true })
   @Put(':id')
-  @UseInterceptors(FileInterceptor('media'))
+  @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
   async update(@Param('id') id: number, @Body() data: TUpdateSpecies, @UploadedFile() media?: Express.MulterS3.File) {
     return await this.speciesService.put(id, data, media);
   }
