@@ -5,16 +5,7 @@ import { Species } from '../species/species.model';
 import { capitalizeFirstLetter } from '../utils';
 
 @DefaultScope(() => ({
-  include: [
-    {
-      model: Ong,
-      attributes: ['name']
-    },
-    {
-      model: Species,
-      attributes: ['name']
-    }
-  ],
+  include: [Ong, Species],
   order: [['id', 'asc']]
 }))
 @Table({ paranoid: true })
