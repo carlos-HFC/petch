@@ -8,11 +8,16 @@ import { PartnerSeed } from './partner.seed';
 import { PartnerService } from './partner.service';
 import { UploadService } from '../upload.service';
 
+const imports = [
+  SequelizeModule.forFeature([Partner]),
+];
+
+if (process.env.NODE_ENV === 'dev') {
+  imports.push(SeederModule.forFeature([PartnerSeed]));
+}
+
 @Module({
-  imports: [
-    SeederModule.forFeature([PartnerSeed]),
-    SequelizeModule.forFeature([Partner]),
-  ],
+  imports,
   controllers: [PartnerController],
   providers: [PartnerService, UploadService],
   exports: [PartnerService],

@@ -8,12 +8,17 @@ import { SizeSeed } from './size.seed';
 import { SizeService } from './size.service';
 import { SpeciesModule } from '../species/species.module';
 
+const imports = [
+  SequelizeModule.forFeature([Size]),
+  forwardRef(() => SpeciesModule),
+];
+
+if (process.env.NODE_ENV === 'dev') {
+  imports.push(SeederModule.forFeature([SizeSeed]));
+}
+
 @Module({
-  imports: [
-    SequelizeModule.forFeature([Size]),
-    SeederModule.forFeature([SizeSeed]),
-    forwardRef(() => SpeciesModule),
-  ],
+  imports,
   controllers: [SizeController],
   providers: [SizeService],
   exports: [SizeService],

@@ -9,12 +9,17 @@ import { SpeciesService } from './species.service';
 import { SizeModule } from '../size/size.module';
 import { UploadService } from '../upload.service';
 
+const imports = [
+  SequelizeModule.forFeature([Species]),
+  forwardRef(() => SizeModule),
+]
+
+if (process.env.NODE_ENV === 'dev') {
+  imports.push(SeederModule.forFeature([SpeciesSeed]));
+}
+
 @Module({
-  imports: [
-    SequelizeModule.forFeature([Species]),
-    SeederModule.forFeature([SpeciesSeed]),
-    forwardRef(() => SizeModule),
-  ],
+  imports,
   controllers: [SpeciesController],
   providers: [SpeciesService, UploadService],
   exports: [SpeciesService],

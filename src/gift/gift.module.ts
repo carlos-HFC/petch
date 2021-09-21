@@ -9,12 +9,17 @@ import { GiftService } from './gift.service';
 import { PartnerModule } from '../partner/partner.module';
 import { UploadService } from '../upload.service';
 
+const imports = [
+  SequelizeModule.forFeature([Gift]),
+  PartnerModule
+];
+
+if (process.env.NODE_ENV === 'dev') {
+  imports.push(SeederModule.forFeature([GiftSeed]));
+}
+
 @Module({
-  imports: [
-    SeederModule.forFeature([GiftSeed]),
-    SequelizeModule.forFeature([Gift]),
-    PartnerModule
-  ],
+  imports,
   controllers: [GiftController],
   providers: [GiftService, UploadService],
   exports: [GiftService]

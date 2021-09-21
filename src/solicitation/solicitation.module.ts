@@ -9,12 +9,17 @@ import { SolicitationService } from './solicitation.service';
 import { SolicitationTypesModule } from '../solicitationTypes/solicitationTypes.module';
 import { UploadService } from '../upload.service';
 
+const imports= [
+  SequelizeModule.forFeature([Solicitation]),
+  SolicitationTypesModule
+]
+
+if (process.env.NODE_ENV === 'dev') {
+  imports.push(SeederModule.forFeature([SolicitationSeed]));
+}
+
 @Module({
-  imports: [
-    SeederModule.forFeature([SolicitationSeed]),
-    SequelizeModule.forFeature([Solicitation]),
-    SolicitationTypesModule
-  ],
+  imports,
   controllers: [SolicitationController],
   providers: [SolicitationService, UploadService],
   exports: [SolicitationService],

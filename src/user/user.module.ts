@@ -11,16 +11,21 @@ import { MailModule } from '../mail/mail.module';
 import { RoleModule } from '../role/role.module';
 import { UploadService } from '../upload.service';
 
+const imports = [
+  SequelizeModule.forFeature([User]),
+  JwtModule.register({
+    secret: process.env.JWT_SECRET
+  }),
+  RoleModule,
+  MailModule
+];
+
+if (process.env.NODE_ENV === 'dev') {
+  imports.push(SeederModule.forFeature([UserSeed]));
+}
+
 @Module({
-  imports: [
-    SeederModule.forFeature([UserSeed]),
-    SequelizeModule.forFeature([User]),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET
-    }),
-    RoleModule,
-    MailModule
-  ],
+  imports,
   controllers: [UserController],
   providers: [UserService, UploadService],
   exports: [UserService],

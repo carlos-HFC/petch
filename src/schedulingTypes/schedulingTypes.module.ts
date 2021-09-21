@@ -7,11 +7,16 @@ import { SchedulingTypes } from './schedulingTypes.model';
 import { SchedulingTypesSeed } from './schedulingTypes.seed';
 import { SchedulingTypesService } from './schedulingTypes.service';
 
+const imports = [
+  SequelizeModule.forFeature([SchedulingTypes])
+];
+
+if (process.env.NODE_ENV === 'dev') {
+  imports.push(SeederModule.forFeature([SchedulingTypesSeed]));
+}
+
 @Module({
-  imports: [
-    SeederModule.forFeature([SchedulingTypesSeed]),
-    SequelizeModule.forFeature([SchedulingTypes])
-  ],
+  imports,
   controllers: [SchedulingTypesController],
   providers: [SchedulingTypesService],
   exports: [SchedulingTypesService],

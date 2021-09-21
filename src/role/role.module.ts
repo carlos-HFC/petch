@@ -7,11 +7,16 @@ import { Role } from './role.model';
 import { RoleSeed } from './role.seed';
 import { RoleService } from './role.service';
 
+const imports = [
+  SequelizeModule.forFeature([Role])
+];
+
+if (process.env.NODE_ENV === 'dev') {
+  imports.push(SeederModule.forFeature([RoleSeed]));
+}
+
 @Module({
-  imports: [
-    SeederModule.forFeature([RoleSeed]),
-    SequelizeModule.forFeature([Role])
-  ],
+  imports,
   controllers: [RoleController],
   providers: [RoleService],
   exports: [RoleService],

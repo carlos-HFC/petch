@@ -8,11 +8,17 @@ import { OngSeed } from './ong.seed';
 import { OngService } from './ong.service';
 import { UploadService } from '../upload.service';
 
+
+const imports = [
+  SequelizeModule.forFeature([Ong])
+];
+
+if (process.env.NODE_ENV === 'dev') {
+  imports.push(SeederModule.forFeature([OngSeed]));
+}
+
 @Module({
-  imports: [
-    SeederModule.forFeature([OngSeed]),
-    SequelizeModule.forFeature([Ong])
-  ],
+  imports,
   controllers: [OngController],
   providers: [OngService, UploadService],
   exports: [OngService],
