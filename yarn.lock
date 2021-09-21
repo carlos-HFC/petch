@@ -734,6 +734,13 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@ntegral/nestjs-s3@^1.0.3":
+  version "1.0.3"
+  resolved "https://registry.yarnpkg.com/@ntegral/nestjs-s3/-/nestjs-s3-1.0.3.tgz#0dde602829822a6015f360605efbc63f6786e306"
+  integrity sha512-Ynhewmt5Yn+Ah2ZgZSHg6je27tFYf5R1GjnPZZUqKgEy00CCnw4qsGT1H/tufOD5ec/x49a7Ci7e7Thec+l5Kw==
+  dependencies:
+    aws-sdk "^2.624.0"
+
 "@ntegral/nestjs-sendgrid@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@ntegral/nestjs-sendgrid/-/nestjs-sendgrid-1.0.0.tgz#3b6c5a8df84830e48e31f2f7d4c85c0182116390"
@@ -1588,6 +1595,21 @@ aws-sdk@*, aws-sdk@^2.37.0, aws-sdk@^2.943.0:
   version "2.943.0"
   resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.943.0.tgz#6bda506cc33f5e7ec14e58ca4847e9abbab05c13"
   integrity sha512-1/WDupJrIB0SJEzIOf+UpqmG0AP5AXoDXhbW7CEujHerOd+/b5A1ubeHKGQJvBN4tAktgsvGpDiBRfB9MpJU5g==
+  dependencies:
+    buffer "4.9.2"
+    events "1.1.1"
+    ieee754 "1.1.13"
+    jmespath "0.15.0"
+    querystring "0.2.0"
+    sax "1.2.1"
+    url "0.10.3"
+    uuid "3.3.2"
+    xml2js "0.4.19"
+
+aws-sdk@^2.624.0:
+  version "2.991.0"
+  resolved "https://registry.yarnpkg.com/aws-sdk/-/aws-sdk-2.991.0.tgz#ba858c65cb71e1eeea39523463cf5ef258a73e8f"
+  integrity sha512-TybluMJhRBZ0h5HGupHPTfamwtsJlW56HddJpMbsIjvmh4LGupajrkEwLQYW7osFXQ1S/xuE+0QIy6vWgOpT0g==
   dependencies:
     buffer "4.9.2"
     events "1.1.1"
