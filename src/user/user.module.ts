@@ -7,9 +7,9 @@ import { UserController } from './user.controller';
 import { User } from './user.model';
 import { UserSeed } from './user.seed';
 import { UserService } from './user.service';
+import { UploadService } from '../config/upload.service';
 import { MailModule } from '../mail/mail.module';
 import { RoleModule } from '../role/role.module';
-import { UploadService } from '../upload.service';
 
 const imports = [
   SequelizeModule.forFeature([User]),

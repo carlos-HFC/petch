@@ -2,21 +2,58 @@ import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Req, Use
 import { ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiBody, ApiBearerAuth, ApiTags, ApiOkResponse, ApiParam, ApiQuery, ApiForbiddenResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 
-import { Scheduling, TAvailableScheduling, TCreateScheduling } from './scheduling.dto';
+import { Scheduling, TAvailableScheduling, TCreateScheduling, TFilterScheduling } from './scheduling.dto';
 import { SchedulingService } from './scheduling.service';
-import { JwtAuthGuard } from '../auth/auth.guard';
-import { RoleDecorator } from '../role/role.decorator';
-import { RoleGuard } from '../role/role.guard';
+import { JwtAuthGuard } from '../common/guards/auth.guard';
+import { RoleGuard } from '../common/guards/role.guard';
+import { RoleDecorator } from '../common/decorators/role.decorator';
 
 @ApiTags('Schedulings')
+@ApiUnauthorizedResponse({
+  description: 'Unauthorized',
+  schema: {
+    type: 'object',
+    properties: {
+      statusCode: {
+        type: 'number',
+        example: 401,
+      },
+      message: {
+        type: 'string',
+        example: 'Unauthorized'
+      }
+    }
+  }
+})
+@ApiForbiddenResponse({
+  description: 'Forbidden',
+  schema: {
+    type: 'object',
+    properties: {
+      statusCode: {
+        type: 'number',
+        example: 403,
+      },
+      message: {
+        type: 'string',
+        example: 'Você não tem permissão'
+      }
+    }
+  }
+})
+@ApiBearerAuth()
 @Controller('schedulings')
 export class SchedulingController {
   constructor(
     private schedulingService: SchedulingService
   ) { }
 
+  @ApiOperation({ summary: 'Visualizar todos os agendamentos' })
+  @ApiOkResponse({ type: Scheduling, description: 'Success' })
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RoleDecorator('admin')
   @Get()
-  async index(@Query() query?: object) {
+  async index(@Query() query?: TFilterScheduling) {
     return await this.schedulingService.get(query);
   }
 
@@ -42,38 +79,6 @@ export class SchedulingController {
       }
     }
   })
-  @ApiUnauthorizedResponse({
-    description: 'Unauthorized',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 401,
-        },
-        message: {
-          type: 'string',
-          example: 'Unauthorized'
-        }
-      }
-    }
-  })
-  @ApiForbiddenResponse({
-    description: 'Forbidden',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 403,
-        },
-        message: {
-          type: 'string',
-          example: 'Você não tem permissão'
-        }
-      }
-    }
-  })
   @ApiNotFoundResponse({
     description: 'Not Found',
     schema: {
@@ -92,7 +97,6 @@ export class SchedulingController {
   })
   @ApiParam({ name: 'schedulingTypesId', required: true })
   @ApiQuery({ name: 'date', type: 'string', required: true })
-  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('adotante')
   @Get(':schedulingTypesId/available')
@@ -145,7 +149,6 @@ export class SchedulingController {
     }
   })
   @ApiBody({ type: TCreateScheduling })
-  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('adotante')
   @Post()
@@ -188,7 +191,6 @@ export class SchedulingController {
     }
   })
   @ApiParam({ name: 'id', required: true })
-  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('adotante')
   @Put(':id')

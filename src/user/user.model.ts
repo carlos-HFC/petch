@@ -1,6 +1,6 @@
 import { compare, hash } from 'bcrypt';
 import { format, parseISO } from 'date-fns';
-import { AfterSync, BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, NotEmpty, Table } from 'sequelize-typescript';
+import { AfterSync, BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, Table } from 'sequelize-typescript';
 
 import { Role } from '../role/role.model';
 
@@ -22,7 +22,6 @@ export class User extends Model {
   })
   googleId: string;
 
-  @NotEmpty({ msg: "Campo 'Nome' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -32,7 +31,6 @@ export class User extends Model {
   @Column(DataType.STRING)
   avatar: string;
 
-  @NotEmpty({ msg: "Campo 'E-mail' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     unique: true,
@@ -56,7 +54,6 @@ export class User extends Model {
   @Column(DataType.VIRTUAL)
   password: string;
 
-  @NotEmpty({ msg: "Campo 'CPF' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     unique: true,
@@ -64,28 +61,24 @@ export class User extends Model {
   })
   cpf: string;
 
-  @NotEmpty({ msg: "Campo 'Data de Nascimento' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   birthday: string;
 
-  @NotEmpty({ msg: "Campo 'Gênero' não pode ser vazio" })
   @Column({
     type: DataType.ENUM('M', 'F', 'O'),
     allowNull: false,
   })
   gender: string;
 
-  @NotEmpty({ msg: "Campo 'CEP' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   cep: string;
 
-  @NotEmpty({ msg: "Campo 'Endereço' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -95,28 +88,24 @@ export class User extends Model {
   @Column(DataType.STRING)
   complement: string;
 
-  @NotEmpty({ msg: "Campo 'Bairro' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   district: string;
 
-  @NotEmpty({ msg: "Campo 'Cidade' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   city: string;
 
-  @NotEmpty({ msg: "Campo 'UF' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
   })
   uf: string;
 
-  @NotEmpty({ msg: "Campo 'Telefone' não pode ser vazio" })
   @Column({
     type: DataType.STRING,
     allowNull: false,
@@ -141,11 +130,6 @@ export class User extends Model {
 
   @BelongsTo(() => Role)
   role: Role;
-
-  @BeforeSave
-  static async hashPass(user: User) {
-    if (user.password) return user.hash = await hash(user.password, 10);
-  }
 
   @AfterSync
   static async createAll() {
@@ -199,7 +183,7 @@ export class User extends Model {
         uf: 'SP',
         phone: '11999008029',
         roleId: 2,
-        avatar: 'https://imagesunsplash.com/photo-1544005313-94ddf0286df2?ixid=MnwxMjA3fDB8MHxzZWFyY2h8OXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
+        avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixid=MnwxMjA3fDB8MHxzZWFyY2h8OXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
       {
         name: 'Guilherme Sérgio Araújo',
@@ -291,6 +275,7 @@ export class User extends Model {
 
   @BeforeSave
   static async formatData(user: User) {
+    if (user.password) return user.hash = await hash(user.password, 10);
     user.email = user.email.toLowerCase();
     user.birthday = format(parseISO(user.birthday), 'yyyy-MM-dd');
     user.uf = user.uf.toUpperCase();

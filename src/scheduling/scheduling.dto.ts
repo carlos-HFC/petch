@@ -1,8 +1,8 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
-import { IsDate, IsDateString, IsNotEmpty } from 'class-validator';
+import { IsDate, IsDateString, IsNotEmpty, IsOptional } from 'class-validator';
 
 import { SchedulingTypes } from '../schedulingTypes/schedulingTypes.model';
-import { User } from '../user/user.swagger';
+import { UserDTO } from '../user/user.dto';
 
 export class Scheduling {
   @ApiProperty({ uniqueItems: true, type: 'integer', readOnly: true })
@@ -28,8 +28,8 @@ export class Scheduling {
   @IsNotEmpty({ message: 'Usuário é obrigatório' })
   userId: number;
 
-  @ApiProperty({ type: User, required: false })
-  user: User;
+  @ApiProperty({ type: UserDTO, required: false })
+  user: UserDTO;
 
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   createdAt: Date;
@@ -60,4 +60,17 @@ export class TCreateScheduling extends PickType(Scheduling, ['schedulingTypesId'
   @IsNotEmpty({ message: 'Data é obrigatória' })
   @IsDateString({}, { message: 'Data inválida' })
   date: string;
+}
+
+export class TFilterScheduling {
+  @ApiProperty({ type: 'number', required: false })
+  schedulingTypesId?: number;
+
+  @ApiProperty({ type: 'string', format: 'date', required: false })
+  @IsOptional()
+  @IsDateString({}, { message: 'Data inválida' })
+  date?: string;
+
+  @ApiProperty({ type: 'string', enum: ['true', 'false'], required: false })
+  canceled?: 'true' | 'false';
 }

@@ -5,12 +5,12 @@ import { ptBR } from 'date-fns/locale';
 import { Op as $ } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
+import { TCreateScheduling, TFilterScheduling } from './scheduling.dto';
 import { Scheduling } from './scheduling.model';
 import { MailService } from '../mail/mail.service';
 import { SchedulingTypesService } from '../schedulingTypes/schedulingTypes.service';
 import { User } from '../user/user.model';
-import { trimObj } from '../utils';
-import { TCreateScheduling } from './scheduling.dto';
+import { convertBool, trimObj } from '../utils';
 
 @Injectable()
 export class SchedulingService {
@@ -24,10 +24,13 @@ export class SchedulingService {
 
   async get(query?: TFilterScheduling) {
     trimObj(query);
+    const where = {};
 
-    return await this.schedulingModel.findAll({
-      paranoid: !query.inactives
-    });
+    if (query.schedulingTypesId) Object.assign(where, { schedulingTypesId: query.schedulingTypesId });
+    if (query.date) Object.assign(where, { date: { [$.between]: [startOfDay(parseISO(query.date)), endOfDay(parseISO(query.date))] } });
+    if (convertBool(query.canceled)) Object.assign(where, { canceledAt: { [$.not]: null } });
+
+    return await this.schedulingModel.findAll({ where });
   }
 
   async findById(id: number, inactives?: boolean) {
@@ -64,7 +67,7 @@ export class SchedulingService {
         break;
     }
 
-    await this.schedulingTypesService.getById(schedulingTypesId)
+    await this.schedulingTypesService.getById(schedulingTypesId);
 
     const schedulings = await this.schedulingModel.findAll({
       where: {
@@ -93,37 +96,31 @@ export class SchedulingService {
 
   async post(user: User, data: TCreateScheduling) {
     trimObj(data);
+
+    if (isBefore(parseISO(data.date), new Date())) throw new HttpException('Data passada não permitida', 400);
+
     const transaction = await this.sequelize.transaction();
 
-    const date = parseISO(data.date);
-
     try {
-      switch (true) {
-        case isBefore(date, new Date()):
-          throw new HttpException('Data passada não permitida', 400);
-        default:
-          break;
-      }
-
       const schedulingType = await this.schedulingTypesService.getById(data.schedulingTypesId);
 
       const available = await this.schedulingModel.findOne({
         where: {
           schedulingTypesId: data.schedulingTypesId,
-          date: startOfHour(date),
+          date: startOfHour(parseISO(data.date)),
           canceledAt: null
         }
       });
 
       if (available) throw new HttpException('Data de agendamento indisponível', 400);
 
-      const dateFormatted = format(date, "dd 'de' MMMM 'de' yyyy', às' HH:mm", { locale: ptBR });
+      const dateFormatted = format(parseISO(data.date), "dd 'de' MMMM 'de' yyyy', às' HH:mm", { locale: ptBR });
 
-      await this.mailService.newScheduling(user, dateFormatted, schedulingType.name);
+      // await this.mailService.newScheduling(user, dateFormatted, schedulingType.name);
 
       const scheduling = await this.schedulingModel.create({
         ...data,
-        userId: 2
+        userId: user.id
       }, { transaction });
 
       await transaction.commit();
@@ -153,11 +150,9 @@ export class SchedulingService {
 
       if (isBefore(cancelTimeLimit, new Date())) throw new HttpException('Você só pode cancelar um agendamento com uma hora de antecedência', 400);
 
-      const canceledAt = new Date();
+      const dateFormatted = format(new Date(), "dd 'de' MMMM 'de' yyyy', às' HH:mm", { locale: ptBR });
 
-      const dateFormatted = format(canceledAt, "dd 'de' MMMM 'de' yyyy', às' HH:mm", { locale: ptBR });
-
-      await scheduling.update({ canceledAt }, { transaction });
+      await scheduling.update({ canceledAt: new Date() }, { transaction });
 
       await transaction.commit();
 
@@ -166,17 +161,5 @@ export class SchedulingService {
       await transaction.rollback();
       throw new HttpException(error, 400);
     }
-  }
-
-  async delete(id: number) {
-    const scheduling = await this.findById(id);
-
-    await scheduling.destroy();
-  }
-
-  async restore(id: number) {
-    const scheduling = await this.findById(id, true);
-
-    await scheduling.restore();
   }
 }

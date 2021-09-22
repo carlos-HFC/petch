@@ -3,12 +3,12 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 
+import { IndexUser, TConfirmRegister, TCreateUser, TFilterUser, TUpdateUser, UserDTO } from './user.dto';
 import { UserService } from './user.service';
-import { CreateUser, FilterUser, IndexUser, UpdateUser, User } from './user.swagger';
-import { JwtAuthGuard } from '../auth/auth.guard';
-import { config } from '../multer';
-import { RoleGuard } from '../role/role.guard';
-import { RoleDecorator } from '../role/role.decorator';
+import { RoleDecorator } from '../common/decorators/role.decorator';
+import { JwtAuthGuard } from '../common/guards/auth.guard';
+import { RoleGuard } from '../common/guards/role.guard';
+import { config } from '../config/multer';
 
 @ApiTags('Users')
 @Controller('users')
@@ -51,17 +51,16 @@ export class UserController {
       }
     }
   })
-  @ApiQuery({ type: FilterUser, required: false })
   @ApiBearerAuth()
   // @UseGuards(JwtAuthGuard, RoleGuard)
   // @RoleDecorator('admin')
   @Get()
-  async index(@Query() query: TFilterUser) {
+  async index(@Query() query?: TFilterUser) {
     return await this.userService.get(query);
   }
 
   @ApiOperation({ summary: 'Listar um usuário pelo ID' })
-  @ApiOkResponse({ type: User, description: 'Success' })
+  @ApiOkResponse({ type: UserDTO, description: 'Success' })
   @ApiUnauthorizedResponse({
     description: 'Unauthorized',
     schema: {
@@ -111,18 +110,19 @@ export class UserController {
     }
   })
   @ApiParam({ name: 'id', required: true })
-  @ApiQuery({ name: 'inactives', type: 'boolean', required: false })
+  @ApiQuery({ name: 'inactives', type: 'string', enum: ['true', 'false'], required: false })
   @ApiBearerAuth()
   // @UseGuards(JwtAuthGuard, RoleGuard)
   // @RoleDecorator('admin')
   @Get(':id')
-  async byId(@Param('id') id: number, @Query('inactives') inactives: boolean) {
+  async byId(@Param('id') id: number, @Query() { inactives }: Pick<TFilterUser, 'inactives'>) {
     return await this.userService.findById(id, inactives);
   }
 
   @ApiOperation({ summary: 'Cadastrar um novo admin' })
-  @ApiCreatedResponse({ type: User, description: 'Created' })
+  @ApiCreatedResponse({ type: UserDTO, description: 'Created' })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
@@ -134,17 +134,18 @@ export class UserController {
           type: 'string',
           oneOf: [
             { example: 'Arquivo não suportado' },
-            { example: 'Campo "X" não pode ser vazio' },
+            { example: 'Campo "X" é obrigatório' },
             { example: 'Usuário já cadastrado' },
             { example: 'CEP inválido' },
             { example: 'CPF inválido' },
             { example: 'E-mail inválido' },
-            { example: 'Número de telefone/celular inválido' },
+            { example: 'Gênero inválido' },
+            { example: 'Telefone inválido' },
+            { example: 'Data de nascimento inválida' },
+            { example: 'Você não tem a idade mínima de 18 anos' },
             { example: 'Senha muito curta' },
             { example: 'Senha precisa ter uma letra maiúscula, uma letra minúscula, um caractere especial e um número' },
             { example: 'Senhas não correspondem' },
-            { example: 'Data de nascimento inválida' },
-            { example: 'Você não tem a idade mínima de 18 anos' },
           ]
         },
       }
@@ -183,7 +184,7 @@ export class UserController {
     }
   })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: CreateUser })
+  @ApiBody({ type: TCreateUser })
   @ApiBearerAuth()
   // @UseGuards(JwtAuthGuard, RoleGuard)
   // @RoleDecorator('admin')
@@ -196,6 +197,7 @@ export class UserController {
   @ApiOperation({ summary: 'Editar os próprios dados' })
   @ApiOkResponse({ description: 'Success' })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
@@ -212,7 +214,9 @@ export class UserController {
             { example: 'CEP inválido' },
             { example: 'CPF inválido' },
             { example: 'E-mail inválido' },
-            { example: 'Número de telefone/celular inválido' },
+            { example: 'Gênero inválido' },
+            { example: 'Telefone inválido' },
+            { example: 'Data de nascimento inválida' },
             { example: 'Senha muito curta' },
             { example: 'Senha precisa ter uma letra maiúscula, uma letra minúscula, um caractere especial e um número' },
             { example: 'Senha atual incorreta' },
@@ -220,7 +224,6 @@ export class UserController {
             { example: 'Nova senha não pode ser igual a senha atual' },
             { example: 'Confirmação de senha é obrigatória' },
             { example: 'Nova senha e confirmação de senha não correspondem' },
-            { example: 'Data de nascimento inválida' },
             { example: 'Você não tem a idade mínima de 18 anos' },
           ]
         },
@@ -228,6 +231,7 @@ export class UserController {
     }
   })
   @ApiUnauthorizedResponse({
+    description: 'Unauthorized',
     schema: {
       type: 'object',
       properties: {
@@ -243,7 +247,7 @@ export class UserController {
     }
   })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: UpdateUser })
+  @ApiBody({ type: TUpdateUser })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Put()
@@ -252,9 +256,10 @@ export class UserController {
     return await this.userService.put(req.user, data, media);
   }
 
-  @ApiOperation({ summary: 'Verificar o e-mail cadastrado' })
+  @ApiOperation({ summary: 'Confirmar o usuário' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
@@ -265,11 +270,11 @@ export class UserController {
         message: {
           type: 'string',
           oneOf: [
-            { example: 'Token inválido' },
-            { example: 'Usuário já confirmado' },
+            { example: 'E-mail é obrigatório' },
             { example: 'E-mail inválido' },
             { example: 'Token não informado' },
-            { example: 'E-mail não informado' },
+            { example: 'Usuário já confirmado' },
+            { example: 'Token inválido' },
           ]
         },
       }
@@ -291,23 +296,13 @@ export class UserController {
       }
     }
   })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        tokenVerificationEmail: {
-          type: 'string'
-        }
-      }
-    }
-  })
-  @ApiQuery({ name: 'email' })
+  @ApiQuery({ type: TConfirmRegister, required: true })
   @Patch('/confirm')
-  async confirmRegister(@Query('email') email: string, @Body() data: { tokenVerificationEmail: string; }) {
-    return await this.userService.confirmRegister(email, data.tokenVerificationEmail);
+  async confirmRegister(@Query() data: TConfirmRegister) {
+    return await this.userService.confirmRegister(data);
   }
 
-  @ApiOperation({ summary: 'Reativar um usuário' })
+  @ApiOperation({ summary: 'Ativar e inativar um usuário' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiUnauthorizedResponse({
     description: 'Unauthorized',
@@ -358,72 +353,13 @@ export class UserController {
     }
   })
   @ApiParam({ name: 'id', required: true })
-  @ApiBearerAuth()
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @RoleDecorator('admin')
-  @Patch(':id')
-  @HttpCode(204)
-  async restore(@Param('id') id: number) {
-    return await this.userService.restore(id);
-  }
-
-  @ApiOperation({ summary: 'Inativar um usuário' })
-  @ApiNoContentResponse({ description: 'No Content' })
-  @ApiUnauthorizedResponse({
-    description: 'Unauthorized',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 401,
-        },
-        message: {
-          type: 'string',
-          example: 'Unauthorized'
-        }
-      }
-    }
-  })
-  @ApiForbiddenResponse({
-    description: 'Forbidden',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 403,
-        },
-        message: {
-          type: 'string',
-          example: 'Você não tem permissão'
-        }
-      }
-    }
-  })
-  @ApiNotFoundResponse({
-    description: 'Not Found',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 404
-        },
-        message: {
-          type: 'string',
-          example: 'Usuário não encontrado',
-        },
-      }
-    }
-  })
-  @ApiParam({ name: 'id', required: true })
+  @ApiQuery({ name: 'inactives', type: 'string', enum: ['true', 'false'], required: true })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('admin')
   @Delete(':id')
   @HttpCode(204)
-  async delete(@Param('id') id: number) {
-    return await this.userService.delete(id);
+  async activeInactive(@Param('id') id: number, @Query() { inactives: status }: Pick<TFilterUser, 'inactives'>) {
+    return await this.userService.activeInactive(id, status);
   }
 }

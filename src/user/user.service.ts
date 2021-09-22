@@ -1,15 +1,16 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { randomBytes } from 'crypto';
-import { differenceInCalendarYears, isValid, parseISO } from 'date-fns';
+import { differenceInCalendarYears, parseISO } from 'date-fns';
 import { col, where } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
+import { TConfirmRegister, TCreateUser, TFilterUser, TUpdateUser } from './user.dto';
 import { User } from './user.model';
+import { UploadService } from '../config/upload.service';
 import { MailService } from '../mail/mail.service';
 import { RoleService } from '../role/role.service';
-import { UploadService } from '../upload.service';
-import { createTokenHEX, trimObj, validateCEP, validateCPF, validateEmail, validatePassword, validatePhone } from '../utils';
+import { convertBool, createTokenHEX, trimObj, validateCPF } from '../utils';
 
 @Injectable()
 export class UserService {
@@ -35,8 +36,8 @@ export class UserService {
     });
   }
 
-  async findById(id: number, inactives?: boolean) {
-    const user = await this.userModel.findByPk(id, { paranoid: !inactives });
+  async findById(id: number, inactives?: 'true' | 'false') {
+    const user = await this.userModel.findByPk(id, { paranoid: !convertBool(inactives) });
 
     if (!user) throw new HttpException('Usuário não encontrado', 404);
 
@@ -61,7 +62,6 @@ export class UserService {
   }
 
   async findByEmail(email: string) {
-    validateEmail(email);
     return await this.userModel.findOne({
       where: {
         email: email.trim().toLowerCase()
@@ -74,35 +74,16 @@ export class UserService {
     const transaction = await this.sequelize.transaction();
 
     try {
-      if (data.cep) validateCEP(data.cep);
-      if (data.phone) validatePhone(data.phone);
-
       if (await this.findByCPF(data.cpf) || await this.findByEmail(data.email)) throw new HttpException('Usuário já cadastrado', 400);
-
-      const birth = parseISO(data.birthday);
-
-      if (!isAdmin) {
-        if (data.password && data.password !== data.confirmPassword) throw new HttpException('Senhas não correspondem', 400);
-        validatePassword(data.password);
-
-        if (!data.googleId) throw new HttpException('A senha é obrigatória', 400);
-      }
 
       if (isAdmin) data.password = randomBytes(5).toString('hex');
 
-      switch (true) {
-        case !isValid(birth):
-          throw new HttpException('Data de nascimento inválida', 400);
-        case differenceInCalendarYears(Date.now(), birth) < 18:
-          throw new HttpException('Você não tem a idade mínima de 18 anos', 400);
-        default:
-          break;
-      }
+      if (differenceInCalendarYears(Date.now(), parseISO(data.birthday)) < 18) throw new HttpException('Você não tem a idade mínima de 18 anos', 400);
 
       const role = await this.roleService.getByName(isAdmin ? 'Admin' : 'Adotante');
 
       if (media) {
-        const avatar = (await this.uploadService.uploadFile(media)).url
+        const avatar = (await this.uploadService.uploadFile(media)).url;
         Object.assign(data, { avatar });
       }
 
@@ -126,9 +107,6 @@ export class UserService {
     const transaction = await this.sequelize.transaction();
 
     try {
-      if (data.cep) validateCEP(data.cep);
-      if (data.phone) validatePhone(data.phone);
-
       if (data.email && data.email !== user.email) {
         if (await this.findByEmail(data.email)) throw new HttpException('Usuário já cadastrado', 400);
       }
@@ -137,38 +115,23 @@ export class UserService {
         if (await this.findByCPF(data.cpf)) throw new HttpException('Usuário já cadastrado', 400);
       }
 
-      switch (true) {
-        case data.birthday && !isValid(parseISO(data.birthday)):
-          throw new HttpException('Data de nascimento inválida', 400);
-        case data.birthday && differenceInCalendarYears(new Date(), parseISO(data.birthday)) < 18:
-          throw new HttpException('Você não tem a idade mínima de 18 anos', 400);
-        default:
-          break;
-      }
+      if (data.birthday && differenceInCalendarYears(new Date(), parseISO(data.birthday)) < 18) throw new HttpException('Você não tem a idade mínima de 18 anos', 400);
 
       if (data.oldPassword) {
-        const { oldPassword, password, confirmPassword } = data;
+        const { oldPassword, password } = data;
 
         switch (true) {
           case !(await user.checkPass(oldPassword)):
             throw new HttpException('Senha atual incorreta', 400);
-          case !password:
-            throw new HttpException('Nova senha é obrigatória', 400);
           case oldPassword === password:
             throw new HttpException('Nova senha não pode ser igual a senha atual', 400);
-          case password && !confirmPassword:
-            throw new HttpException('Confirmação de senha é obrigatória', 400);
-          case password !== confirmPassword:
-            throw new HttpException('Nova senha e confirmação de senha não correspondem', 400);
           default:
             break;
         }
-
-        validatePassword(password);
       }
 
       if (media) {
-        const avatar = (await this.uploadService.uploadFile(media)).url
+        const avatar = (await this.uploadService.uploadFile(media)).url;
         Object.assign(data, { avatar });
       }
 
@@ -187,33 +150,28 @@ export class UserService {
     }
   }
 
-  async delete(id: number) {
-    const user = await this.findById(id);
+  async activeInactive(id: number, status: 'true' | 'false') {
+    const st = convertBool(status);
 
-    await user.destroy();
+    const user = await this.findById(id, 'true');
+
+    if (!st) return await user.destroy();
+    return await user.restore();
   }
 
-  async restore(id: number) {
-    const user = await this.findById(id, true);
-
-    await user.restore();
-  }
-
-  async confirmRegister(email: string, tokenVerificationEmail: string) {
-    if (!email) throw new HttpException('E-mail não informdo', 400);
-    if (!tokenVerificationEmail) throw new HttpException('Token não informdo', 400);
-
+  async confirmRegister(data: TConfirmRegister) {
+    trimObj(data)
     const transaction = await this.sequelize.transaction();
 
     try {
-      const user = await this.findByEmail(email);
+      const user = await this.findByEmail(data.email);
 
       switch (true) {
         case !user:
           throw new HttpException('Usuário não encontrado', 404);
         case user.emailVerified:
           throw new HttpException('Usuário já confirmado', 400);
-        case user.tokenVerificationEmail !== tokenVerificationEmail:
+        case user.tokenVerificationEmail !== data.token:
           throw new HttpException('Token inválido', 400);
         default:
           break;
