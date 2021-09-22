@@ -4,7 +4,7 @@ import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoC
 
 import { TCreateGift, TFilterGift, Gift, IndexGift, TUpdateGift } from './gift.dto';
 import { GiftService } from './gift.service';
-import { config } from '../multer';
+import { config } from '../config/multer';
 
 @ApiTags('Gifts')
 @Controller('gifts')

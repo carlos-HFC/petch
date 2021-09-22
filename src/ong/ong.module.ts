@@ -6,7 +6,7 @@ import { OngController } from './ong.controller';
 import { Ong } from './ong.model';
 import { OngSeed } from './ong.seed';
 import { OngService } from './ong.service';
-import { UploadService } from '../upload.service';
+import { UploadService } from '../config/upload.service';
 
 
 const imports = [

@@ -4,8 +4,8 @@ import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNot
 
 import { TForgotPassword, TGoogleLogin, TLogin, TResetPassword } from './auth.dto';
 import { AuthService } from './auth.service';
-import { config } from '../multer';
-import { CreateUser, User } from '../user/user.swagger';
+import { config } from '../config/multer';
+import { TCreateUser, UserDTO } from '../user/user.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -119,7 +119,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Registrar-se' })
-  @ApiCreatedResponse({ type: User, description: 'Created' })
+  @ApiCreatedResponse({ type: UserDTO, description: 'Created' })
   @ApiBadRequestResponse({
     description: 'Bad Request',
     schema: {
@@ -149,7 +149,7 @@ export class AuthController {
     }
   })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: CreateUser })
+  @ApiBody({ type: TCreateUser })
   @Post('register')
   @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
   async register(@Body() data: TCreateUser, @UploadedFile() media: Express.MulterS3.File) {

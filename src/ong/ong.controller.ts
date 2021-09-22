@@ -4,7 +4,7 @@ import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoC
 
 import { IndexOng, Ong, TCreateOng, TFilterOng, TUpdateOng } from './ong.dto';
 import { OngService } from './ong.service';
-import { config } from '../multer';
+import { config } from '../config/multer';
 
 @ApiTags('ONGs')
 @Controller('ongs')

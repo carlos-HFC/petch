@@ -6,8 +6,8 @@ import { SpeciesController } from './species.controller';
 import { Species } from './species.model';
 import { SpeciesSeed } from './species.seed';
 import { SpeciesService } from './species.service';
+import { UploadService } from '../config/upload.service';
 import { SizeModule } from '../size/size.module';
-import { UploadService } from '../upload.service';
 
 const imports = [
   SequelizeModule.forFeature([Species]),

@@ -4,8 +4,8 @@ import { Op as $ } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
 import { Species } from './species.model';
+import { UploadService } from '../config/upload.service';
 import { SizeService } from '../size/size.service';
-import { UploadService } from '../upload.service';
 import { trimObj } from '../utils';
 
 @Injectable()

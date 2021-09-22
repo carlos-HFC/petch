@@ -5,7 +5,7 @@ import { Sequelize } from 'sequelize-typescript';
 
 import { TFilterOng, TCreateOng, TUpdateOng } from './ong.dto';
 import { Ong } from './ong.model';
-import { UploadService } from '../upload.service';
+import { UploadService } from '../config/upload.service';
 import { convertBool, trimObj } from '../utils';
 
 @Injectable()

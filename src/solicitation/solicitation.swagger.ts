@@ -1,7 +1,7 @@
 import { ApiProperty, OmitType } from '@nestjs/swagger';
 
 import { SolicitationTypes } from '../solicitationTypes/solicitationTypes.model';
-import { User } from '../user/user.swagger';
+import { UserDTO } from '../user/user.dto';
 
 export class Solicitation {
   @ApiProperty({ type: 'integer', uniqueItems: true, readOnly: true })
@@ -28,8 +28,8 @@ export class Solicitation {
   @ApiProperty({ type: 'number', required: false })
   userId: number;
 
-  @ApiProperty({ type: User, required: false })
-  user: User;
+  @ApiProperty({ type: UserDTO, required: false })
+  user: UserDTO;
 
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   createdAt: Date;

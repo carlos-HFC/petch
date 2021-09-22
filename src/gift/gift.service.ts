@@ -5,8 +5,8 @@ import { Sequelize } from 'sequelize-typescript';
 
 import { TCreateGift, TFilterGift, TUpdateGift } from './gift.dto';
 import { Gift } from './gift.model';
+import { UploadService } from '../config/upload.service';
 import { PartnerService } from '../partner/partner.service';
-import { UploadService } from '../upload.service';
 import { convertBool, trimObj } from '../utils';
 
 @Injectable()

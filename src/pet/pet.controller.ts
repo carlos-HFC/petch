@@ -4,7 +4,7 @@ import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoC
 
 import { PetService } from './pet.service';
 import { CreatePet, FilterPet, IndexPet, Pet, UpdatePet } from './pet.swagger';
-import { config } from '../multer';
+import { config } from '../config/multer';
 
 @ApiTags('Pets')
 @Controller('pets')

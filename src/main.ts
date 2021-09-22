@@ -4,7 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 import { AppModule } from './app.module';
 import { AuthModule } from './auth/auth.module';
-import { AllExceptionsFilter } from './exception.filter';
+import { AllExceptionsFilter } from './common/filters/exception.filter';
 import { GiftModule } from './gift/gift.module';
 import { OngModule } from './ong/ong.module';
 import { PartnerModule } from './partner/partner.module';

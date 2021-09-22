@@ -1,7 +1,7 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
 import { IsEmail, IsNotEmpty, IsString, Matches, MinLength } from 'class-validator';
 
-import { Match } from './auth.decorator';
+import { Match } from '../common/pipes/match.pipe';
 
 export class TLogin {
   @ApiProperty({ type: 'string' })

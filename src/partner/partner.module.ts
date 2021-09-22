@@ -6,7 +6,7 @@ import { PartnerController } from './partner.controller';
 import { Partner } from './partner.model';
 import { PartnerSeed } from './partner.seed';
 import { PartnerService } from './partner.service';
-import { UploadService } from '../upload.service';
+import { UploadService } from '../config/upload.service';
 
 const imports = [
   SequelizeModule.forFeature([Partner]),

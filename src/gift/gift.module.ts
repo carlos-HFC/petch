@@ -6,8 +6,8 @@ import { GiftController } from './gift.controller';
 import { Gift } from './gift.model';
 import { GiftSeed } from './gift.seed';
 import { GiftService } from './gift.service';
+import { UploadService } from '../config/upload.service';
 import { PartnerModule } from '../partner/partner.module';
-import { UploadService } from '../upload.service';
 
 const imports = [
   SequelizeModule.forFeature([Gift]),

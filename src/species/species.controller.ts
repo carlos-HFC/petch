@@ -4,7 +4,7 @@ import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoC
 
 import { SpeciesService } from './species.service';
 import { CreateSpecies, FilterSpecies, IndexSpecies, Species, UpdateSpecies } from './species.swagger';
-import { config } from '../multer';
+import { config } from '../config/multer';
 import { UpdateSize } from '../size/size.swagger';
 
 @ApiTags('Species')

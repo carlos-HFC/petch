@@ -4,6 +4,7 @@ import { isAfter } from 'date-fns';
 import { Sequelize } from 'sequelize-typescript';
 
 import { TForgotPassword, TGoogleLogin, TLogin, TResetPassword } from './auth.dto';
+import { TCreateUser } from '../user/user.dto';
 import { User } from '../user/user.model';
 import { UserService } from '../user/user.service';
 import { createTokenHEX, trimObj } from '../utils';
@@ -130,6 +131,8 @@ export class AuthService {
       }
 
       if (!userByGoogle && userByEmail) {
+        if (userByEmail.role.name.toLowerCase() === 'admin') throw new HttpException('Você não tem permissão para este login', 400);
+
         await userByEmail.update({ ...data }, { transaction });
 
         const auth = await this.createTokenJwt(userByEmail);

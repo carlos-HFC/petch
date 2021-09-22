@@ -6,8 +6,8 @@ import { SolicitationController } from './solicitation.controller';
 import { Solicitation } from './solicitation.model';
 import { SolicitationSeed } from './solicitation.seed';
 import { SolicitationService } from './solicitation.service';
+import { UploadService } from '../config/upload.service';
 import { SolicitationTypesModule } from '../solicitationTypes/solicitationTypes.module';
-import { UploadService } from '../upload.service';
 
 const imports= [
   SequelizeModule.forFeature([Solicitation]),

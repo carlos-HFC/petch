@@ -5,8 +5,8 @@ import { Sequelize } from 'sequelize-typescript';
 
 import { TCreatePartner, TFilterPartner, TUpdatePartner } from './partner.dto';
 import { Partner } from './partner.model';
+import { UploadService } from '../config/upload.service';
 import { convertBool, trimObj, validateCNPJ } from '../utils';
-import { UploadService } from '../upload.service';
 
 @Injectable()
 export class PartnerService {

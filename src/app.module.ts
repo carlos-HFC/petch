@@ -9,7 +9,8 @@ import { SeederModule } from 'nestjs-sequelize-seeder';
 import { resolve } from 'path';
 
 import { AuthModule } from './auth/auth.module';
-import { AllExceptionsFilter } from './exception.filter';
+import { AllExceptionsFilter } from './common/filters/exception.filter';
+import { UploadService } from './config/upload.service';
 import { GiftModule } from './gift/gift.module';
 import { MailModule } from './mail/mail.module';
 import { OngModule } from './ong/ong.module';
@@ -21,7 +22,6 @@ import { SchedulingTypesModule } from './schedulingTypes/schedulingTypes.module'
 import { SolicitationModule } from './solicitation/solicitation.module';
 import { SolicitationTypesModule } from './solicitationTypes/solicitationTypes.module';
 import { SpeciesModule } from './species/species.module';
-import { UploadService } from './upload.service';
 import { UserModule } from './user/user.module';
 
 const imports = [

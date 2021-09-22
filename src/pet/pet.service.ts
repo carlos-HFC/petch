@@ -4,11 +4,11 @@ import { col, where } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
 import { Pet } from './pet.model';
+import { UploadService } from '../config/upload.service';
 import { OngService } from '../ong/ong.service';
 import { SizeService } from '../size/size.service';
 import { SpeciesService } from '../species/species.service';
 import { trimObj } from '../utils';
-import { UploadService } from '../upload.service';
 
 @Injectable()
 export class PetService {

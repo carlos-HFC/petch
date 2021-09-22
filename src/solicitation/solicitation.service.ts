@@ -3,8 +3,8 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
 import { Solicitation } from './solicitation.model';
+import { UploadService } from '../config/upload.service';
 import { SolicitationTypesService } from '../solicitationTypes/solicitationTypes.service';
-import { UploadService } from '../upload.service';
 import { User } from '../user/user.model';
 import { trimObj, validateEmail } from '../utils';
 

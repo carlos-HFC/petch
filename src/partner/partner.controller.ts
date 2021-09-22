@@ -4,7 +4,7 @@ import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoC
 
 import { IndexPartner, Partner, TCreatePartner, TFilterPartner, TUpdatePartner } from './partner.dto';
 import { PartnerService } from './partner.service';
-import { config } from '../multer';
+import { config } from '../config/multer';
 
 @ApiTags('Partners')
 @Controller('partners')

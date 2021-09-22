@@ -4,10 +4,10 @@ import { SequelizeModule } from '@nestjs/sequelize';
 import { PetController } from './pet.controller';
 import { Pet } from './pet.model';
 import { PetService } from './pet.service';
+import { UploadService } from '../config/upload.service';
 import { OngModule } from '../ong/ong.module';
 import { SizeModule } from '../size/size.module';
 import { SpeciesModule } from '../species/species.module';
-import { UploadService } from '../upload.service';
 
 @Module({
   imports: [

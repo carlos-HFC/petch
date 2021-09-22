@@ -5,10 +5,10 @@ import { Request } from 'express';
 
 import { SolicitationService } from './solicitation.service';
 import { CreateSolicitation, Solicitation } from './solicitation.swagger';
-import { JwtAuthGuard, OptionalAuthGuard } from '../auth/auth.guard';
-import { config } from '../multer';
-import { RoleDecorator } from '../role/role.decorator';
-import { RoleGuard } from '../role/role.guard';
+import { RoleDecorator } from '../common/decorators/role.decorator';
+import { JwtAuthGuard, OptionalAuthGuard } from '../common/guards/auth.guard';
+import { RoleGuard } from '../common/guards/role.guard';
+import { config } from '../config/multer';
 
 @ApiTags('Solicitations')
 @Controller('solicitations')
