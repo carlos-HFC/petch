@@ -1,4 +1,5 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsDate, IsDateString, IsNotEmpty, IsOptional } from 'class-validator';
 
 import { SchedulingTypes } from '../schedulingTypes/schedulingTypes.model';
@@ -10,6 +11,7 @@ export class Scheduling {
 
   @ApiProperty({ type: 'string', format: 'date-time', example: '2021-01-01T00:00:00-03:00' })
   @IsNotEmpty({ message: 'Data é obrigatória' })
+  @Transform(({ value }) => value.trim())
   @IsDateString({}, { message: 'Data inválida' })
   date: Date;
 
@@ -19,6 +21,7 @@ export class Scheduling {
 
   @ApiProperty({ type: 'number' })
   @IsNotEmpty({ message: 'Tipo de agendamento é obrigatório' })
+  @Transform(({ value }) => value.trim())
   schedulingTypesId: number;
 
   @ApiProperty({ type: SchedulingTypes, required: false })
@@ -26,6 +29,7 @@ export class Scheduling {
 
   @ApiProperty({ type: 'number' })
   @IsNotEmpty({ message: 'Usuário é obrigatório' })
+  @Transform(({ value }) => value.trim())
   userId: number;
 
   @ApiProperty({ type: UserDTO, required: false })
@@ -58,6 +62,7 @@ export class TAvailableScheduling {
 export class TCreateScheduling extends PickType(Scheduling, ['schedulingTypesId']) {
   @ApiProperty({ type: 'string', format: 'date-time', example: '2021-01-01T00:00:00-03:00' })
   @IsNotEmpty({ message: 'Data é obrigatória' })
+  @Transform(({ value }) => value.trim())
   @IsDateString({}, { message: 'Data inválida' })
   date: string;
 }

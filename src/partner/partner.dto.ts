@@ -1,4 +1,5 @@
 import { ApiProperty, OmitType, PartialType, PickType } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsPhoneNumber, IsPostalCode, IsString, IsUrl, ValidateIf } from 'class-validator';
 
 export class Partner {
@@ -7,43 +8,51 @@ export class Partner {
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Nome Fantasia é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   fantasyName: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Razão Social é obrigatória' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   companyName: string;
 
   @ApiProperty({ type: 'string', uniqueItems: true })
   @IsNotEmpty({ message: 'CNPJ é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   cnpj: string;
 
   @ApiProperty({ type: 'string', uniqueItems: true })
   @IsNotEmpty({ message: 'Inscrição Estadual é obrigatória' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   stateRegistration: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Responsável é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   responsible: string;
 
   @ApiProperty({ type: 'string', uniqueItems: true })
   @IsNotEmpty({ message: 'E-mail é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsEmail({}, { message: 'E-mail inválido' })
   @IsString()
   email: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Website é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsUrl({}, { message: 'Website inválido' })
   @IsString()
   website: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Telefone é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsPhoneNumber('BR', { message: 'Telefone inválido' })
   @IsString()
   phone1: string;
@@ -60,17 +69,20 @@ export class Partner {
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'CEP é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsPostalCode('BR', { message: 'CEP inválido' })
   @IsString()
   cep: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Endereço é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   address: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Bairro é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   district: string;
 
@@ -79,11 +91,13 @@ export class Partner {
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Cidade é obrigatória' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   city: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'UF é obrigatória' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   uf: string;
 

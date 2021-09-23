@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { S3 } from 'aws-sdk';
-import { randomBytes } from 'crypto';
+
+import { createTokenHEX } from '../utils';
 
 @Injectable()
 export class UploadService {
@@ -13,7 +14,7 @@ export class UploadService {
   async uploadFile(file: Express.MulterS3.File) {
     if (!file.mimetype.includes('image')) throw new HttpException('Arquivo não suportado', 400);
 
-    const hash = randomBytes(16).toString('hex');
+    const hash = createTokenHEX();
 
     if (process.env.NODE_ENV === 'dev') {
       return { url: `http://localhost:8000/files/${file.filename}` };

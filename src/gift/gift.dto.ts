@@ -1,4 +1,5 @@
 import { ApiProperty, OmitType, PartialType, PickType } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsNotEmpty, IsString } from 'class-validator';
 
 import { Partner } from '../partner/partner.dto';
@@ -9,11 +10,13 @@ export class Gift {
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Nome é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   name: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Descrição é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   description: string;
 
@@ -34,6 +37,7 @@ export class Gift {
 
   @ApiProperty({ type: 'number' })
   @IsNotEmpty({ message: 'Parceiro é obrigatório' })
+  @Transform(({ value }) => value.trim())
   partnerId: number;
 
   @ApiProperty({ type: Partner, required: false })

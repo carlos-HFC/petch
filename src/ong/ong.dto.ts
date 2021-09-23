@@ -1,4 +1,5 @@
 import { ApiProperty, OmitType, PartialType, PickType } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsPhoneNumber, IsPostalCode, IsString, ValidateIf } from 'class-validator';
 
 export class Ong {
@@ -7,17 +8,20 @@ export class Ong {
 
   @ApiProperty({ type: 'string', uniqueItems: true })
   @IsNotEmpty({ message: 'Nome é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   name: string;
 
   @ApiProperty({ type: 'string', uniqueItems: true })
   @IsNotEmpty({ message: 'E-mail é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsEmail({}, { message: 'E-mail inválido' })
   @IsString()
   email: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Responsável é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   responsible: string;
 
@@ -26,6 +30,7 @@ export class Ong {
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Telefone é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsPhoneNumber('BR', { message: 'Telefone inválido' })
   @IsString()
   phone1: string;
@@ -42,17 +47,20 @@ export class Ong {
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'CEP é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsPostalCode('BR', { message: 'CEP inválido' })
   @IsString()
   cep: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Endereço é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   address: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Bairro é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   district: string;
 
@@ -61,16 +69,19 @@ export class Ong {
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Cidade é obrigatória' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   city: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'UF é obrigatória' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   uf: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Abrangência é obrigatória' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   coverage: string;
 

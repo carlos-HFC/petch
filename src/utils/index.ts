@@ -18,14 +18,6 @@ export function validateEmail(email: string) {
   if (!regex.test(email)) throw new HttpException('E-mail inválido', 400);
 }
 
-export function validateCEP(cep: string) {
-  const regex = /[\d]/g;
-
-  cep = cep.replace(/[-]/g, '').trim();
-
-  if (!regex.test(cep) || cep.length !== 8) throw new HttpException("CEP inválido", 400);
-}
-
 export function validateCPF(cpf: string) {
   let sum = 0, rest = 0;
 
@@ -62,24 +54,8 @@ export function validateCPF(cpf: string) {
   if (rest !== Number(cpf.substring(10, 11))) throw new HttpException("CPF inválido", 400);
 }
 
-export function validatePassword(password: string) {
-  trimObj({ password });
-  const regex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[-_@#$!%/+*=()?&,.:;?|])[A-Za-z\d-_@#$!%/+*=()?&,.:;?|]/;
-
-  if (password.length < 7) throw new HttpException('Senha muito curta', 400);
-  if (!regex.test(password)) throw new HttpException('Senha precisa ter uma letra maiúscula, uma letra minúscula, um caractere especial e um número', 400);
-}
-
-export function validatePhone(phone: string) {
-  const regex = /[\d]/g;
-
-  phone = phone.replace(/[()-\s]/g, '');
-
-  if (!regex.test(phone) || phone.length < 10 || phone.length > 11) throw new HttpException('Número de telefone/celular inválido', 400);
-}
-
-export function createTokenHEX() {
-  return randomBytes(20).toString('hex');
+export function createTokenHEX(size: number = 20) {
+  return randomBytes(size).toString('hex');
 }
 
 export function validateCNPJ(cnpj: string) {

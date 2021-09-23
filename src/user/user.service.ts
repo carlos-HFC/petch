@@ -1,6 +1,5 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { randomBytes } from 'crypto';
 import { differenceInCalendarYears, parseISO } from 'date-fns';
 import { col, where } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
@@ -76,7 +75,7 @@ export class UserService {
     try {
       if (await this.findByCPF(data.cpf) || await this.findByEmail(data.email)) throw new HttpException('Usuário já cadastrado', 400);
 
-      if (isAdmin) data.password = randomBytes(5).toString('hex');
+      if (isAdmin) data.password = createTokenHEX(5);
 
       if (differenceInCalendarYears(Date.now(), parseISO(data.birthday)) < 18) throw new HttpException('Você não tem a idade mínima de 18 anos', 400);
 

@@ -1,4 +1,5 @@
 import { ApiProperty, PickType } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, IsString, Matches, MinLength } from 'class-validator';
 
 import { Match } from '../common/pipes/match.pipe';
@@ -6,6 +7,7 @@ import { Match } from '../common/pipes/match.pipe';
 export class TLogin {
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'E-mail é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsEmail({}, { message: 'E-mail inválido' })
   @IsString()
   email: string;
@@ -21,12 +23,14 @@ export class TForgotPassword extends PickType(TLogin, ['email']) { }
 export class TGoogleLogin {
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'E-mail é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsEmail({}, { message: 'E-mail inválido' })
   @IsString()
   email: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Google ID é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   googleId: string;
 
@@ -40,11 +44,13 @@ export class TGoogleLogin {
 export class TResetPassword {
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Token é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsString()
   token: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'E-mail é obrigatório' })
+  @Transform(({ value }) => value.trim())
   @IsEmail({}, { message: 'E-mail inválido' })
   @IsString()
   email: string;
