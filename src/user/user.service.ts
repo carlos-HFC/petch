@@ -75,6 +75,10 @@ export class UserService {
     try {
       if (await this.findByCPF(data.cpf) || await this.findByEmail(data.email)) throw new HttpException('Usuário já cadastrado', 400);
 
+      if (!isAdmin) {
+        if (!data.password && !data.googleId) throw new HttpException('A senha é obrigatória', 400);
+      }
+
       if (isAdmin) data.password = createTokenHEX(5);
 
       if (differenceInCalendarYears(Date.now(), parseISO(data.birthday)) < 18) throw new HttpException('Você não tem a idade mínima de 18 anos', 400);

@@ -275,7 +275,6 @@ export class User extends Model {
 
   @BeforeSave
   static async formatData(user: User) {
-    if (user.password) return user.hash = await hash(user.password, 10);
     user.email = user.email.toLowerCase();
     user.birthday = format(parseISO(user.birthday), 'yyyy-MM-dd');
     user.uf = user.uf.toUpperCase();
@@ -283,6 +282,7 @@ export class User extends Model {
     user.cpf = user.cpf.replace(/[\s.-]/g, '');
     user.cep = user.cep.replace(/[\s-]/g, '');
     user.phone = user.phone.replace(/(55)?[\s-+()]/g, '');
+    if (user.password) user.hash = await hash(user.password, 10);
   }
 
   checkPass(password: string) {

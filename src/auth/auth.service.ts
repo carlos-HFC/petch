@@ -97,7 +97,7 @@ export class AuthService {
   }
 
   async register(data: TCreateUser, media?: Express.MulterS3.File) {
-    await this.userService.post(data, false, media);
+    return await this.userService.post(data, false, media);
   }
 
   private async createTokenJwt(user: User) {
