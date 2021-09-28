@@ -3,9 +3,9 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Op as $ } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
+import { TCreateSize, TUpdateSize } from './size.dto';
 import { Size } from './size.model';
 import { SpeciesService } from '../species/species.service';
-import { trimObj } from '../utils';
 
 @Injectable()
 export class SizeService {
@@ -41,25 +41,22 @@ export class SizeService {
     return size;
   }
 
-  async post(data: TCreateSize) {
-    trimObj(data);
+  async post(speciesId: number, data: TCreateSize) {
     const transaction = await this.sequelize.transaction();
 
     const num = (/([\d]{0,})([\.{1}])?([\d]+)/g);
 
     try {
-      await this.speciesService.findById(data.speciesId);
+      await this.speciesService.findById(speciesId);
 
-      if (data.initWeight && data.endWeight) {
-        const initWeight = Number(data.initWeight.match(num).join(''));
-        const endWeight = Number(data.endWeight.match(num).join(''));
+      const initWeight = Number(data.initWeight.match(num)?.join(''));
+      const endWeight = Number(data.endWeight.match(num)?.join(''));
 
-        if (isNaN(initWeight) || isNaN(endWeight)) throw new HttpException('Valor inválido', 400);
+      if (isNaN(initWeight) || isNaN(endWeight)) throw new HttpException('Valor inválido', 400);
 
-        if (initWeight >= endWeight) throw new HttpException('Peso inicial não pode ser maior ou igual ao peso final', 400);
-      }
+      if (initWeight >= endWeight) throw new HttpException('Peso inicial não pode ser maior ou igual ao peso final', 400);
 
-      const size = await this.sizeModel.create({ ...data }, { transaction });
+      const size = await this.sizeModel.create({ ...data, speciesId }, { transaction });
 
       await transaction.commit();
 
@@ -71,7 +68,6 @@ export class SizeService {
   }
 
   async put(speciesId: number, id: number, data: TUpdateSize) {
-    trimObj(data);
     const transaction = await this.sequelize.transaction();
 
     const num = (/([\d]{0,})([\.{1}])?([\d]+)/g);

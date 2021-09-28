@@ -1,22 +1,24 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, ParseArrayPipe, Patch, Post, Put, Query, Req, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { SpeciesService } from './species.service';
-import { CreateSpecies, FilterSpecies, IndexSpecies, Species, UpdateSpecies } from './species.swagger';
+import { IndexSpecies, Species, TCreateSpecies, TUpdateSpecies, TFilterSpecies } from './species.dto';
 import { config } from '../config/multer';
-import { UpdateSize } from '../size/size.swagger';
+import { Size, TCreateSize, TUpdateSize } from '../size/size.dto';
+import { SizeService } from '../size/size.service';
 
 @ApiTags('Species')
 @Controller('species')
 export class SpeciesController {
   constructor(
-    private speciesService: SpeciesService
+    private speciesService: SpeciesService,
+    private sizeService: SizeService
   ) { }
 
   @ApiOperation({ summary: 'Listar todas as espécies' })
   @ApiOkResponse({ type: [IndexSpecies], description: 'Success' })
-  @ApiQuery({ type: FilterSpecies, required: false })
+  @ApiQuery({ type: TFilterSpecies, required: false })
   @Get()
   async index(@Query() query?: TFilterSpecies) {
     return await this.speciesService.get(query);
@@ -41,15 +43,16 @@ export class SpeciesController {
     }
   })
   @ApiParam({ name: 'id', required: true })
-  @ApiQuery({ name: 'inactives', type: 'boolean', required: false })
+  @ApiQuery({ name: 'inactives', type: 'string', enum: ['true', 'false'], required: true })
   @Get(':id')
-  async byId(@Param('id') id: number, @Query('inactives') inactives?: boolean) {
+  async byId(@Param('id') id: number, @Query() { inactives }: Pick<TFilterSpecies, 'inactives'>) {
     return await this.speciesService.findById(id, inactives);
   }
 
   @ApiOperation({ summary: 'Cadastrar uma nova espécie' })
   @ApiCreatedResponse({ type: Species, description: 'Created' })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
@@ -62,23 +65,67 @@ export class SpeciesController {
           oneOf: [
             { example: 'Arquivo não suportado' },
             { example: 'Espécie já cadastrada' },
-            { example: 'Campo "Nome" não pode ser vazio' },
+            { example: 'Nome é obrigatório' },
           ]
         },
       }
     }
   })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: CreateSpecies })
+  @ApiBody({ type: TCreateSpecies })
   @Post()
   @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
   async create(@Body() data: TCreateSpecies, @UploadedFile() media?: Express.MulterS3.File) {
     return await this.speciesService.post(data, media);
   }
 
+  @ApiOperation({ summary: 'Cadastrar um porte da espécie' })
+  @ApiCreatedResponse({ type: Size, description: 'Created' })
+  @ApiBadRequestResponse({
+    description: 'Bad Request',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 400,
+        },
+        message: {
+          type: 'string',
+          oneOf: [
+            { example: 'Espécie não encontrada' },
+            { example: 'Campo "X" é obrigatório' },
+          ]
+        },
+      }
+    }
+  })
+  @ApiNotFoundResponse({
+    description: 'Not Found',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 404,
+        },
+        message: {
+          type: 'string',
+          example: 'Espécie não encontrada',
+        },
+      }
+    }
+  })
+  @ApiBody({ type: TCreateSize })
+  @Post(':id/size')
+  async createSize(@Param('id') id: number, @Body() data: TCreateSize) {
+    return await this.speciesService.postSizes(id, data);
+  }
+
   @ApiOperation({ summary: 'Editar uma espécie' })
   @ApiOkResponse({ description: 'Success' })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
@@ -91,7 +138,7 @@ export class SpeciesController {
           oneOf: [
             { example: 'Arquivo não suportado' },
             { example: 'Espécie já cadastrada' },
-            { example: 'Campo "Nome" não pode ser vazio' },
+            { example: 'Nome é obrigatório' },
           ]
         },
       }
@@ -114,7 +161,7 @@ export class SpeciesController {
     }
   })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: UpdateSpecies })
+  @ApiBody({ type: TUpdateSpecies })
   @ApiParam({ name: 'id', required: true })
   @Put(':id')
   @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
@@ -125,6 +172,7 @@ export class SpeciesController {
   @ApiOperation({ summary: 'Editar o porte de uma espécie' })
   @ApiOkResponse({ description: 'Success' })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
@@ -138,9 +186,7 @@ export class SpeciesController {
             { example: 'Porte já existente para essa espécie' },
             { example: 'Valor inválido' },
             { example: 'Peso Inicial não pode ser maior ou igual ao Peso Final' },
-            { example: 'Campo "Nome" não pode ser vazio' },
-            { example: 'Campo "Peso Inicial" não pode ser vazio' },
-            { example: 'Campo "Peso Final" não pode ser vazio' },
+            { example: 'Campo "X" é obrigatório' },
           ]
         },
       }
@@ -165,7 +211,7 @@ export class SpeciesController {
       }
     }
   })
-  @ApiBody({ type: UpdateSize })
+  @ApiBody({ type: TUpdateSize })
   @ApiParam({ name: 'id', required: true })
   @ApiParam({ name: 'sizeId', required: true })
   @Put(':id/size/:sizeId')
@@ -173,7 +219,7 @@ export class SpeciesController {
     return await this.speciesService.putSizes(params.id, params.sizeId, data);
   }
 
-  @ApiOperation({ summary: 'Inativar uma espécie' })
+  @ApiOperation({ summary: 'Ativar e inativar uma espécie' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiNotFoundResponse({
     description: 'Not Found',
@@ -192,34 +238,10 @@ export class SpeciesController {
     }
   })
   @ApiParam({ name: 'id', required: true })
+  @ApiQuery({ name: 'status', type: 'string', enum: ['true', 'false'], required: true })
   @Delete(':id')
   @HttpCode(204)
-  async delete(@Param('id') id: number) {
-    return await this.speciesService.delete(id);
-  }
-
-  @ApiOperation({ summary: 'Reativar uma espécie' })
-  @ApiNoContentResponse({ description: 'No Content' })
-  @ApiNotFoundResponse({
-    description: 'Not Found',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 404,
-        },
-        message: {
-          type: 'string',
-          example: 'Espécie não encontrada',
-        },
-      }
-    }
-  })
-  @ApiParam({ name: 'id', required: true })
-  @Patch(':id')
-  @HttpCode(204)
-  async restore(@Param('id') id: number) {
-    return await this.speciesService.restore(id);
+  async activeInactive(@Param('id') id: number, @Query('status') status: 'true' | 'false') {
+    return await this.speciesService.activeInactive(id, status);
   }
 }

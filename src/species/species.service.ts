@@ -3,10 +3,12 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Op as $ } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
+import { TCreateSpecies, TFilterSpecies, TUpdateSpecies } from './species.dto';
 import { Species } from './species.model';
 import { UploadService } from '../config/upload.service';
+import { TCreateSize, TUpdateSize } from '../size/size.dto';
 import { SizeService } from '../size/size.service';
-import { trimObj } from '../utils';
+import { convertBool, trimObj } from '../utils';
 
 @Injectable()
 export class SpeciesService {
@@ -30,14 +32,14 @@ export class SpeciesService {
     });
 
     return await this.speciesModel.findAll({
-      paranoid: !query.inactives,
+      paranoid: !convertBool(query.inactives),
       where,
       attributes: ['id', 'name', 'image', 'deletedAt']
     });
   }
 
-  async findById(id: number, inactives?: boolean) {
-    const species = await this.speciesModel.findByPk(id, { paranoid: !inactives });
+  async findById(id: number, inactives?: 'true' | 'false') {
+    const species = await this.speciesModel.findByPk(id, { paranoid: !convertBool(inactives) });
 
     if (!species) throw new HttpException('Espécie não encontrada', 404);
 
@@ -57,20 +59,18 @@ export class SpeciesService {
     const transaction = await this.sequelize.transaction();
 
     try {
-      if (data.name && await this.findByName(data.name)) throw new HttpException('Espécie já cadastrada', 400);
+      if (await this.findByName(data.name)) throw new HttpException('Espécie já cadastrada', 400);
 
       if (media) {
-        const image = (await this.uploadService.uploadFile(media)).url
+        const image = (await this.uploadService.uploadFile(media)).url;
         Object.assign(data, { image });
       }
 
       const species = await this.speciesModel.create({ ...data }, { transaction });
 
-      const sizes = await Promise.all(data.size.map(size => this.sizeService.post({ ...size, speciesId: species.id })));
-
       await transaction.commit();
 
-      return { species, sizes };
+      return species;
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);
@@ -84,10 +84,10 @@ export class SpeciesService {
     try {
       const species = await this.findById(id);
 
-      if (data.name && await this.findByName(data.name)) throw new HttpException('Espécie já cadastrada', 400);
+      if (await this.findByName(data.name)) throw new HttpException('Espécie já cadastrada', 400);
 
       if (media) {
-        const image = (await this.uploadService.uploadFile(media)).url
+        const image = (await this.uploadService.uploadFile(media)).url;
         Object.assign(data, { image });
       }
 
@@ -100,6 +100,14 @@ export class SpeciesService {
     }
   }
 
+  async postSizes(id: number, data: TCreateSize) {
+    trimObj(data);
+
+    await this.findById(id);
+
+    return await this.sizeService.post(id, data);
+  }
+
   async putSizes(id: number, sizeId: number, data: TUpdateSize) {
     trimObj(data);
 
@@ -108,15 +116,12 @@ export class SpeciesService {
     return await this.sizeService.put(id, sizeId, data);
   }
 
-  async delete(id: number) {
-    const species = await this.findById(id);
+  async activeInactive(id: number, status: 'true' | 'false') {
+    const st = convertBool(status);
 
-    await species.destroy();
-  }
+    const specie = await this.findById(id, 'true');
 
-  async restore(id: number) {
-    const species = await this.findById(id, true);
-
-    await species.restore();
+    if (!st) return await specie.destroy();
+    return await specie.restore();
   }
 }
