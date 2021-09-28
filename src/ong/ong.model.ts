@@ -91,6 +91,7 @@ export class Ong extends Model {
   static async createAll() {
     process.env.NODE_ENV !== 'dev' && await this.bulkCreate([
       {
+        id: 1,
         name: 'Dogs do Coração',
         email: 'doguineos@dogscore.com',
         image: 'https://images.unsplash.com/photo-1612536057832-2ff7ead58194?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8ZG9nJTIwaGVhcnR8ZW58MHx8MHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
@@ -105,6 +106,7 @@ export class Ong extends Model {
         responsible: 'Raimunda Renata Brito'
       },
       {
+        id: 2,
         name: 'Pet Place',
         email: 'place@petplace.com.br',
         image: 'https://images.unsplash.com/photo-1415369629372-26f2fe60c467?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGV0JTIwcGxhY3xlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',
@@ -119,6 +121,7 @@ export class Ong extends Model {
         responsible: 'Jaqueline Aparecida Pereira'
       },
       {
+        id: 3,
         name: 'ONG Melhor Amigo',
         email: 'OMA@melhoramigo.com.br',
         image: 'https://images.unsplash.com/photo-1607163365613-c281acde5012?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGV0JTIwZnJpZW5kfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60',

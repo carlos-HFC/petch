@@ -102,6 +102,7 @@ export class Partner extends Model {
   static async createAll() {
     process.env.NODE_ENV !== 'dev' && await this.bulkCreate([
       {
+        id: 1,
         fantasyName: 'Petz',
         companyName: 'Petz Com. e Ind. de Produtos LTDA.',
         cnpj: '05875578000105',
@@ -119,6 +120,7 @@ export class Partner extends Model {
         image: 'https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=1150&q=80'
       },
       {
+        id: 2,
         fantasyName: 'Photografia Sublime',
         companyName: 'Photografia Sublime ME',
         cnpj: '69334805000178',
@@ -137,6 +139,7 @@ export class Partner extends Model {
         image: 'https://images.unsplash.com/photo-1484239398315-f1681ef72fe6?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1050&q=80'
       },
       {
+        id: 3,
         fantasyName: 'Focinhos e Patas',
         companyName: 'Focinhos e Patas Com. de Produtos LTDA.',
         cnpj: '74010830000136',
@@ -154,6 +157,7 @@ export class Partner extends Model {
         image: 'https://images.unsplash.com/photo-1606425271394-c3ca9aa1fc06?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cGF3fGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
       {
+        id: 4,
         fantasyName: 'PetPlace',
         companyName: 'PetPlace Produtos Licenciados LTDA.',
         cnpj: '25759326000128',

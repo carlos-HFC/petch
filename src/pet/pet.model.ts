@@ -2,22 +2,23 @@ import { BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Mode
 
 import { Ong } from '../ong/ong.model';
 import { Species } from '../species/species.model';
+import { User } from '../user/user.model';
 import { capitalizeFirstLetter } from '../utils';
 
 @DefaultScope(() => ({
-  include: [Ong, Species],
-  order: [['id', 'asc']]
+  include: [
+    {
+      model: Species,
+      attributes: ['name']
+    }
+  ]
 }))
 @Table({ paranoid: true })
 export class Pet extends Model {
-  @Column({
-    type: DataType.STRING,
-  })
+  @Column(DataType.STRING)
   breed: string;
 
-  @Column({
-    type: DataType.STRING,
-  })
+  @Column(DataType.STRING)
   name: string;
 
   @Column({
@@ -62,6 +63,10 @@ export class Pet extends Model {
   })
   cut: boolean;
 
+  @ForeignKey(() => User)
+  @Column
+  userId: number;
+
   @ForeignKey(() => Ong)
   @Column({ allowNull: false })
   ongId: number;
@@ -69,6 +74,9 @@ export class Pet extends Model {
   @ForeignKey(() => Species)
   @Column({ allowNull: false })
   speciesId: number;
+
+  @BelongsTo(() => User)
+  user: User;
 
   @BelongsTo(() => Ong)
   ong: Ong;
@@ -79,6 +87,7 @@ export class Pet extends Model {
   @BeforeSave
   static async formatData(pet: Pet) {
     pet.gender = pet.gender.toUpperCase();
+    pet.age = pet.age.toLowerCase();
     pet.color = capitalizeFirstLetter(pet.color);
     pet.description = capitalizeFirstLetter(pet.description);
     if (pet.name) pet.name = capitalizeFirstLetter(pet.name);

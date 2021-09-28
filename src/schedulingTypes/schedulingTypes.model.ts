@@ -22,9 +22,9 @@ export class SchedulingTypes extends Model {
   @AfterSync
   static async createAll() {
     process.env.NODE_ENV !== 'dev' && await this.bulkCreate([
-      { name: "Vacina" },
-      { name: "Banho" },
-      { name: "Medicação" },
+      { id: 1, name: "Vacina" },
+      { id: 2, name: "Banho" },
+      { id: 3, name: "Medicação" },
     ], { ignoreDuplicates: true });
   }
 }

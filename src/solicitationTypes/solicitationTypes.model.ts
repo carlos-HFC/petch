@@ -22,9 +22,9 @@ export class SolicitationTypes extends Model {
   @AfterSync
   static async createAll() {
     process.env.NODE_ENV !== 'dev' && await this.bulkCreate([
-      { name: "Elogio" },
-      { name: "Reclamação" },
-      { name: "Dúvida" },
+      { id: 1, name: "Elogio" },
+      { id: 2, name: "Reclamação" },
+      { id: 3, name: "Dúvida" },
     ], { ignoreDuplicates: true });
   }
 }

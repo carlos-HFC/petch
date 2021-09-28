@@ -135,6 +135,7 @@ export class User extends Model {
   static async createAll() {
     process.env.NODE_ENV !== 'dev' && await this.bulkCreate([
       {
+        id: 1,
         name: 'Luara Silva Oliveira',
         email: 'luara.oliveira8@gmail.com',
         emailVerified: true,
@@ -152,6 +153,7 @@ export class User extends Model {
         avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
       {
+        id: 2,
         name: 'Carlos Henrique Faustino Cardoso',
         email: 'chfcchfc96@gmail.com',
         emailVerified: true,
@@ -169,6 +171,7 @@ export class User extends Model {
         avatar: 'https://images.unsplash.com/photo-1504593811423-6dd665756598?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fHBlcnNvbnxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
       {
+        id: 3,
         name: 'Mirella Letícia Drumond',
         email: 'mirella@teste.com',
         emailVerified: true,
@@ -186,6 +189,7 @@ export class User extends Model {
         avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?ixid=MnwxMjA3fDB8MHxzZWFyY2h8OXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
       {
+        id: 4,
         name: 'Guilherme Sérgio Araújo',
         email: 'guilherme@teste.com',
         emailVerified: true,
@@ -203,6 +207,7 @@ export class User extends Model {
         avatar: 'https://images.unsplash.com/photo-1500048993953-d23a436266cf?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fHBlcnNvbnxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
       {
+        id: 5,
         name: 'Luiz Nathan das Neves',
         email: 'luiz@teste.com',
         emailVerified: true,
@@ -220,6 +225,7 @@ export class User extends Model {
         avatar: 'https://images.unsplash.com/photo-1547425260-76bcadfb4f2c?ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
       {
+        id: 6,
         name: 'Liz Lúcia Santos',
         email: 'liz@teste.com',
         emailVerified: true,
@@ -237,6 +243,7 @@ export class User extends Model {
         avatar: 'https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTB8fHBlcnNvbnxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
       {
+        id: 7,
         name: 'Débora Benedita Allana Ramos',
         email: 'debora@teste.com',
         emailVerified: true,
@@ -254,6 +261,7 @@ export class User extends Model {
         avatar: 'https://images.unsplash.com/photo-1619312676557-aa9fe05ef190?ixid=MnwxMjA3fDB8MHxzZWFyY2h8Mnx8cGVyc29uJTIwbWlkJTIwYWdlfGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
       },
       {
+        id: 8,
         name: 'Danilo Leonardo Fogaça',
         email: 'danilo@teste.com',
         emailVerified: true,

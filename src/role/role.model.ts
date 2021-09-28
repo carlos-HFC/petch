@@ -25,8 +25,8 @@ export class Role extends Model {
   @AfterSync
   static async createAll() {
     process.env.NODE_ENV !== 'dev' && await this.bulkCreate([
-      { name: "Admin" },
-      { name: "Adotante" },
+      { id: 1, name: "Admin" },
+      { id: 2, name: "Adotante" },
     ], { ignoreDuplicates: true });
   }
 }
