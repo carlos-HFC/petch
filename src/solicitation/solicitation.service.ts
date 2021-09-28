@@ -2,11 +2,12 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
+import { TCreateSolicitation } from './solicitation.dto';
 import { Solicitation } from './solicitation.model';
 import { UploadService } from '../config/upload.service';
 import { SolicitationTypesService } from '../solicitationTypes/solicitationTypes.service';
 import { User } from '../user/user.model';
-import { trimObj, validateEmail } from '../utils';
+import { trimObj } from '../utils';
 
 @Injectable()
 export class SolicitationService {
@@ -38,7 +39,7 @@ export class SolicitationService {
       await this.solicitationTypeService.findById(data.solicitationTypeId);
 
       if (media) {
-        const image = (await this.uploadService.uploadFile(media)).url
+        const image = (await this.uploadService.uploadFile(media)).url;
         Object.assign(data, { image });
       }
 
@@ -57,7 +58,7 @@ export class SolicitationService {
       }
 
       if (!data.email) throw new HttpException('E-mail é obrigatório', 400);
-      validateEmail(data.email);
+      if (!data.name) throw new HttpException('Nome é obrigatório', 400);
 
       const solicitation = await this.solicitationModel.create({ ...data }, { transaction });
 
@@ -69,8 +70,6 @@ export class SolicitationService {
       throw new HttpException(error, 400);
     }
   }
-
-  async put(data: object) { }
 
   async delete(id: number) {
     const solicitation = await this.findById(id);

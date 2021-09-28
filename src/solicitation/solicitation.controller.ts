@@ -3,8 +3,8 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedR
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 
+import { Solicitation, TCreateSolicitation } from './solicitation.dto';
 import { SolicitationService } from './solicitation.service';
-import { CreateSolicitation, Solicitation } from './solicitation.swagger';
 import { RoleDecorator } from '../common/decorators/role.decorator';
 import { JwtAuthGuard, OptionalAuthGuard } from '../common/guards/auth.guard';
 import { RoleGuard } from '../common/guards/role.guard';
@@ -117,6 +117,7 @@ export class SolicitationController {
   @ApiOperation({ summary: 'Cadastrar uma nova solicitação' })
   @ApiCreatedResponse({ type: Solicitation, description: 'Created' })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
@@ -128,9 +129,7 @@ export class SolicitationController {
           type: 'string',
           oneOf: [
             { example: 'Arquivo não suportado' },
-            { example: 'Campo "X" não pode ser vazio' },
-            { example: 'Descrição é obrigatória' },
-            { example: 'E-mail é obrigatório' },
+            { example: 'Campo "X" é obrigatório' },
             { example: 'E-mail inválido' },
           ]
         },
@@ -154,7 +153,7 @@ export class SolicitationController {
     }
   })
   @ApiConsumes('multipart/form-data')
-  @ApiBody({ type: CreateSolicitation })
+  @ApiBody({ type: TCreateSolicitation })
   @ApiBearerAuth()
   @UseGuards(OptionalAuthGuard)
   @Post()
