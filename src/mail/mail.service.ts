@@ -25,7 +25,7 @@ export class MailService {
             dynamicTemplateData: {
               subject: "Bem-Vindo(a) ao Petch!!",
               name: user.name,
-              token: user.tokenVerificationEmail
+              link: `https://petch-front.herokuapp.com/confirmacao?token=${user.tokenVerificationEmail}&email=${user.email}`
             }
           }
         ],
@@ -61,20 +61,24 @@ export class MailService {
 
   async newScheduling(user: User, date: string, schedulingTypeName: string) {
     const envelope = {
-      to: user.email,
+      templateId: "d-c5227df320394815a2e5d4d37b67a60c",
       from: "NoReply <projetopetch@gmail.com>"
     };
 
     try {
       await this.client.send({
         ...envelope,
-        subject: "Agendamento confirmado!!",
-        html: `<h2>Agendamento confirmado com sucesso!</h2>
-
-          <p>
-            <strong>Olá ${user.name},</strong>
-            o seu agendamento para ${schedulingTypeName}, marcado para o dia ${date}, foi confirmado com sucesso
-          </p>`
+        personalizations: [
+          {
+            to: user.email,
+            dynamicTemplateData: {
+              subject: "Agendamento confirmado!!",
+              name: user.name,
+              date,
+              schedulingTypeName,
+            }
+          }
+        ],
       });
     } catch (error) {
       throw new HttpException(error, 400);
@@ -83,20 +87,24 @@ export class MailService {
 
   async cancelScheduling(user: User, date: string, schedulingTypeName: string) {
     const envelope = {
-      to: user.email,
+      templateId: "d-e1b080d5343f445091f7ec2b6453f173",
       from: "NoReply <projetopetch@gmail.com>"
     };
 
     try {
       await this.client.send({
         ...envelope,
-        subject: "Agendamento cancelado!!",
-        html: `<h2>Agendamento cancelado!</h2>
-
-          <p>
-            <strong>Olá ${user.name},</strong>
-            o seu agendamento para ${schedulingTypeName}, marcado para o dia ${date}, foi cancelado com sucesso
-          </p>`
+        personalizations: [
+          {
+            to: user.email,
+            dynamicTemplateData: {
+              subject: "Agendamento cancelado!!",
+              name: user.name,
+              date,
+              schedulingTypeName,
+            }
+          }
+        ],
       });
     } catch (error) {
       throw new HttpException(error, 400);
