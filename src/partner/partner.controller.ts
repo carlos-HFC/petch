@@ -134,7 +134,7 @@ export class PartnerController {
   @ApiQuery({ name: 'status', type: 'string', enum: ['true', 'false'], required: true })
   @Delete(':id')
   @HttpCode(204)
-  async activeInactive(@Param('id') id: number, @Query() { inactives: status }: Pick<TFilterPartner, 'inactives'>) {
+  async activeInactive(@Param('id') id: number, @Query('status') status: 'true' | 'false') {
     return await this.partnerService.activeInactive(id, status);
   }
 }

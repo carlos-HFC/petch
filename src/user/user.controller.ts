@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 
-import { IndexUser, TConfirmRegister, TCreateUser, TFilterUser, TUpdateUser, UserDTO } from './user.dto';
+import { IndexUser, TConfirmRegister, TCreateUser, TFilterUser, TUpdateUser, User } from './user.dto';
 import { UserService } from './user.service';
 import { RoleDecorator } from '../common/decorators/role.decorator';
 import { JwtAuthGuard } from '../common/guards/auth.guard';
@@ -60,7 +60,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Listar um usuário pelo ID' })
-  @ApiOkResponse({ type: UserDTO, description: 'Success' })
+  @ApiOkResponse({ type: User, description: 'Success' })
   @ApiUnauthorizedResponse({
     description: 'Unauthorized',
     schema: {
@@ -120,7 +120,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Cadastrar um novo admin' })
-  @ApiCreatedResponse({ type: UserDTO, description: 'Created' })
+  @ApiCreatedResponse({ type: User, description: 'Created' })
   @ApiBadRequestResponse({
     description: 'Bad Request',
     schema: {
@@ -353,13 +353,13 @@ export class UserController {
     }
   })
   @ApiParam({ name: 'id', required: true })
-  @ApiQuery({ name: 'inactives', type: 'string', enum: ['true', 'false'], required: true })
+  @ApiQuery({ name: 'status', type: 'string', enum: ['true', 'false'], required: true })
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('admin')
   @Delete(':id')
   @HttpCode(204)
-  async activeInactive(@Param('id') id: number, @Query() { inactives: status }: Pick<TFilterUser, 'inactives'>) {
+  async activeInactive(@Param('id') id: number, @Query('status') status: 'true' | 'false') {
     return await this.userService.activeInactive(id, status);
   }
 }
