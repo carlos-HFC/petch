@@ -12,12 +12,6 @@ export function capitalizeFirstLetter(str: string) {
   return str.charAt(0).toUpperCase() + str.slice(1);
 }
 
-export function validateEmail(email: string) {
-  const regex = /\S+@\S+\.\S+/;
-
-  if (!regex.test(email)) throw new HttpException('E-mail inválido', 400);
-}
-
 export function validateCPF(cpf: string) {
   let sum = 0, rest = 0;
 
