@@ -60,12 +60,12 @@ export class Partner {
   @ApiProperty({ type: 'string', required: false })
   @ValidateIf((_, value) => value)
   @IsPhoneNumber('BR', { message: 'Telefone 2 inválido' })
-  phone2: string;
+  phone2?: string;
 
   @ApiProperty({ type: 'string', required: false })
   @ValidateIf((_, value) => value)
   @IsPhoneNumber('BR', { message: 'Telefone 3 inválido' })
-  phone3: string;
+  phone3?: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'CEP é obrigatório' })
@@ -87,7 +87,7 @@ export class Partner {
   district: string;
 
   @ApiProperty({ type: 'string', required: false })
-  complement: string;
+  complement?: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Cidade é obrigatória' })
@@ -102,7 +102,7 @@ export class Partner {
   uf: string;
 
   @ApiProperty({ type: 'string', required: false })
-  image: string;
+  image?: string;
 
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   createdAt: Date;
@@ -118,7 +118,7 @@ export class IndexPartner extends PickType(Partner, ['id', 'fantasyName', 'cnpj'
 
 export class TCreatePartner extends OmitType(Partner, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'image']) {
   @ApiProperty({ type: 'string', format: 'binary', required: false })
-  media: string;
+  media?: string;
 }
 
 export class TUpdatePartner extends PartialType(TCreatePartner) { }

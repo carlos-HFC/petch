@@ -5,7 +5,7 @@ import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNot
 import { TForgotPassword, TGoogleLogin, TLogin, TResetPassword } from './auth.dto';
 import { AuthService } from './auth.service';
 import { config } from '../config/multer';
-import { TCreateUser, UserDTO } from '../user/user.dto';
+import { TCreateUser, User } from '../user/user.dto';
 
 @ApiTags('Auth')
 @Controller('auth')
@@ -119,7 +119,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Registrar-se' })
-  @ApiCreatedResponse({ type: UserDTO, description: 'Created' })
+  @ApiCreatedResponse({ type: User, description: 'Created' })
   @ApiBadRequestResponse({
     description: 'Bad Request',
     schema: {

@@ -21,19 +21,19 @@ export class Gift {
   description: string;
 
   @ApiProperty({ type: 'string', required: false })
-  size: string;
+  size?: string;
 
   @ApiProperty({ type: 'string', required: false })
-  color: string;
+  color?: string;
 
   @ApiProperty({ type: 'string', required: false })
-  weight: string;
+  weight?: string;
 
   @ApiProperty({ type: 'string', required: false })
-  taste: string;
+  taste?: string;
 
   @ApiProperty({ type: 'string', required: false })
-  image: string;
+  image?: string;
 
   @ApiProperty({ type: 'number' })
   @IsNotEmpty({ message: 'Parceiro é obrigatório' })
@@ -67,7 +67,7 @@ export class IndexGift extends PickType(Gift, ['id', 'name', 'description', 'ima
 
 export class TCreateGift extends OmitType(Gift, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'image', 'partner']) {
   @ApiProperty({ type: 'string', format: 'binary', required: false })
-  media: string;
+  media?: string;
 }
 
 export class TUpdateGift extends PartialType(TCreateGift) { }

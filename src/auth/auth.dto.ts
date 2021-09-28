@@ -35,10 +35,10 @@ export class TGoogleLogin {
   googleId: string;
 
   @ApiProperty({ type: 'string', required: false })
-  name: string;
+  name?: string;
 
   @ApiProperty({ type: 'string', required: false })
-  avatar: string;
+  avatar?: string;
 }
 
 export class TResetPassword {

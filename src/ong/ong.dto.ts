@@ -26,7 +26,7 @@ export class Ong {
   responsible: string;
 
   @ApiProperty({ type: 'string', required: false })
-  image: string;
+  image?: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Telefone é obrigatório' })
@@ -38,12 +38,12 @@ export class Ong {
   @ApiProperty({ type: 'string', required: false })
   @ValidateIf((_, value) => value)
   @IsPhoneNumber('BR', { message: 'Telefone 2 inválido' })
-  phone2: string;
+  phone2?: string;
 
   @ApiProperty({ type: 'string', required: false })
   @ValidateIf((_, value) => value)
   @IsPhoneNumber('BR', { message: 'Telefone 3 inválido' })
-  phone3: string;
+  phone3?: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'CEP é obrigatório' })
@@ -65,7 +65,7 @@ export class Ong {
   district: string;
 
   @ApiProperty({ type: 'string', required: false })
-  complement: string;
+  complement?: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Cidade é obrigatória' })
@@ -99,7 +99,7 @@ export class IndexOng extends PickType(Ong, ['id', 'name', 'email', 'phone1', 'r
 
 export class TCreateOng extends OmitType(Ong, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'image']) {
   @ApiProperty({ type: 'string', format: 'binary', required: false })
-  media: string;
+  media?: string;
 }
 
 export class TUpdateOng extends PartialType(TCreateOng) { }

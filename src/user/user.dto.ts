@@ -5,7 +5,7 @@ import { IsDateString, IsEmail, IsEnum, IsNotEmpty, IsPhoneNumber, IsPostalCode,
 import { Match } from '../common/pipes/match.pipe';
 import { Role } from '../role/role.model';
 
-export class UserDTO {
+export class User {
   @ApiProperty({ type: 'integer', uniqueItems: true, readOnly: true })
   id: number;
 
@@ -19,7 +19,7 @@ export class UserDTO {
   name: string;
 
   @ApiProperty({ type: 'string', required: false })
-  avatar: string;
+  avatar?: string;
 
   @ApiProperty({ type: 'string', uniqueItems: true })
   @IsNotEmpty({ message: 'E-mail é obrigatório' })
@@ -32,10 +32,10 @@ export class UserDTO {
   emailVerified: boolean;
 
   @ApiProperty({ type: 'string', required: false })
-  tokenVerificationEmail: string;
+  tokenVerificationEmail?: string;
 
   @ApiProperty({ type: 'string', required: false })
-  hash: string;
+  hash?: string;
 
   @ApiProperty({ type: 'string', uniqueItems: true })
   @IsNotEmpty({ message: 'CPF é obrigatório' })
@@ -76,7 +76,7 @@ export class UserDTO {
   district: string;
 
   @ApiProperty({ type: 'string', required: false })
-  complement: string;
+  complement?: string;
 
   @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Cidade é obrigatória' })
@@ -98,10 +98,10 @@ export class UserDTO {
   phone: string;
 
   @ApiProperty({ type: 'string', required: false })
-  tokenResetPassword: string;
+  tokenResetPassword?: string;
 
   @ApiProperty({ type: 'string', required: false })
-  tokenResetPasswordExpires: string;
+  tokenResetPasswordExpires?: string;
 
   @ApiProperty({ type: 'number' })
   roleId: number;
@@ -119,7 +119,7 @@ export class UserDTO {
   deletedAt: Date | null;
 }
 
-export class IndexUser extends PickType(UserDTO, ['id', 'name', 'email', 'avatar', 'deletedAt']) {
+export class IndexUser extends PickType(User, ['id', 'name', 'email', 'avatar', 'deletedAt']) {
   @ApiProperty({
     type: 'object',
     properties: {
@@ -131,7 +131,7 @@ export class IndexUser extends PickType(UserDTO, ['id', 'name', 'email', 'avatar
   role: Role;
 }
 
-export class TCreateUser extends OmitType(UserDTO, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'hash', 'avatar', 'tokenResetPassword', 'tokenResetPasswordExpires', 'tokenVerificationEmail', 'emailVerified', 'roleId', 'role']) {
+export class TCreateUser extends OmitType(User, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'hash', 'avatar', 'tokenResetPassword', 'tokenResetPasswordExpires', 'tokenVerificationEmail', 'emailVerified', 'roleId', 'role']) {
   @ApiProperty({ type: 'string', required: false })
   @ValidateIf((_, value) => value)
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[-_@#$!%+*=()?&,.:;?|])[A-Za-z\d-_@#$!%+*=()?&,.:;?|]/, { message: 'Senha precisa ter uma letra maiúscula, uma letra minúscula, um caractere especial e um número' })
@@ -144,25 +144,25 @@ export class TCreateUser extends OmitType(UserDTO, ['createdAt', 'updatedAt', 'd
   confirmPassword: string;
 
   @ApiProperty({ type: 'string', format: 'binary', required: false })
-  media: string;
+  media?: string;
 }
 
 export class TUpdateUser extends OmitType(PartialType(TCreateUser), ['googleId', 'password', 'confirmPassword']) {
   @ApiProperty({ type: 'string', required: false })
-  oldPassword: string;
+  oldPassword?: string;
 
   @ApiProperty({ type: 'string', required: false })
   @ValidateIf((obj, _) => obj.oldPassword)
   @IsNotEmpty({ message: 'Nova senha é obrigatória' })
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[-_@#$!%+*=()?&,.:;?|])[A-Za-z\d-_@#$!%+*=()?&,.:;?|]/, { message: 'Senha precisa ter uma letra maiúscula, uma letra minúscula, um caractere especial e um número' })
   @MinLength(8, { message: 'Senha muito curta' })
-  password: string;
+  password?: string;
 
   @ApiProperty({ type: 'string', required: false })
   @ValidateIf((obj, _) => obj.password)
   @IsNotEmpty({ message: 'Confirmação de senha é obrigatória' })
   @Match('password', { message: 'Nova senha e confirmação de senha não correspondem' })
-  confirmPassword: string;
+  confirmPassword?: string;
 }
 
 export class TFilterUser {

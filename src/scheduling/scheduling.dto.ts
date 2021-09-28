@@ -3,7 +3,7 @@ import { Transform } from 'class-transformer';
 import { IsDate, IsDateString, IsNotEmpty, IsOptional } from 'class-validator';
 
 import { SchedulingTypes } from '../schedulingTypes/schedulingTypes.model';
-import { UserDTO } from '../user/user.dto';
+import { User } from '../user/user.dto';
 
 export class Scheduling {
   @ApiProperty({ uniqueItems: true, type: 'integer', readOnly: true })
@@ -17,7 +17,7 @@ export class Scheduling {
 
   @ApiProperty({ type: 'string', format: 'date-time', required: false, default: null })
   @IsDate({ message: 'Data de cancelamento inválida' })
-  canceledAt: Date;
+  canceledAt?: Date;
 
   @ApiProperty({ type: 'number' })
   @IsNotEmpty({ message: 'Tipo de agendamento é obrigatório' })
@@ -32,8 +32,8 @@ export class Scheduling {
   @Transform(({ value }) => value.trim())
   userId: number;
 
-  @ApiProperty({ type: UserDTO, required: false })
-  user: UserDTO;
+  @ApiProperty({ type: User, required: false })
+  user: User;
 
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   createdAt: Date;
