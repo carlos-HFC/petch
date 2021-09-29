@@ -47,7 +47,7 @@ export class PetService {
 
     return await this.petModel.findAll({
       paranoid: !convertBool(query.inactives),
-      attributes: ['id', 'name', 'gender', 'age', 'deletedAt'],
+      attributes: ['id', 'name', 'image', 'gender', 'age', 'deletedAt'],
       order: [['id', 'asc']],
     });
   }
@@ -142,6 +142,10 @@ export class PetService {
       await transaction.rollback();
       throw new HttpException(error, 400);
     }
+  }
+
+  async activeInactive(id: never, status: 'true' | 'false') {
+    const st = convertBool(status);
   }
 
   async delete(id: number) {

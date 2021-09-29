@@ -6,8 +6,6 @@ import { Sequelize } from 'sequelize-typescript';
 import { TCreateSpecies, TFilterSpecies, TUpdateSpecies } from './species.dto';
 import { Species } from './species.model';
 import { UploadService } from '../config/upload.service';
-import { TCreateSize, TUpdateSize } from '../size/size.dto';
-import { SizeService } from '../size/size.service';
 import { convertBool, trimObj } from '../utils';
 
 @Injectable()
@@ -16,8 +14,6 @@ export class SpeciesService {
     @InjectModel(Species)
     private readonly speciesModel: typeof Species,
     private uploadService: UploadService,
-    @Inject(forwardRef(() => SizeService))
-    private sizeService: SizeService,
     private sequelize: Sequelize
   ) { }
 
@@ -98,22 +94,6 @@ export class SpeciesService {
       await transaction.rollback();
       throw new HttpException(error, 400);
     }
-  }
-
-  async postSizes(id: number, data: TCreateSize) {
-    trimObj(data);
-
-    await this.findById(id);
-
-    return await this.sizeService.post(id, data);
-  }
-
-  async putSizes(id: number, sizeId: number, data: TUpdateSize) {
-    trimObj(data);
-
-    await this.findById(id);
-
-    return await this.sizeService.put(id, sizeId, data);
   }
 
   async activeInactive(id: number, status: 'true' | 'false') {

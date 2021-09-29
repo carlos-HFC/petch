@@ -1,4 +1,4 @@
-import { forwardRef, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { SeederModule } from 'nestjs-sequelize-seeder';
 
@@ -7,11 +7,9 @@ import { Species } from './species.model';
 import { SpeciesSeed } from './species.seed';
 import { SpeciesService } from './species.service';
 import { UploadService } from '../config/upload.service';
-import { SizeModule } from '../size/size.module';
 
 const imports = [
-  SequelizeModule.forFeature([Species]),
-  forwardRef(() => SizeModule),
+  SequelizeModule.forFeature([Species])
 ]
 
 if (process.env.NODE_ENV === 'dev') {

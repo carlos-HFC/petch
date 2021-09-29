@@ -6,7 +6,6 @@ import { Pet } from './pet.model';
 import { PetService } from './pet.service';
 import { UploadService } from '../config/upload.service';
 import { OngModule } from '../ong/ong.module';
-import { SizeModule } from '../size/size.module';
 import { SpeciesModule } from '../species/species.module';
 
 @Module({
@@ -14,7 +13,6 @@ import { SpeciesModule } from '../species/species.module';
     SequelizeModule.forFeature([Pet]),
     OngModule,
     SpeciesModule,
-    SizeModule
   ],
   controllers: [PetController],
   providers: [PetService, UploadService],

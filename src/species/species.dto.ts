@@ -2,8 +2,6 @@ import { ApiProperty, OmitType, PartialType, PickType } from '@nestjs/swagger';
 import { Transform, Type } from 'class-transformer';
 import { IsNotEmpty, ValidateNested } from 'class-validator';
 
-import { TCreateSize, Size } from '../size/size.dto';
-
 export class Species {
   @ApiProperty({ type: 'integer', uniqueItems: true, readOnly: true })
   id: number;
@@ -15,9 +13,6 @@ export class Species {
 
   @ApiProperty({ type: 'string', required: false })
   image?: string;
-
-  @ApiProperty({ type: [Size], required: false })
-  sizes: Size[];
 
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   createdAt: Date;
@@ -36,7 +31,7 @@ export class TCreateSpecies extends PickType(Species, ['name']) {
   media?: string;
 }
 
-export class TUpdateSpecies extends PartialType(OmitType(Species, ['id', 'image', 'sizes', 'createdAt', 'updatedAt', 'deletedAt'])) {
+export class TUpdateSpecies extends PartialType(OmitType(Species, ['id', 'image', 'createdAt', 'updatedAt', 'deletedAt'])) {
   @ApiProperty({ type: 'string', format: 'binary', required: false })
   media?: string;
 }

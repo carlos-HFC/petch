@@ -1,6 +1,5 @@
 import { AfterSync, BeforeSave, Column, DataType, DefaultScope, HasMany, Model, NotEmpty, Table } from 'sequelize-typescript';
 
-import { Size } from '../size/size.model';
 import { capitalizeFirstLetter } from '../utils';
 
 @DefaultScope(() => ({
@@ -9,19 +8,23 @@ import { capitalizeFirstLetter } from '../utils';
 }))
 @Table({ paranoid: true })
 export class Species extends Model {
-  @NotEmpty({ msg: "Campo 'Nome' não pode ser vazio" })
+  @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    primaryKey: true,
+    autoIncrement: true
+  })
+  id: number;
+
   @Column({
     type: DataType.STRING,
     allowNull: false,
-    unique: true
+    unique: true,
   })
   name: string;
 
   @Column(DataType.STRING)
   image: string;
-
-  @HasMany(() => Size)
-  sizes: Size[];
 
   @AfterSync
   static async createAll() {
