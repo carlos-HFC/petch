@@ -20,7 +20,8 @@ export class Gift extends Model {
     allowNull: false,
     unique: true,
     primaryKey: true,
-    autoIncrement: true
+    autoIncrement: true,
+    autoIncrementIdentity: false
   })
   id: string;
 
