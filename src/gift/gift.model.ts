@@ -16,6 +16,15 @@ import { capitalizeFirstLetter } from '../utils';
 @Table({ paranoid: true })
 export class Gift extends Model {
   @Column({
+    type: DataType.INTEGER,
+    allowNull: false,
+    unique: true,
+    primaryKey: true,
+    autoIncrement: true
+  })
+  id: string;
+
+  @Column({
     type: DataType.STRING,
     allowNull: false,
   })
