@@ -69,10 +69,7 @@ export class User extends Model {
 
   @Column({
     type: DataType.STRING,
-    allowNull: false,
-    get(this: User) {
-      return formatData(this.getDataValue('birthday'), 'birthday');
-    }
+    allowNull: false
   })
   birthday: string;
 
