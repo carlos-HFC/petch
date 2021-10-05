@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { HttpException, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
@@ -46,7 +46,16 @@ async function bootstrap() {
     include: [AuthModule, DislikeModule, FavoriteModule, GiftModule, OngModule, PartnerModule, PetModule, RoleModule, SchedulingModule, SchedulingTypesModule, SolicitationModule, SolicitationTypesModule, SpeciesModule, UserModule],
   });
   SwaggerModule.setup('swagger', app, docs);
-  app.enableCors();
+  const whitelist = ['https://petch-front.herokuapp.com', 'http://localhost:3000'];
+  app.enableCors({
+    origin: (origin, cb) => {
+      if (!origin || whitelist.indexOf(origin) !== -1) {
+        cb(null, true);
+      } else {
+        cb(new HttpException('Erro de cors', 500), false);
+      }
+    }
+  });
   app.useGlobalFilters(new AllExceptionsFilter(app.getHttpAdapter()));
   app.useGlobalPipes(new ValidationPipe({
     transform: true
