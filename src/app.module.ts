@@ -11,6 +11,7 @@ import { resolve } from 'path';
 import { AuthModule } from './auth/auth.module';
 import { AllExceptionsFilter } from './common/filters/exception.filter';
 import { UploadService } from './config/upload.service';
+import { DashboardModule } from './dashboard/dashboard.module';
 import { GiftModule } from './gift/gift.module';
 import { MailModule } from './mail/mail.module';
 import { OngModule } from './ong/ong.module';
@@ -76,6 +77,7 @@ const imports = [
   PetModule,
   MailModule,
   SchedulingModule,
+  DashboardModule
 ];
 if (process.env.NODE_ENV === 'dev') {
   imports.push(SeederModule.forRoot({
