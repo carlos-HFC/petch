@@ -1,9 +1,21 @@
-import { AfterSync, BeforeSave, Column, DataType, DefaultScope, Model, Table } from 'sequelize-typescript';
+import { AfterSync, BeforeSave, Column, DataType, DefaultScope, HasMany, Model, Scopes, Table } from 'sequelize-typescript';
 
+import { Pet } from '../pet/pet.model';
 import { formatData } from '../utils';
 
 @DefaultScope(() => ({
   order: [['id', 'asc']]
+}))
+@Scopes(() => ({
+  petsByOng: {
+    attributes: ['name'],
+    include: [
+      {
+        model: Pet,
+        attributes: ['id']
+      }
+    ]
+  }
 }))
 @Table({ paranoid: true })
 export class Ong extends Model {
@@ -96,6 +108,9 @@ export class Ong extends Model {
     allowNull: false,
   })
   coverage: string;
+
+  @HasMany(() => Pet)
+  pets: Pet[];
 
   @AfterSync
   static async createAll() {

@@ -1,6 +1,19 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AfterSync, Column, DataType, Model, Table } from 'sequelize-typescript';
+import { AfterSync, Column, DataType, HasMany, Model, Scopes, Table } from 'sequelize-typescript';
 
+import { Solicitation } from '../solicitation/solicitation.model';
+
+@Scopes(() => ({
+  dash: {
+    attributes: ['id', 'name'],
+    include: [
+      {
+        model: Solicitation,
+        attributes: ['id', 'solicitationTypeId']
+      }
+    ]
+  }
+}))
 @Table({ paranoid: true })
 export class SolicitationTypes extends Model {
   @ApiProperty({ uniqueItems: true, type: 'integer', readOnly: true })
@@ -18,6 +31,9 @@ export class SolicitationTypes extends Model {
 
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   deletedAt: Date | null;
+
+  @HasMany(() => Solicitation)
+  solicitations: Solicitation[];
 
   @AfterSync
   static async createAll() {

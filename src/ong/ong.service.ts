@@ -6,6 +6,7 @@ import { Sequelize } from 'sequelize-typescript';
 import { TFilterOng, TCreateOng, TUpdateOng } from './ong.dto';
 import { Ong } from './ong.model';
 import { UploadService } from '../config/upload.service';
+import { Pet } from '../pet/pet.model';
 import { convertBool, trimObj } from '../utils';
 
 @Injectable()
@@ -16,6 +17,10 @@ export class OngService {
     private uploadService: UploadService,
     private sequelize: Sequelize
   ) { }
+
+  async petsByOng() {
+    return await this.ongModel.scope('petsByOng').findAll();
+  }
 
   async get(query?: TFilterOng) {
     trimObj(query);
@@ -71,11 +76,12 @@ export class OngService {
 
   async post(data: TCreateOng, media?: Express.MulterS3.File) {
     trimObj(data);
+
+    if (await this.findByEmail(data.email) || await this.findByName(data.name)) throw new HttpException('ONG já cadastrada', 400);
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      if (await this.findByEmail(data.email) || await this.findByName(data.name)) throw new HttpException('ONG já cadastrada', 400);
-
       if (media) {
         const image = (await this.uploadService.uploadFile(media)).url;
         Object.assign(data, { image });
@@ -94,19 +100,20 @@ export class OngService {
 
   async put(id: number, data: TUpdateOng, media?: Express.MulterS3.File) {
     trimObj(data);
+
+    const ong = await this.findById(id);
+
+    if (data.email && data.email !== ong.email) {
+      if (await this.findByEmail(data.email)) throw new HttpException('ONG já cadastrada', 400);
+    }
+
+    if (data.name && data.name !== ong.name) {
+      if (await this.findByName(data.name)) throw new HttpException('ONG já cadastrada', 400);
+    }
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      const ong = await this.findById(id);
-
-      if (data.email && data.email !== ong.email) {
-        if (await this.findByEmail(data.email)) throw new HttpException('ONG já cadastrada', 400);
-      }
-
-      if (data.name && data.name !== ong.name) {
-        if (await this.findByName(data.name)) throw new HttpException('ONG já cadastrada', 400);
-      }
-
       if (media) {
         const image = (await this.uploadService.uploadFile(media)).url;
         Object.assign(data, { image });

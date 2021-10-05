@@ -10,6 +10,10 @@ export class SolicitationTypesService {
     private readonly solicitationTypesModel: typeof SolicitationTypes
   ) { }
 
+  async dash() {
+    return await this.solicitationTypesModel.scope('dash').findAll();
+  }
+
   async get(name?: string) {
     if (name) return await this.findByName(name);
 

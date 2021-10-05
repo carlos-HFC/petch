@@ -81,6 +81,12 @@ export class Pet extends Model {
   })
   cut: boolean;
 
+  @Column({
+    type: DataType.DATEONLY,
+    defaultValue: null
+  })
+  adoptedAt: Date;
+
   @ForeignKey(() => User)
   @Column
   userId: number;

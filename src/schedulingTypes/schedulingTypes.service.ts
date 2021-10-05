@@ -10,6 +10,10 @@ export class SchedulingTypesService {
     private readonly schedulingTypesModel: typeof SchedulingTypes
   ) { }
 
+  async dash() {
+    return await this.schedulingTypesModel.scope('dash').findAll()
+  }
+
   async get(name?: string) {
     if (name) return await this.getByName(name);
 

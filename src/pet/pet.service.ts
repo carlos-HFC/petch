@@ -1,6 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { col, Op as $, where } from 'sequelize';
+import { col, FindAndCountOptions, Op as $, where } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
 import { TCreatePet, TFilterPet, TUpdatePet } from './pet.dto';
@@ -25,6 +25,10 @@ export class PetService {
     private dislikeService: DislikeService,
     private favoriteService: FavoriteService,
   ) { }
+
+  async petsByGender(options?: FindAndCountOptions) {
+    return await this.petModel.findAndCountAll({ ...options, attributes: ['id', 'gender'] });
+  }
 
   async find(id: number, query?: TFilterPet) {
     trimObj(query);
@@ -125,14 +129,15 @@ export class PetService {
 
   async create(data: TCreatePet, media: Express.MulterS3.File) {
     trimObj(data);
-    const transaction = await this.sequelize.transaction();
 
     const num = (/([\d])/g);
 
-    try {
-      await this.ongService.findById(data.ongId);
-      await this.speciesService.findById(data.speciesId);
+    await this.ongService.findById(data.ongId);
+    await this.speciesService.findById(data.speciesId);
 
+    const transaction = await this.sequelize.transaction();
+
+    try {
       if (!media) throw new HttpException('Imagem é obrigatória', 400);
 
       const image = (await this.uploadService.uploadFile(media)).url;
@@ -154,15 +159,16 @@ export class PetService {
 
   async put(id: number, data: TUpdatePet, media: Express.MulterS3.File) {
     trimObj(data);
-    const transaction = await this.sequelize.transaction();
 
     const num = (/([\d])/g);
 
-    try {
-      const pet = await this.findById(id);
+    const pet = await this.findById(id);
 
-      if (data.ongId) await this.ongService.findById(data.ongId);
-      if (data.speciesId) await this.speciesService.findById(data.speciesId);
+    if (data.ongId) await this.ongService.findById(data.ongId);
+    if (data.speciesId) await this.speciesService.findById(data.speciesId);
+
+    const transaction = await this.sequelize.transaction();
+    try {
 
       if (data.age) {
         const age = Number(data.age.match(num)?.join(''));
@@ -184,25 +190,25 @@ export class PetService {
   }
 
   async adopt(user: User, petId: number) {
+    const pet = await this.petModel.findOne({
+      where: {
+        id: petId,
+        userId: null
+      }
+    });
+
+    if (!pet) throw new HttpException('Pet não encontrado', 404);
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      const pet = await this.petModel.findOne({
-        where: {
-          id: petId,
-          userId: null
-        }
-      });
-
-      if (!pet) throw new HttpException('Pet não encontrado', 404);
-
       const favorites = await this.favoriteService.get({
         where: {
           petId: pet.id
         }
       });
 
-      await pet.update({ userId: user.id }, { transaction });
+      await pet.update({ userId: user.id, adoptedAt: new Date() }, { transaction });
 
       await Promise.all(favorites.map(favorite => favorite.destroy({ force: true, transaction })));
 
@@ -220,17 +226,5 @@ export class PetService {
 
     if (!st) return await pet.destroy();
     return await pet.restore();
-  }
-
-  async delete(id: number) {
-    const pet = await this.findById(id);
-
-    await pet.destroy();
-  }
-
-  async restore(id: number) {
-    const pet = await this.findById(id, 'true');
-
-    await pet.restore();
   }
 }
