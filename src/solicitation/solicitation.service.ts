@@ -33,11 +33,12 @@ export class SolicitationService {
 
   async post(data: TCreateSolicitation, media?: Express.MulterS3.File, user?: User) {
     trimObj(data);
+
+    await this.solicitationTypeService.findById(data.solicitationTypeId);
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      await this.solicitationTypeService.findById(data.solicitationTypeId);
-
       if (media) {
         const image = (await this.uploadService.uploadFile(media)).url;
         Object.assign(data, { image });

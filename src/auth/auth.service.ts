@@ -40,13 +40,13 @@ export class AuthService {
   }
 
   async forgotPassword({ email }: TForgotPassword) {
+    const user = await this.userService.findByEmail(email);
+
+    if (!user) throw new HttpException('Usuário não encontrado', 404);
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      const user = await this.userService.findByEmail(email);
-
-      if (!user) throw new HttpException('Usuário não encontrado', 404);
-
       const token = createTokenHEX(), now = new Date().setHours(new Date().getHours() + 1);
 
       await user.update({
@@ -65,14 +65,15 @@ export class AuthService {
 
   async resetPassword(data: TResetPassword) {
     trimObj(data);
+
+    const user = await this.userService.findByEmail(data.email);
+
+    if (!user) throw new HttpException('Usuário não encontrado', 404);
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      const user = await this.userService.findByEmail(data.email);
-
       switch (true) {
-        case !user:
-          throw new HttpException('Usuário não encontrado', 404);
         case data.token !== user.tokenResetPassword:
           throw new HttpException('Token inválido', 400);
         case isAfter(new Date(), Number(user.tokenResetPasswordExpires)):
@@ -133,16 +134,17 @@ export class AuthService {
 
   async googleLogin(data: TGoogleLogin) {
     trimObj(data);
+
+    const [userByGoogle, userByEmail] = await Promise.all([
+      this.userService.findByGoogleId(data.googleId),
+      this.userService.findByEmail(data.email)
+    ]);
+
+    if (!userByGoogle && !userByEmail) throw new HttpException('Usuário não encontrado', 404);
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      const [userByGoogle, userByEmail] = await Promise.all([
-        this.userService.findByGoogleId(data.googleId),
-        this.userService.findByEmail(data.email)
-      ]);
-
-      if (!userByGoogle && !userByEmail) throw new HttpException('Usuário não encontrado', 404);
-
       if (userByGoogle) {
         await userByGoogle.update({ ...data }, { transaction });
 

@@ -52,8 +52,8 @@ export class UserController {
     }
   })
   @ApiBearerAuth()
-  // @UseGuards(JwtAuthGuard, RoleGuard)
-  // @RoleDecorator('admin')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RoleDecorator('admin')
   @Get()
   async index(@Query() query?: TFilterUser) {
     return await this.userService.get(query);
@@ -112,8 +112,8 @@ export class UserController {
   @ApiParam({ name: 'id', required: true })
   @ApiQuery({ name: 'inactives', type: 'string', enum: ['true', 'false'], required: false })
   @ApiBearerAuth()
-  // @UseGuards(JwtAuthGuard, RoleGuard)
-  // @RoleDecorator('admin')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RoleDecorator('admin')
   @Get(':id')
   async byId(@Param('id') id: number, @Query() { inactives }: Pick<TFilterUser, 'inactives'>) {
     return await this.userService.findById(id, inactives);
@@ -186,8 +186,8 @@ export class UserController {
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: TCreateUser })
   @ApiBearerAuth()
-  // @UseGuards(JwtAuthGuard, RoleGuard)
-  // @RoleDecorator('admin')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @RoleDecorator('admin')
   @Post()
   @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
   async create(@Body() data: TCreateUser, @UploadedFile() media?: Express.MulterS3.File) {

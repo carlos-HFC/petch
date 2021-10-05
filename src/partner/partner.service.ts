@@ -58,11 +58,12 @@ export class PartnerService {
 
   async post(data: TCreatePartner, media?: Express.MulterS3.File) {
     trimObj(data);
+
+    if (await this.findByEmail(data.email) || await this.findByCNPJ(data.cnpj)) throw new HttpException('Parceiro já cadastrado', 400);
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      if (await this.findByEmail(data.email) || await this.findByCNPJ(data.cnpj)) throw new HttpException('Parceiro já cadastrado', 400);
-
       if (media) {
         const image = (await this.uploadService.uploadFile(media)).url;
         Object.assign(data, { image });
@@ -81,24 +82,25 @@ export class PartnerService {
 
   async put(id: number, data: TUpdatePartner, media?: Express.MulterS3.File) {
     trimObj(data);
+
+    const partner = await this.findById(id);
+
+    if (data.email && data.email !== partner.email) {
+      if (await this.findByEmail(data.email)) throw new HttpException('Parceiro já cadastrado', 400);
+    }
+
+    if (data.cnpj && data.cnpj !== partner.cnpj) {
+      if (await this.findByCNPJ(data.cnpj)) throw new HttpException('Parceiro já cadastrado', 400);
+    }
+
+    if (media) {
+      const image = (await this.uploadService.uploadFile(media)).url;
+      Object.assign(data, { image });
+    }
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      const partner = await this.findById(id);
-
-      if (data.email && data.email !== partner.email) {
-        if (await this.findByEmail(data.email)) throw new HttpException('Parceiro já cadastrado', 400);
-      }
-
-      if (data.cnpj && data.cnpj !== partner.cnpj) {
-        if (await this.findByCNPJ(data.cnpj)) throw new HttpException('Parceiro já cadastrado', 400);
-      }
-
-      if (media) {
-        const image = (await this.uploadService.uploadFile(media)).url;
-        Object.assign(data, { image });
-      }
-
       await partner.update({ ...data }, { transaction });
 
       await transaction.commit();

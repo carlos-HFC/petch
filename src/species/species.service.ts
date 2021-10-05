@@ -75,13 +75,13 @@ export class SpeciesService {
 
   async put(id: number, data: TUpdateSpecies, media?: Express.MulterS3.File) {
     trimObj(data);
+    const species = await this.findById(id);
+
+    if (await this.findByName(data.name)) throw new HttpException('Espécie já cadastrada', 400);
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      const species = await this.findById(id);
-
-      if (await this.findByName(data.name)) throw new HttpException('Espécie já cadastrada', 400);
-
       if (media) {
         const image = (await this.uploadService.uploadFile(media)).url;
         Object.assign(data, { image });

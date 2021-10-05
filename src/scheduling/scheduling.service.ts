@@ -99,11 +99,11 @@ export class SchedulingService {
 
     if (isBefore(parseISO(data.date), new Date())) throw new HttpException('Data passada não permitida', 400);
 
+    const schedulingType = await this.schedulingTypesService.getById(data.schedulingTypesId);
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      const schedulingType = await this.schedulingTypesService.getById(data.schedulingTypesId);
-
       const available = await this.schedulingModel.findOne({
         where: {
           schedulingTypesId: data.schedulingTypesId,
@@ -116,14 +116,14 @@ export class SchedulingService {
 
       const dateFormatted = format(parseISO(data.date), "dd 'de' MMMM 'de' yyyy', às' HH:mm", { locale: ptBR });
 
-      // await this.mailService.newScheduling(user, dateFormatted, schedulingType.name);
-
       const scheduling = await this.schedulingModel.create({
         ...data,
         userId: user.id
       }, { transaction });
 
       await transaction.commit();
+
+      await this.mailService.newScheduling(user, dateFormatted, schedulingType.name);
 
       return scheduling;
     } catch (error) {
@@ -133,19 +133,19 @@ export class SchedulingService {
   }
 
   async cancelSchedule(user: User, id: number) {
+    const scheduling = await this.schedulingModel.findOne({
+      where: {
+        id,
+        userId: user.id,
+        canceledAt: null
+      }
+    });
+
+    if (!scheduling) throw new HttpException('Agendamento não encontrado', 404);
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      const scheduling = await this.schedulingModel.findOne({
-        where: {
-          id,
-          userId: user.id,
-          canceledAt: null
-        }
-      });
-
-      if (!scheduling) throw new HttpException('Agendamento não encontrado', 404);
-
       const cancelTimeLimit = subHours(scheduling.date, 1);
 
       if (isBefore(cancelTimeLimit, new Date())) throw new HttpException('Você só pode cancelar um agendamento com uma hora de antecedência', 400);

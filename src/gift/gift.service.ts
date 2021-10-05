@@ -42,13 +42,14 @@ export class GiftService {
 
   async post(data: TCreateGift, media?: Express.MulterS3.File) {
     trimObj(data);
+
+    if (data.partnerId) await this.partnerService.findById(data.partnerId);
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      if (data.partnerId) await this.partnerService.findById(data.partnerId);
-
       if (media) {
-        const image = (await this.uploadService.uploadFile(media)).url
+        const image = (await this.uploadService.uploadFile(media)).url;
         Object.assign(data, { image });
       }
 
@@ -65,15 +66,16 @@ export class GiftService {
 
   async put(id: number, data: TUpdateGift, media?: Express.MulterS3.File) {
     trimObj(data);
+
+    if (data.partnerId) await this.partnerService.findById(data.partnerId);
+
+    const gift = await this.findById(id);
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      const gift = await this.findById(id);
-
-      if (data.partnerId) await this.partnerService.findById(data.partnerId);
-
       if (media) {
-        const image = (await this.uploadService.uploadFile(media)).url
+        const image = (await this.uploadService.uploadFile(media)).url;
         Object.assign(data, { image });
       }
 
