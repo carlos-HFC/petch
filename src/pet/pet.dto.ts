@@ -2,8 +2,10 @@ import { ApiProperty, OmitType, PartialType, PickType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsEnum, IsNotEmpty } from 'class-validator';
 
+import { Gift } from '../gift/gift.dto';
 import { Ong } from '../ong/ong.dto';
 import { Species } from '../species/species.dto';
+import { User } from '../user/user.dto';
 
 export class Pet {
   @ApiProperty({ type: 'integer', uniqueItems: true, readOnly: true })
@@ -59,11 +61,25 @@ export class Pet {
   @Transform(({ value }) => value.trim())
   speciesId: number;
 
+  @ApiProperty({ type: 'number', required: false })
+  @Transform(({ value }) => value.trim())
+  userId: number;
+
+  @ApiProperty({ type: 'number', required: false })
+  @Transform(({ value }) => value.trim())
+  giftId: number;
+
   @ApiProperty({ type: Ong, required: false })
   ong: Ong;
 
   @ApiProperty({ type: Species, required: false })
   species: Species;
+
+  @ApiProperty({ type: Gift, required: false })
+  gift: Gift;
+
+  @ApiProperty({ type: User, required: false })
+  user: User;
 
   @ApiProperty({ type: 'string', format: 'date', required: false, readOnly: true })
   createdAt: Date;
@@ -75,7 +91,7 @@ export class Pet {
   deletedAt: Date | null;
 }
 
-export class TCreatePet extends OmitType(Pet, ['id', 'createdAt', 'updatedAt', 'deletedAt', 'ong', 'species', 'image']) {
+export class TCreatePet extends OmitType(Pet, ['id', 'createdAt', 'updatedAt', 'deletedAt', 'ong', 'species', 'image', 'userId', 'giftId', 'user', 'gift']) {
   @ApiProperty({ type: 'string', format: 'binary' })
   media: string;
 }
@@ -103,4 +119,12 @@ export class TFilterPet {
 
   @ApiProperty({ type: 'number', required: false })
   speciesId?: number;
+}
+
+export class TChooseGift {
+  @ApiProperty({ type: 'number' })
+  id: number;
+
+  @ApiProperty({ type: 'number' })
+  giftId: number;
 }

@@ -8,6 +8,7 @@ import { Pet } from './pet.model';
 import { UploadService } from '../config/upload.service';
 import { DislikeService } from '../dislike/dislike.service';
 import { FavoriteService } from '../favorite/favorite.service';
+import { GiftService } from '../gift/gift.service';
 import { OngService } from '../ong/ong.service';
 import { SpeciesService } from '../species/species.service';
 import { User } from '../user/user.model';
@@ -24,10 +25,11 @@ export class PetService {
     private sequelize: Sequelize,
     private dislikeService: DislikeService,
     private favoriteService: FavoriteService,
+    private giftService: GiftService,
   ) { }
 
   async petsByGender(options?: FindOptions) {
-    return await this.petModel.findAll({ ...options, attributes: ['id', 'gender'] });
+    return await this.petModel.findAll({ where: { userId: null }, attributes: ['id', 'gender'] });
   }
 
   async find(id: number, query?: TFilterPet) {
@@ -202,15 +204,35 @@ export class PetService {
     const transaction = await this.sequelize.transaction();
 
     try {
-      const favorites = await this.favoriteService.get({
-        where: {
-          petId: pet.id
-        }
-      });
+      const favorites = await this.favoriteService.get({ where: { petId } });
 
       await pet.update({ userId: user.id, adoptedAt: new Date() }, { transaction });
 
       await Promise.all(favorites.map(favorite => favorite.destroy({ force: true, transaction })));
+
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw new HttpException(error, 400);
+    }
+  }
+
+  async chooseGift(user: User, petId: number, giftId: number) {
+    const pet = await this.petModel.findOne({
+      where: {
+        id: petId,
+        userId: user.id
+      }
+    });
+
+    if (!pet) throw new HttpException('Pet não encontrado', 404);
+
+    await this.giftService.findById(giftId);
+
+    const transaction = await this.sequelize.transaction();
+
+    try {
+      await pet.update({ giftId }, { transaction });
 
       await transaction.commit();
     } catch (error) {
