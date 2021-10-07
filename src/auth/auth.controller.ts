@@ -1,10 +1,8 @@
-import { Body, Controller, HttpCode, Post, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, HttpCode, Post } from '@nestjs/common';
+import { ApiBadRequestResponse, ApiBody, ApiCreatedResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { TForgotPassword, TGoogleLogin, TLogin, TResetPassword } from './auth.dto';
+import { TForgotPassword, TGoogleLogin, TLogin, TResetPassword, TReturnLogin } from './auth.dto';
 import { AuthService } from './auth.service';
-import { config } from '../config/multer';
 import { TCreateUser, User } from '../user/user.dto';
 
 @ApiTags('Auth')
@@ -15,22 +13,7 @@ export class AuthController {
   ) { }
 
   @ApiOperation({ summary: 'Efetuar login com e-mail e senha' })
-  @ApiOkResponse({
-    description: 'Success',
-    schema: {
-      type: 'object',
-      properties: {
-        token: {
-          type: 'string',
-          example: '456fda'
-        },
-        role: {
-          type: 'string',
-          example: 'Admin'
-        },
-      }
-    }
-  })
+  @ApiOkResponse({ type: TReturnLogin, description: 'Success' })
   @ApiBadRequestResponse({
     description: 'Bad Request',
     schema: {
@@ -60,22 +43,7 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'Efetuar login com Google' })
-  @ApiOkResponse({
-    description: 'Success',
-    schema: {
-      type: 'object',
-      properties: {
-        token: {
-          type: 'string',
-          example: '456fda'
-        },
-        role: {
-          type: 'string',
-          example: 'Admin'
-        },
-      }
-    }
-  })
+  @ApiOkResponse({ type: TReturnLogin, description: 'Success' })
   @ApiBadRequestResponse({
     description: 'Bad Request',
     schema: {
@@ -148,12 +116,10 @@ export class AuthController {
       }
     }
   })
-  @ApiConsumes('multipart/form-data')
   @ApiBody({ type: TCreateUser })
   @Post('register')
-  @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
-  async register(@Body() data: TCreateUser, @UploadedFile() media: Express.MulterS3.File) {
-    return await this.authService.register(data, media);
+  async register(@Body() data: TCreateUser) {
+    return await this.authService.register(data);
   }
 
   @ApiOperation({ summary: 'Solicitar troca de senha por esquecimento' })

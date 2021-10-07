@@ -4,17 +4,19 @@ import { isAfter } from 'date-fns';
 import { Sequelize } from 'sequelize-typescript';
 
 import { TForgotPassword, TGoogleLogin, TLogin, TResetPassword } from './auth.dto';
+import { MailService } from '../mail/mail.service';
 import { TCreateUser } from '../user/user.dto';
 import { User } from '../user/user.model';
 import { UserService } from '../user/user.service';
-import { createTokenHEX, formatData, trimObj } from '../utils';
+import { createTokenHEX, trimObj } from '../utils';
 
 @Injectable()
 export class AuthService {
   constructor(
     private jwtService: JwtService,
     private userService: UserService,
-    private sequelize: Sequelize
+    private sequelize: Sequelize,
+    private mailService: MailService
   ) { }
 
   async login(data: TLogin) {
@@ -56,6 +58,7 @@ export class AuthService {
 
       await transaction.commit();
 
+      // await this.mailService.forgotPassword(user);
       return { token };
     } catch (error) {
       await transaction.rollback();
@@ -97,8 +100,8 @@ export class AuthService {
     }
   }
 
-  async register(data: TCreateUser, media?: Express.MulterS3.File) {
-    return await this.userService.post(data, false, media);
+  async register(data: TCreateUser) {
+    return await this.userService.post(data, false);
   }
 
   private async createTokenJwt(user: User) {

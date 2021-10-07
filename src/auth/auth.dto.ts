@@ -1,8 +1,9 @@
-import { ApiProperty, PickType } from '@nestjs/swagger';
+import { ApiProperty, OmitType, PickType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
 import { IsEmail, IsNotEmpty, Matches, MinLength } from 'class-validator';
 
 import { Match } from '../common/pipes/match.pipe';
+import { User } from '../user/user.dto';
 
 export class TLogin {
   @ApiProperty({ type: 'string' })
@@ -59,4 +60,20 @@ export class TResetPassword {
   @IsNotEmpty({ message: 'Confirmação de senha é obrigatória' })
   @Match('password', { message: 'Nova senha e confirmação de senha não correspondem' })
   confirmPassword: string;
+}
+
+class TUserLogin extends OmitType(User, ['createdAt', 'updatedAt', 'emailVerified', 'tokenVerificationEmail', 'tokenResetPasswordExpires', 'tokenResetPassword', 'role', 'roleId', 'hash', 'googleId']) {
+  @ApiProperty({ type: 'string' })
+  role: string;
+
+  @ApiProperty({ type: 'string' })
+  number: string;
+}
+
+export class TReturnLogin {
+  @ApiProperty({ type: 'string' })
+  token: string;
+
+  @ApiProperty({ type: TUserLogin })
+  user: TUserLogin;
 }
