@@ -23,16 +23,10 @@ export class DashboardService {
       this.petService.petsByGender({ where: { gender: 'F', userId: null } }),
     ]);
 
-    return [
-      {
-        name: 'Males',
-        quantity: males.count
-      },
-      {
-        name: 'Females',
-        quantity: females.count
-      },
-    ];
+    return {
+      males: males.length,
+      females: females.length
+    };
   }
 
   async petsByOng() {
@@ -40,8 +34,8 @@ export class DashboardService {
 
     return ongs.map(ong => {
       return {
-        ongName: ong.name,
-        quantityPets: ong.pets.length
+        name: ong.name,
+        quantity: ong.pets.length
       };
     });
   }
