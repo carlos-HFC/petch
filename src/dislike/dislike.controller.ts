@@ -1,5 +1,5 @@
-import { ApiTags, ApiUnauthorizedResponse, ApiForbiddenResponse, ApiBearerAuth, ApiOperation, ApiOkResponse } from '@nestjs/swagger';
-import { Controller, Get, Param, Patch, Req, UseGuards } from '@nestjs/common';
+import { ApiTags, ApiUnauthorizedResponse, ApiForbiddenResponse, ApiBearerAuth, ApiOperation, ApiOkResponse, ApiParam, ApiNotFoundResponse, ApiBadRequestResponse } from '@nestjs/swagger';
+import { Controller, Param, Patch, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 
 import { TCreateDislike } from './dislike.dto';
@@ -50,13 +50,41 @@ export class DislikeController {
     private dislikeService: DislikeService
   ) { }
 
-  @Get()
-  async index() {
-    return await this.dislikeService.get();
-  }
-
   @ApiOperation({ summary: 'Dar dislike em um pet' })
   @ApiOkResponse({ description: 'Success' })
+  @ApiBadRequestResponse({
+    description: 'Bad Request',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 400,
+        },
+        message: {
+          type: 'string',
+          example: 'Pet já recebeu dislike'
+        },
+      }
+    }
+  })
+  @ApiNotFoundResponse({
+    description: 'Not Found',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 404,
+        },
+        message: {
+          type: 'string',
+          example: 'Pet não encontrado',
+        },
+      }
+    }
+  })
+  @ApiParam({ type: 'number', name: 'petId', required: true })
   @Patch(':petId')
   async create(@Param() { petId }: TCreateDislike, @Req() req: Request) {
     return await this.dislikeService.post(petId, req.user.id);
