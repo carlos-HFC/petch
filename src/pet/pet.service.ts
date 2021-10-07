@@ -1,6 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { col, FindAndCountOptions, Op as $, where } from 'sequelize';
+import { col, FindOptions, Op as $, where } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
 import { TCreatePet, TFilterPet, TUpdatePet } from './pet.dto';
@@ -26,8 +26,8 @@ export class PetService {
     private favoriteService: FavoriteService,
   ) { }
 
-  async petsByGender(options?: FindAndCountOptions) {
-    return await this.petModel.findAndCountAll({ ...options, attributes: ['id', 'gender'] });
+  async petsByGender(options?: FindOptions) {
+    return await this.petModel.findAll({ ...options, attributes: ['id', 'gender'] });
   }
 
   async find(id: number, query?: TFilterPet) {
