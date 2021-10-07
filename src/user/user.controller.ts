@@ -11,6 +11,37 @@ import { RoleGuard } from '../common/guards/role.guard';
 import { config } from '../config/multer';
 
 @ApiTags('Users')
+@ApiUnauthorizedResponse({
+  schema: {
+    type: 'object',
+    properties: {
+      statusCode: {
+        type: 'number',
+        example: 401,
+      },
+      message: {
+        type: 'string',
+        example: 'Unauthorized'
+      }
+    }
+  }
+})
+@ApiForbiddenResponse({
+  schema: {
+    type: 'object',
+    properties: {
+      statusCode: {
+        type: 'number',
+        example: 403,
+      },
+      message: {
+        type: 'string',
+        example: 'Você não tem permissão'
+      }
+    }
+  }
+})
+@ApiBearerAuth()
 @Controller('users')
 export class UserController {
   constructor(
@@ -19,39 +50,6 @@ export class UserController {
 
   @ApiOperation({ summary: 'Listar todos os usuários' })
   @ApiOkResponse({ type: [IndexUser], description: 'Success' })
-  @ApiUnauthorizedResponse({
-    description: 'Unauthorized',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 401,
-        },
-        message: {
-          type: 'string',
-          example: 'Unauthorized'
-        }
-      }
-    }
-  })
-  @ApiForbiddenResponse({
-    description: 'Forbidden',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 403,
-        },
-        message: {
-          type: 'string',
-          example: 'Você não tem permissão'
-        }
-      }
-    }
-  })
-  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('admin')
   @Get()
@@ -61,38 +59,6 @@ export class UserController {
 
   @ApiOperation({ summary: 'Listar um usuário pelo ID' })
   @ApiOkResponse({ type: User, description: 'Success' })
-  @ApiUnauthorizedResponse({
-    description: 'Unauthorized',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 401,
-        },
-        message: {
-          type: 'string',
-          example: 'Unauthorized'
-        }
-      }
-    }
-  })
-  @ApiForbiddenResponse({
-    description: 'Forbidden',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 403,
-        },
-        message: {
-          type: 'string',
-          example: 'Você não tem permissão'
-        }
-      }
-    }
-  })
   @ApiNotFoundResponse({
     description: 'Not Found',
     schema: {
@@ -111,7 +77,6 @@ export class UserController {
   })
   @ApiParam({ name: 'id', required: true })
   @ApiQuery({ name: 'inactives', type: 'string', enum: ['true', 'false'], required: false })
-  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('admin')
   @Get(':id')
@@ -131,61 +96,66 @@ export class UserController {
           example: 400,
         },
         message: {
-          type: 'string',
           oneOf: [
-            { example: 'Arquivo não suportado' },
-            { example: 'Campo "X" é obrigatório' },
-            { example: 'Usuário já cadastrado' },
-            { example: 'CEP inválido' },
-            { example: 'CPF inválido' },
-            { example: 'E-mail inválido' },
-            { example: 'Gênero inválido' },
-            { example: 'Telefone inválido' },
-            { example: 'Data de nascimento inválida' },
-            { example: 'Você não tem a idade mínima de 18 anos' },
-            { example: 'Senha muito curta' },
-            { example: 'Senha precisa ter uma letra maiúscula, uma letra minúscula, um caractere especial e um número' },
-            { example: 'Senhas não correspondem' },
+            {
+              type: 'string',
+              example: 'Arquivo não suportado'
+            },
+            {
+              type: 'string',
+              example: 'Campo "X" é obrigatório'
+            },
+            {
+              type: 'string',
+              example: 'Usuário já cadastrado'
+            },
+            {
+              type: 'string',
+              example: 'CEP inválido'
+            },
+            {
+              type: 'string',
+              example: 'CPF inválido'
+            },
+            {
+              type: 'string',
+              example: 'E-mail inválido'
+            },
+            {
+              type: 'string',
+              example: 'Gênero inválido'
+            },
+            {
+              type: 'string',
+              example: 'Telefone inválido'
+            },
+            {
+              type: 'string',
+              example: 'Data de nascimento inválida'
+            },
+            {
+              type: 'string',
+              example: 'Você não tem a idade mínima de 18 anos'
+            },
+            {
+              type: 'string',
+              example: 'Senha muito curta'
+            },
+            {
+              type: 'string',
+              example: 'Senha precisa ter uma letra maiúscula, uma letra minúscula, um caractere especial e um número'
+            },
+            {
+              type: 'string',
+              example: 'Senhas não correspondem'
+            },
           ]
         },
       }
     }
   })
-  @ApiUnauthorizedResponse({
-    description: 'Unauthorized',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 401,
-        },
-        message: {
-          type: 'string',
-          example: 'Unauthorized'
-        }
-      }
-    }
-  })
-  @ApiForbiddenResponse({
-    description: 'Forbidden',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 403,
-        },
-        message: {
-          type: 'string',
-          example: 'Você não tem permissão'
-        }
-      }
-    }
-  })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: TCreateUser })
-  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('admin')
   @Post()
@@ -206,49 +176,82 @@ export class UserController {
           example: 400,
         },
         message: {
-          type: 'string',
           oneOf: [
-            { example: 'Arquivo não suportado' },
-            { example: 'Campo "X" não pode ser vazio' },
-            { example: 'Usuário já cadastrado' },
-            { example: 'CEP inválido' },
-            { example: 'CPF inválido' },
-            { example: 'E-mail inválido' },
-            { example: 'Gênero inválido' },
-            { example: 'Telefone inválido' },
-            { example: 'Data de nascimento inválida' },
-            { example: 'Senha muito curta' },
-            { example: 'Senha precisa ter uma letra maiúscula, uma letra minúscula, um caractere especial e um número' },
-            { example: 'Senha atual incorreta' },
-            { example: 'Nova senha é obrigatória' },
-            { example: 'Nova senha não pode ser igual a senha atual' },
-            { example: 'Confirmação de senha é obrigatória' },
-            { example: 'Nova senha e confirmação de senha não correspondem' },
-            { example: 'Você não tem a idade mínima de 18 anos' },
+            {
+              type: 'string',
+              example: 'Arquivo não suportado'
+            },
+            {
+              type: 'string',
+              example: 'Campo "X" não pode ser vazio'
+            },
+            {
+              type: 'string',
+              example: 'Usuário já cadastrado'
+            },
+            {
+              type: 'string',
+              example: 'CEP inválido'
+            },
+            {
+              type: 'string',
+              example: 'CPF inválido'
+            },
+            {
+              type: 'string',
+              example: 'E-mail inválido'
+            },
+            {
+              type: 'string',
+              example: 'Gênero inválido'
+            },
+            {
+              type: 'string',
+              example: 'Telefone inválido'
+            },
+            {
+              type: 'string',
+              example: 'Data de nascimento inválida'
+            },
+            {
+              type: 'string',
+              example: 'Senha muito curta'
+            },
+            {
+              type: 'string',
+              example: 'Senha precisa ter uma letra maiúscula, uma letra minúscula, um caractere especial e um número'
+            },
+            {
+              type: 'string',
+              example: 'Senha atual incorreta'
+            },
+            {
+              type: 'string',
+              example: 'Nova senha é obrigatória'
+            },
+            {
+              type: 'string',
+              example: 'Nova senha não pode ser igual a senha atual'
+            },
+            {
+              type: 'string',
+              example: 'Confirmação de senha é obrigatória'
+            },
+            {
+              type: 'string',
+              example: 'Nova senha e confirmação de senha não correspondem'
+            },
+            {
+              type: 'string',
+              example: 'Você não tem a idade mínima de 18 anos'
+            },
           ]
         },
       }
     }
   })
-  @ApiUnauthorizedResponse({
-    description: 'Unauthorized',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 401,
-        },
-        message: {
-          type: 'string',
-          example: 'Unauthorized'
-        }
-      }
-    }
-  })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: TUpdateUser })
-  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Put()
   @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
@@ -268,13 +271,27 @@ export class UserController {
           example: 400,
         },
         message: {
-          type: 'string',
           oneOf: [
-            { example: 'E-mail é obrigatório' },
-            { example: 'E-mail inválido' },
-            { example: 'Token não informado' },
-            { example: 'Usuário já confirmado' },
-            { example: 'Token inválido' },
+            {
+              type: 'string',
+              example: 'E-mail é obrigatório'
+            },
+            {
+              type: 'string',
+              example: 'E-mail inválido'
+            },
+            {
+              type: 'string',
+              example: 'Token não informado'
+            },
+            {
+              type: 'string',
+              example: 'Usuário já confirmado'
+            },
+            {
+              type: 'string',
+              example: 'Token inválido'
+            },
           ]
         },
       }
@@ -304,38 +321,6 @@ export class UserController {
 
   @ApiOperation({ summary: 'Ativar e inativar um usuário' })
   @ApiNoContentResponse({ description: 'No Content' })
-  @ApiUnauthorizedResponse({
-    description: 'Unauthorized',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 401,
-        },
-        message: {
-          type: 'string',
-          example: 'Unauthorized'
-        }
-      }
-    }
-  })
-  @ApiForbiddenResponse({
-    description: 'Forbidden',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 403,
-        },
-        message: {
-          type: 'string',
-          example: 'Você não tem permissão'
-        }
-      }
-    }
-  })
   @ApiNotFoundResponse({
     description: 'Not Found',
     schema: {
@@ -354,7 +339,6 @@ export class UserController {
   })
   @ApiParam({ name: 'id', required: true })
   @ApiQuery({ name: 'status', type: 'string', enum: ['true', 'false'], required: true })
-  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('admin')
   @Delete(':id')

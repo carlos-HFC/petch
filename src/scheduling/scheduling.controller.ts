@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Param, Patch, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
 import { ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiBody, ApiBearerAuth, ApiTags, ApiOkResponse, ApiParam, ApiQuery, ApiForbiddenResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 
@@ -69,11 +69,19 @@ export class SchedulingController {
           example: 400,
         },
         message: {
-          type: 'string',
           oneOf: [
-            { example: 'Data é obrigatória' },
-            { example: 'Data inválida' },
-            { example: 'Impossível agendar em uma data passada' },
+            {
+              type: 'string',
+              example: 'Data é obrigatória'
+            },
+            {
+              type: 'string',
+              example: 'Data inválida'
+            },
+            {
+              type: 'string',
+              example: 'Impossível agendar em uma data passada'
+            },
           ]
         },
       }
@@ -121,12 +129,23 @@ export class SchedulingController {
           example: 400,
         },
         message: {
-          type: 'string',
           oneOf: [
-            { example: 'Campo "X" é obrigatório' },
-            { example: 'Data inválida' },
-            { example: 'Data passada não permitida' },
-            { example: 'Data de agendamento indisponível' },
+            {
+              type: 'string',
+              example: 'Campo "X" é obrigatório'
+            },
+            {
+              type: 'string',
+              example: 'Data inválida'
+            },
+            {
+              type: 'string',
+              example: 'Data passada não permitida'
+            },
+            {
+              type: 'string',
+              example: 'Data de agendamento indisponível'
+            },
           ]
         },
       }

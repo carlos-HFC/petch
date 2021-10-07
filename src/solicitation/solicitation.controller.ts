@@ -126,11 +126,19 @@ export class SolicitationController {
           example: 400,
         },
         message: {
-          type: 'string',
           oneOf: [
-            { example: 'Arquivo não suportado' },
-            { example: 'Campo "X" é obrigatório' },
-            { example: 'E-mail inválido' },
+            {
+              type: 'string',
+              example: 'Arquivo não suportado'
+            },
+            {
+              type: 'string',
+              example: 'Campo "X" é obrigatório'
+            },
+            {
+              type: 'string',
+              example: 'E-mail inválido'
+            },
           ]
         },
       }

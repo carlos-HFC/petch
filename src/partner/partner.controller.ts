@@ -56,15 +56,35 @@ export class PartnerController {
           example: 400,
         },
         message: {
-          type: 'string',
           oneOf: [
-            { example: 'Arquivo não suportado' },
-            { example: 'Campo "X" é obrigatório' },
-            { example: 'E-mail é inválido' },
-            { example: 'CNPJ é inválido' },
-            { example: 'Website é inválido' },
-            { example: 'Telefone é inválido' },
-            { example: 'CEP é inválido' },
+            {
+              type: 'string',
+              example: 'Arquivo não suportado'
+            },
+            {
+              type: 'string',
+              example: 'Campo "X" é obrigatório'
+            },
+            {
+              type: 'string',
+              example: 'E-mail é inválido'
+            },
+            {
+              type: 'string',
+              example: 'CNPJ é inválido'
+            },
+            {
+              type: 'string',
+              example: 'Website é inválido'
+            },
+            {
+              type: 'string',
+              example: 'Telefone é inválido'
+            },
+            {
+              type: 'string',
+              example: 'CEP é inválido'
+            },
           ]
         },
       }
@@ -89,15 +109,35 @@ export class PartnerController {
           example: 400,
         },
         message: {
-          type: 'string',
           oneOf: [
-            { example: 'Arquivo não suportado' },
-            { example: 'Campo "X" é obrigatório' },
-            { example: 'E-mail é inválido' },
-            { example: 'CNPJ é inválido' },
-            { example: 'Website é inválido' },
-            { example: 'Telefone é inválido' },
-            { example: 'CEP é inválido' },
+            {
+              type: 'string',
+              example: 'Arquivo não suportado'
+            },
+            {
+              type: 'string',
+              example: 'Campo "X" é obrigatório'
+            },
+            {
+              type: 'string',
+              example: 'E-mail é inválido'
+            },
+            {
+              type: 'string',
+              example: 'CNPJ é inválido'
+            },
+            {
+              type: 'string',
+              example: 'Website é inválido'
+            },
+            {
+              type: 'string',
+              example: 'Telefone é inválido'
+            },
+            {
+              type: 'string',
+              example: 'CEP é inválido'
+            },
           ]
         },
       }

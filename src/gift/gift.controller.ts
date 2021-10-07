@@ -55,10 +55,15 @@ export class GiftController {
           example: 400,
         },
         message: {
-          type: 'string',
           oneOf: [
-            { example: 'Arquivo não suportado' },
-            { example: 'Campo "X" é obrigatório' },
+            {
+              type: 'string',
+              example: 'Arquivo não suportado'
+            },
+            {
+              type: 'string',
+              example: 'Campo "X" é obrigatório'
+            },
           ]
         },
       }
@@ -99,10 +104,15 @@ export class GiftController {
           example: 400,
         },
         message: {
-          type: 'string',
           oneOf: [
-            { example: 'Arquivo não suportado' },
-            { example: 'Campo "X" é obrigatório' },
+            {
+              type: 'string',
+              example: 'Arquivo não suportado'
+            },
+            {
+              type: 'string',
+              example: 'Campo "X" é obrigatório'
+            },
           ]
         },
       }
@@ -117,10 +127,15 @@ export class GiftController {
           example: 404,
         },
         message: {
-          type: 'string',
           oneOf: [
-            { example: 'Brinde não encontrado' },
-            { example: 'Parceiro não encontrado' },
+            {
+              type: 'string',
+              example: 'Brinde não encontrado'
+            },
+            {
+              type: 'string',
+              example: 'Parceiro não encontrado'
+            },
           ]
         },
       }

@@ -56,14 +56,31 @@ export class OngController {
           example: 400,
         },
         message: {
-          type: 'string',
           oneOf: [
-            { example: 'Arquivo não suportado' },
-            { example: 'CEP inválido' },
-            { example: 'E-mail inválido' },
-            { example: 'Telefone inválido' },
-            { example: 'ONG já cadastrada' },
-            { example: 'Campo "X" é obrigatório' },
+            {
+              type: 'string',
+              example: 'Arquivo não suportado'
+            },
+            {
+              type: 'string',
+              example: 'CEP inválido'
+            },
+            {
+              type: 'string',
+              example: 'E-mail inválido'
+            },
+            {
+              type: 'string',
+              example: 'Telefone inválido'
+            },
+            {
+              type: 'string',
+              example: 'ONG já cadastrada'
+            },
+            {
+              type: 'string',
+              example: 'Campo "X" é obrigatório'
+            },
           ]
         },
       }
@@ -88,14 +105,31 @@ export class OngController {
           example: 400,
         },
         message: {
-          type: 'string',
           oneOf: [
-            { example: 'Arquivo não suportado' },
-            { example: 'CEP inválido' },
-            { example: 'E-mail inválido' },
-            { example: 'Telefone inválido' },
-            { example: 'ONG já cadastrada' },
-            { example: 'Campo "X" é obrigatório' },
+            {
+              type: 'string',
+              example: 'Arquivo não suportado'
+            },
+            {
+              type: 'string',
+              example: 'CEP inválido'
+            },
+            {
+              type: 'string',
+              example: 'E-mail inválido'
+            },
+            {
+              type: 'string',
+              example: 'Telefone inválido'
+            },
+            {
+              type: 'string',
+              example: 'ONG já cadastrada'
+            },
+            {
+              type: 'string',
+              example: 'Campo "X" é obrigatório'
+            },
           ]
         },
       }
