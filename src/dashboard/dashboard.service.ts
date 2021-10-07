@@ -18,15 +18,12 @@ export class DashboardService {
   ) { }
 
   async petsByGender() {
-    const [males, females] = await Promise.all([
-      this.petService.petsByGender({ where: { gender: 'M', userId: null } }),
-      this.petService.petsByGender({ where: { gender: 'F', userId: null } }),
-    ]);
+    const pets = await this.petService.petsByGender();
 
-    return {
-      males: males.length,
-      females: females.length
-    };
+    const males = pets.filter(pet => pet.gender === 'M').length;
+    const females = pets.filter(pet => pet.gender === 'F').length;
+
+    return { males, females };
   }
 
   async petsByOng() {
