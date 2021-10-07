@@ -35,24 +35,25 @@ export class MailService {
     }
   }
 
-  async emailConfirmed(user: User) {
+  async forgotPassword(user: User) {
     const envelope = {
-      to: user.email,
+      templateId: "d-83ded5f9282e48d0a5921780031fe238",
       from: "NoReply <projetopetch@gmail.com>"
     };
 
     try {
       await this.client.send({
         ...envelope,
-        subject: "Confirmação de e-mail",
-        html: `
-          <h2>Obrigado</h2>
-
-          <p>
-            <strong>Olá ${user.name},</strong>
-            seu e-mail foi confirmado com sucesso!
-          </p>
-        `
+        personalizations: [
+          {
+            to: user.email,
+            dynamicTemplateData: {
+              subject: "Esqueceu sua senha?",
+              name: user.name,
+              link: `https://petch-front.herokuapp.com/adopter/RegisterConfirmation?token=${user.tokenResetPassword}&email=${user.email}`
+            }
+          }
+        ],
       });
     } catch (error) {
       throw new HttpException(error, 400);
