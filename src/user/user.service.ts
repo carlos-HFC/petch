@@ -76,25 +76,26 @@ export class UserService {
 
   async post(data: TCreateUser, isAdmin: boolean, media?: Express.MulterS3.File) {
     trimObj(data);
+
+    if (await this.findByCPF(data.cpf) || await this.findByEmail(data.email)) throw new HttpException('Usuário já cadastrado', 400);
+
+    if (!isAdmin) {
+      if (!data.password && !data.googleId) throw new HttpException('A senha é obrigatória', 400);
+    }
+
+    if (isAdmin) data.password = createTokenHEX(5);
+
+    if (differenceInCalendarYears(Date.now(), parseISO(data.birthday)) < 18) throw new HttpException('Você não tem a idade mínima de 18 anos', 400);
+
+    if (media) {
+      const avatar = (await this.uploadService.uploadFile(media)).url;
+      Object.assign(data, { avatar });
+    }
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      if (await this.findByCPF(data.cpf) || await this.findByEmail(data.email)) throw new HttpException('Usuário já cadastrado', 400);
-
-      if (!isAdmin) {
-        if (!data.password && !data.googleId) throw new HttpException('A senha é obrigatória', 400);
-      }
-
-      if (isAdmin) data.password = createTokenHEX(5);
-
-      if (differenceInCalendarYears(Date.now(), parseISO(data.birthday)) < 18) throw new HttpException('Você não tem a idade mínima de 18 anos', 400);
-
       const role = await this.roleService.getByName(isAdmin ? 'Admin' : 'Adotante');
-
-      if (media) {
-        const avatar = (await this.uploadService.uploadFile(media)).url;
-        Object.assign(data, { avatar });
-      }
 
       const user = await this.userModel.create({
         ...data,
@@ -115,37 +116,38 @@ export class UserService {
 
   async put(user: User, data: TUpdateUser, media?: Express.MulterS3.File) {
     trimObj(data);
+
+    if (data.email && data.email !== user.email) {
+      if (await this.findByEmail(data.email)) throw new HttpException('Usuário já cadastrado', 400);
+    }
+
+    if (data.cpf && data.cpf !== user.cpf) {
+      if (await this.findByCPF(data.cpf)) throw new HttpException('Usuário já cadastrado', 400);
+    }
+
+    if (data.birthday && differenceInCalendarYears(new Date(), parseISO(data.birthday)) < 18) throw new HttpException('Você não tem a idade mínima de 18 anos', 400);
+
+    if (data.oldPassword) {
+      const { oldPassword, password } = data;
+
+      switch (true) {
+        case !(await user.checkPass(oldPassword)):
+          throw new HttpException('Senha atual incorreta', 400);
+        case oldPassword === password:
+          throw new HttpException('Nova senha não pode ser igual a senha atual', 400);
+        default:
+          break;
+      }
+    }
+
+    if (media) {
+      const avatar = (await this.uploadService.uploadFile(media)).url;
+      Object.assign(data, { avatar });
+    }
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      if (data.email && data.email !== user.email) {
-        if (await this.findByEmail(data.email)) throw new HttpException('Usuário já cadastrado', 400);
-      }
-
-      if (data.cpf && data.cpf !== user.cpf) {
-        if (await this.findByCPF(data.cpf)) throw new HttpException('Usuário já cadastrado', 400);
-      }
-
-      if (data.birthday && differenceInCalendarYears(new Date(), parseISO(data.birthday)) < 18) throw new HttpException('Você não tem a idade mínima de 18 anos', 400);
-
-      if (data.oldPassword) {
-        const { oldPassword, password } = data;
-
-        switch (true) {
-          case !(await user.checkPass(oldPassword)):
-            throw new HttpException('Senha atual incorreta', 400);
-          case oldPassword === password:
-            throw new HttpException('Nova senha não pode ser igual a senha atual', 400);
-          default:
-            break;
-        }
-      }
-
-      if (media) {
-        const avatar = (await this.uploadService.uploadFile(media)).url;
-        Object.assign(data, { avatar });
-      }
-
       await user.update({
         ...data,
         emailVerified: data.email && false,
