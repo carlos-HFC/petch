@@ -53,20 +53,16 @@ export class Pet {
 
   @ApiProperty({ type: 'number' })
   @IsNotEmpty({ message: 'ONG é obrigatória' })
-  @Transform(({ value }) => value.trim())
   ongId: number;
 
   @ApiProperty({ type: 'number' })
   @IsNotEmpty({ message: 'Espécie é obrigatória' })
-  @Transform(({ value }) => value.trim())
   speciesId: number;
 
   @ApiProperty({ type: 'number', required: false })
-  @Transform(({ value }) => value.trim())
   userId: number;
 
   @ApiProperty({ type: 'number', required: false })
-  @Transform(({ value }) => value.trim())
   giftId: number;
 
   @ApiProperty({ type: Ong, required: false })

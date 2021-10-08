@@ -21,7 +21,6 @@ export class Scheduling {
 
   @ApiProperty({ type: 'number' })
   @IsNotEmpty({ message: 'Tipo de agendamento é obrigatório' })
-  @Transform(({ value }) => value.trim())
   schedulingTypesId: number;
 
   @ApiProperty({ type: SchedulingTypes, required: false })
@@ -29,7 +28,6 @@ export class Scheduling {
 
   @ApiProperty({ type: 'number' })
   @IsNotEmpty({ message: 'Usuário é obrigatório' })
-  @Transform(({ value }) => value.trim())
   userId: number;
 
   @ApiProperty({ type: User, required: false })

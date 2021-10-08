@@ -35,7 +35,6 @@ export class Gift {
 
   @ApiProperty({ type: 'number' })
   @IsNotEmpty({ message: 'Parceiro é obrigatório' })
-  @Transform(({ value }) => value.trim())
   partnerId: number;
 
   @ApiProperty({ type: Partner, required: false })
