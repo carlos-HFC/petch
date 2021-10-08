@@ -48,7 +48,7 @@ async function bootstrap() {
     include: [AuthModule, DashboardModule, DislikeModule, FavoriteModule, GiftModule, OngModule, PartnerModule, PetModule, RoleModule, SchedulingModule, SchedulingTypesModule, SolicitationModule, SolicitationTypesModule, SpeciesModule, UserModule],
   });
   SwaggerModule.setup('swagger', app, docs);
-  const whitelist = ['https://petch-front.herokuapp.com', 'http://petch-front.herokuapp.com', 'http://localhost:3000'];
+  const whitelist = ['https://petch-front.herokuapp.com', 'http://petch-front.herokuapp.com', 'https://petch-dev.herokuapp.com', 'http://petch-dev.herokuapp.com', 'http://localhost:3000'];
   app.enableCors({
     origin: (origin, cb) => {
       if (!origin || whitelist.indexOf(origin) !== -1) {
