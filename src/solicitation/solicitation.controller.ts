@@ -11,6 +11,37 @@ import { RoleGuard } from '../common/guards/role.guard';
 import { config } from '../config/multer';
 
 @ApiTags('Solicitations')
+@ApiUnauthorizedResponse({
+  schema: {
+    type: 'object',
+    properties: {
+      statusCode: {
+        type: 'number',
+        example: 401,
+      },
+      message: {
+        type: 'string',
+        example: 'Unauthorized'
+      }
+    }
+  }
+})
+@ApiForbiddenResponse({
+  schema: {
+    type: 'object',
+    properties: {
+      statusCode: {
+        type: 'number',
+        example: 403,
+      },
+      message: {
+        type: 'string',
+        example: 'Você não tem permissão'
+      }
+    }
+  }
+})
+@ApiBearerAuth()
 @Controller('solicitations')
 export class SolicitationController {
   constructor(
@@ -19,37 +50,6 @@ export class SolicitationController {
 
   @ApiOperation({ summary: 'Listar todas as solicitações' })
   @ApiOkResponse({ type: [Solicitation], description: 'Success' })
-  @ApiUnauthorizedResponse({
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 401,
-        },
-        message: {
-          type: 'string',
-          example: 'Unauthorized'
-        }
-      }
-    }
-  })
-  @ApiForbiddenResponse({
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 403,
-        },
-        message: {
-          type: 'string',
-          example: 'Você não tem permissão'
-        }
-      }
-    }
-  })
-  @ApiBearerAuth()
   // @UseGuards(JwtAuthGuard, RoleGuard)
   // @RoleDecorator('admin')
   @Get()
@@ -59,36 +59,6 @@ export class SolicitationController {
 
   @ApiOperation({ summary: 'Listar uma solicitação pelo ID' })
   @ApiOkResponse({ type: Solicitation, description: 'Success' })
-  @ApiUnauthorizedResponse({
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 401,
-        },
-        message: {
-          type: 'string',
-          example: 'Unauthorized'
-        }
-      }
-    }
-  })
-  @ApiForbiddenResponse({
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 403,
-        },
-        message: {
-          type: 'string',
-          example: 'Você não tem permissão'
-        }
-      }
-    }
-  })
   @ApiNotFoundResponse({
     description: 'Not Found',
     schema: {
@@ -106,7 +76,6 @@ export class SolicitationController {
     }
   })
   @ApiParam({ name: 'id', required: true })
-  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('admin')
   @Get(':id')
@@ -162,7 +131,6 @@ export class SolicitationController {
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: TCreateSolicitation })
-  @ApiBearerAuth()
   @UseGuards(OptionalAuthGuard)
   @Post()
   @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
@@ -172,36 +140,6 @@ export class SolicitationController {
 
   @ApiOperation({ summary: 'Inativar uma solicitação' })
   @ApiNoContentResponse({ description: 'No Content' })
-  @ApiUnauthorizedResponse({
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 401,
-        },
-        message: {
-          type: 'string',
-          example: 'Unauthorized'
-        }
-      }
-    }
-  })
-  @ApiForbiddenResponse({
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 403,
-        },
-        message: {
-          type: 'string',
-          example: 'Você não tem permissão'
-        }
-      }
-    }
-  })
   @ApiNotFoundResponse({
     description: 'Not Found',
     schema: {
@@ -219,7 +157,6 @@ export class SolicitationController {
     }
   })
   @ApiParam({ name: 'id', required: true })
-  @ApiBearerAuth()
   @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('admin')
   @Delete(':id')
