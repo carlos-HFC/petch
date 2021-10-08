@@ -1,9 +1,10 @@
 import { compare, hash } from 'bcrypt';
 import { format, parseISO } from 'date-fns';
-import { AfterSync, BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, HasMany, Model, Table } from 'sequelize-typescript';
+import { AfterSync, BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, HasMany, Model, Scopes, Table } from 'sequelize-typescript';
 
 import { Dislike } from '../dislike/dislike.model';
 import { Favorite } from '../favorite/favorite.model';
+import { Pet } from '../pet/pet.model';
 import { Role } from '../role/role.model';
 import { formatData } from '../utils';
 
@@ -15,6 +16,17 @@ import { formatData } from '../utils';
     }
   ],
   order: [['id', 'asc']]
+}))
+@Scopes(() => ({
+  withPet: {
+    attributes: ['id'],
+    include: [
+      {
+        model: Pet,
+        attributes: ['id']
+      }
+    ],
+  }
 }))
 @Table({ paranoid: true })
 export class User extends Model {
@@ -148,6 +160,9 @@ export class User extends Model {
 
   @HasMany(() => Favorite)
   favorite: Favorite[];
+
+  @HasMany(() => Pet)
+  pets: Pet[];
 
   @AfterSync
   static async createAll() {

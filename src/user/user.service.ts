@@ -22,7 +22,12 @@ export class UserService {
     private sequelize: Sequelize
   ) { }
 
+  async userWithPet(id: number) {
+    return await this.userModel.scope('withPet').findByPk(id);
+  }
+
   async get(query?: TFilterUser) {
+    trimObj(query);
     const options = {};
 
     if (query.gender) Object.assign(options, { gender: query.gender.toUpperCase() });
@@ -178,18 +183,18 @@ export class UserService {
 
     if (!user) throw new HttpException('Usuário não encontrado', 404);
 
+    switch (true) {
+      case user.emailVerified:
+        throw new HttpException('Usuário já confirmado', 400);
+      case user.tokenVerificationEmail !== data.token:
+        throw new HttpException('Token inválido', 400);
+      default:
+        break;
+    }
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      switch (true) {
-        case user.emailVerified:
-          throw new HttpException('Usuário já confirmado', 400);
-        case user.tokenVerificationEmail !== data.token:
-          throw new HttpException('Token inválido', 400);
-        default:
-          break;
-      }
-
       await user.update({
         tokenVerificationEmail: null,
         emailVerified: true
