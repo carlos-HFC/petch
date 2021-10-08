@@ -61,14 +61,14 @@ export class PartnerService {
 
     if (await this.findByEmail(data.email) || await this.findByCNPJ(data.cnpj)) throw new HttpException('Parceiro já cadastrado', 400);
 
+    if (media) {
+      const image = (await this.uploadService.uploadFile(media)).url;
+      Object.assign(data, { image });
+    }
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      if (media) {
-        const image = (await this.uploadService.uploadFile(media)).url;
-        Object.assign(data, { image });
-      }
-
       const partner = await this.partnerModel.create({ ...data }, { transaction });
 
       await transaction.commit();

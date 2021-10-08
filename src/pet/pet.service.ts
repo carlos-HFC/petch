@@ -1,6 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { col, FindOptions, Op as $, where } from 'sequelize';
+import { col, Op as $, where } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
 import { TCreatePet, TFilterPet, TUpdatePet } from './pet.dto';
@@ -28,7 +28,7 @@ export class PetService {
     private giftService: GiftService,
   ) { }
 
-  async petsByGender(options?: FindOptions) {
+  async petsByGender() {
     return await this.petModel.findAll({ where: { userId: null }, attributes: ['id', 'gender'] });
   }
 
@@ -134,20 +134,23 @@ export class PetService {
 
     const num = (/([\d])/g);
 
+    const age = Number(data.age.match(num)?.join(''));
+    if (isNaN(age)) throw new HttpException('Idade inválida', 400);
+
+    const weight = Number(data.weight.match(num)?.join(''));
+    if (isNaN(weight)) throw new HttpException('Peso inválido', 400);
+
+    if (!media) throw new HttpException('Imagem é obrigatória', 400);
+
     await this.ongService.findById(data.ongId);
     await this.speciesService.findById(data.speciesId);
+
+    const image = (await this.uploadService.uploadFile(media)).url;
+    Object.assign(data, { image });
 
     const transaction = await this.sequelize.transaction();
 
     try {
-      if (!media) throw new HttpException('Imagem é obrigatória', 400);
-
-      const image = (await this.uploadService.uploadFile(media)).url;
-      Object.assign(data, { image });
-
-      const age = Number(data.age.match(num)?.join(''));
-      if (isNaN(age)) throw new HttpException('Idade inválida', 400);
-
       const pet = await this.petModel.create({ ...data }, { transaction });
 
       await transaction.commit();
@@ -166,22 +169,27 @@ export class PetService {
 
     const pet = await this.findById(id);
 
+    if (data.age) {
+      const age = Number(data.age.match(num)?.join(''));
+      if (isNaN(age)) throw new HttpException('Idade inválida', 400);
+    }
+
+    if (data.weight) {
+      const weight = Number(data.weight.match(num)?.join(''));
+      if (isNaN(weight)) throw new HttpException('Peso inválido', 400);
+    }
+
+    if (media) {
+      const image = (await this.uploadService.uploadFile(media)).url;
+      Object.assign(data, { image });
+    }
+
     if (data.ongId) await this.ongService.findById(data.ongId);
     if (data.speciesId) await this.speciesService.findById(data.speciesId);
 
     const transaction = await this.sequelize.transaction();
+
     try {
-
-      if (data.age) {
-        const age = Number(data.age.match(num)?.join(''));
-        if (isNaN(age)) throw new HttpException('Idade inválida', 400);
-      }
-
-      if (media) {
-        const image = (await this.uploadService.uploadFile(media)).url;
-        Object.assign(data, { image });
-      }
-
       await pet.update({ ...data }, { transaction });
 
       await transaction.commit();
@@ -201,11 +209,11 @@ export class PetService {
 
     if (!pet) throw new HttpException('Pet não encontrado', 404);
 
+    const favorites = await this.favoriteService.get({ where: { petId } });
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      const favorites = await this.favoriteService.get({ where: { petId } });
-
       await pet.update({ userId: user.id, adoptedAt: new Date() }, { transaction });
 
       await Promise.all(favorites.map(favorite => favorite.destroy({ force: true, transaction })));

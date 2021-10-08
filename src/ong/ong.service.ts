@@ -6,8 +6,7 @@ import { Sequelize } from 'sequelize-typescript';
 import { TFilterOng, TCreateOng, TUpdateOng } from './ong.dto';
 import { Ong } from './ong.model';
 import { UploadService } from '../config/upload.service';
-import { Pet } from '../pet/pet.model';
-import { convertBool, trimObj } from '../utils';
+import { capitalizeFirstLetter, convertBool, trimObj } from '../utils';
 
 @Injectable()
 export class OngService {
@@ -61,7 +60,7 @@ export class OngService {
   async findByName(name: string) {
     return await this.ongModel.findOne({
       where: {
-        name: name.normalize().toLowerCase()
+        name: capitalizeFirstLetter(name).trim()
       }
     });
   }
@@ -79,14 +78,14 @@ export class OngService {
 
     if (await this.findByEmail(data.email) || await this.findByName(data.name)) throw new HttpException('ONG já cadastrada', 400);
 
+    if (media) {
+      const image = (await this.uploadService.uploadFile(media)).url;
+      Object.assign(data, { image });
+    }
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      if (media) {
-        const image = (await this.uploadService.uploadFile(media)).url;
-        Object.assign(data, { image });
-      }
-
       const ong = await this.ongModel.create({ ...data }, { transaction });
 
       await transaction.commit();
@@ -111,14 +110,14 @@ export class OngService {
       if (await this.findByName(data.name)) throw new HttpException('ONG já cadastrada', 400);
     }
 
+    if (media) {
+      const image = (await this.uploadService.uploadFile(media)).url;
+      Object.assign(data, { image });
+    }
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      if (media) {
-        const image = (await this.uploadService.uploadFile(media)).url;
-        Object.assign(data, { image });
-      }
-
       await ong.update({ ...data }, { transaction });
 
       await transaction.commit();

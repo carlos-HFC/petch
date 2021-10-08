@@ -42,6 +42,8 @@ export class AuthService {
   }
 
   async forgotPassword({ email }: TForgotPassword) {
+    const token = createTokenHEX(), now = new Date().setHours(new Date().getHours() + 1);
+
     const user = await this.userService.findByEmail(email);
 
     if (!user) throw new HttpException('Usuário não encontrado', 404);
@@ -49,8 +51,6 @@ export class AuthService {
     const transaction = await this.sequelize.transaction();
 
     try {
-      const token = createTokenHEX(), now = new Date().setHours(new Date().getHours() + 1);
-
       await user.update({
         tokenResetPassword: token,
         tokenResetPasswordExpires: now.toString(),
@@ -73,20 +73,20 @@ export class AuthService {
 
     if (!user) throw new HttpException('Usuário não encontrado', 404);
 
+    switch (true) {
+      case data.token !== user.tokenResetPassword:
+        throw new HttpException('Token inválido', 400);
+      case isAfter(new Date(), Number(user.tokenResetPasswordExpires)):
+        throw new HttpException('Token expirou', 400);
+      case await user.checkPass(data.password):
+        throw new HttpException('Nova senha não pode ser igual a senha atual', 400);
+      default:
+        break;
+    }
+
     const transaction = await this.sequelize.transaction();
 
     try {
-      switch (true) {
-        case data.token !== user.tokenResetPassword:
-          throw new HttpException('Token inválido', 400);
-        case isAfter(new Date(), Number(user.tokenResetPasswordExpires)):
-          throw new HttpException('Token expirou', 400);
-        case await user.checkPass(data.password):
-          throw new HttpException('Nova senha não pode ser igual a senha atual', 400);
-        default:
-          break;
-      }
-
       await user.update({
         ...data,
         tokenResetPassword: null,
@@ -105,11 +105,11 @@ export class AuthService {
   }
 
   private async createTokenJwt(user: User) {
-    const token = this.jwtService.sign({ id: user.id, email: user.email, role: user.role.name, cpf: user.cpf, password: user.hash, google: user.googleId });
-
     const { id, name, avatar, email, gender, cep, cpf, birthday, phone, complement, district, city, uf, deletedAt, role } = user;
 
-    const [address, number] = user.address.split(',').map(ad => ad.trim());
+    const token = this.jwtService.sign({ id, email, role: role.name, cpf, password: user.hash, google: user.googleId });
+
+    const [address, number] = user.address.split(',').map(address => address.trim());
 
     return {
       token,
