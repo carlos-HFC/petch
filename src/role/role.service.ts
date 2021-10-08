@@ -2,6 +2,7 @@ import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 
 import { Role } from './role.model';
+import { capitalizeFirstLetter } from '../utils';
 
 @Injectable()
 export class RoleService {
@@ -27,7 +28,7 @@ export class RoleService {
   async getByName(name: string) {
     return await this.roleModel.findOne({
       where: {
-        name: name.normalize().trim()
+        name: capitalizeFirstLetter(name).trim()
       }
     });
   }
