@@ -32,10 +32,4 @@ export class TScheduleByMonth {
   month: ScheduleMonth | ScheduleMonth[];
 }
 
-export class TTotalSolicitations {
-  @ApiProperty({ type: 'string' })
-  name: string;
-
-  @ApiProperty({ type: 'number' })
-  quantity: number;
-}
+export class TTotalSolicitations extends TPetsByOng { }

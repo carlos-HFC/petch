@@ -38,12 +38,12 @@ export class DashboardService {
   }
 
   async scheduleByMonth(month?: number) {
-    const schedulings = await this.schedulingTypesService.dash();
+    const types = await this.schedulingTypesService.dash();
 
     const displayMonth = (value: number) => setMonth(new Date(), value);
 
     if (month) {
-      const total = schedulings.map(schedule => {
+      const total = types.map(schedule => {
         return {
           name: schedule.name,
           month: {
@@ -55,7 +55,7 @@ export class DashboardService {
 
       return total;
     } else {
-      const total = schedulings.map(schedule => {
+      const total = types.map(schedule => {
         return {
           name: schedule.name,
           month: schedule.schedulings.map(sch => {

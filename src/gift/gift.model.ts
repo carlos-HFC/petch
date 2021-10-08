@@ -8,7 +8,6 @@ import { capitalizeFirstLetter } from '../utils';
     {
       model: Partner,
       attributes: ['fantasyName'],
-      paranoid: true,
     }
   ],
   order: [['id', 'asc']]

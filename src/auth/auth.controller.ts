@@ -117,15 +117,15 @@ export class AuthController {
           oneOf: [
             {
               type: 'string',
-              example: 'Arquivo não suportado'
-            },
-            {
-              type: 'string',
               example: 'Usuário já cadastrado'
             },
             {
               type: 'string',
               example: 'CEP inválido'
+            },
+            {
+              type: 'string',
+              example: 'Gênero inválido'
             },
             {
               type: 'string',
@@ -219,7 +219,7 @@ export class AuthController {
     return await this.authService.forgotPassword(data);
   }
 
-  @ApiOperation({ summary: 'Reiniciar a senha a partir de seu esquecimento' })
+  @ApiOperation({ summary: 'Redefinir a senha a partir de seu esquecimento' })
   @ApiOkResponse({ description: 'Success' })
   @ApiBadRequestResponse({
     description: 'Bad Request',

@@ -122,6 +122,10 @@ export class PetController {
               type: 'string',
               example: 'Gênero inválido'
             },
+            {
+              type: 'string',
+              example: 'Peso inválido'
+            },
           ]
         },
       }
@@ -286,6 +290,10 @@ export class PetController {
             {
               type: 'string',
               example: 'Gênero inválido'
+            },
+            {
+              type: 'string',
+              example: 'Peso inválido'
             },
           ]
         },

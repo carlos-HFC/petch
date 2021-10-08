@@ -4,9 +4,9 @@ import { Request } from 'express';
 
 import { Scheduling, TAvailableScheduling, TCreateScheduling, TFilterScheduling } from './scheduling.dto';
 import { SchedulingService } from './scheduling.service';
+import { RoleDecorator } from '../common/decorators/role.decorator';
 import { JwtAuthGuard } from '../common/guards/auth.guard';
 import { RoleGuard } from '../common/guards/role.guard';
-import { RoleDecorator } from '../common/decorators/role.decorator';
 
 @ApiTags('Schedulings')
 @ApiUnauthorizedResponse({
@@ -51,7 +51,7 @@ export class SchedulingController {
   @ApiOperation({ summary: 'Visualizar todos os agendamentos' })
   @ApiOkResponse({ type: Scheduling, description: 'Success' })
   @UseGuards(JwtAuthGuard, RoleGuard)
-  @RoleDecorator('admin')
+  // @RoleDecorator('admin')
   @Get()
   async index(@Query() query?: TFilterScheduling) {
     return await this.schedulingService.get(query);
@@ -133,6 +133,10 @@ export class SchedulingController {
             {
               type: 'string',
               example: 'Campo "X" é obrigatório'
+            },
+            {
+              type: 'string',
+              example: 'Você não adotou um pet para efetuar um agendamento'
             },
             {
               type: 'string',

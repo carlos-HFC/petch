@@ -4,7 +4,6 @@ import { SchedulingTypes } from '../schedulingTypes/schedulingTypes.model';
 import { User } from '../user/user.model';
 
 @DefaultScope(() => ({
-  // include: [User, SchedulingTypes],
   order: [['id', 'asc']]
 }))
 @Table({ paranoid: true })
