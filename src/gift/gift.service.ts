@@ -42,12 +42,18 @@ export class GiftService {
 
   async post(data: TCreateGift, media?: Express.MulterS3.File) {
     trimObj(data);
+    const num = (/([\d])/g);
 
     await this.partnerService.findById(data.partnerId);
 
     if (media) {
       const image = (await this.uploadService.uploadFile(media)).url;
       Object.assign(data, { image });
+    }
+
+    if (data.weight) {
+      const weight = Number(data.weight.match(num)?.join(''));
+      if (isNaN(weight)) throw new HttpException('Peso inválido', 400);
     }
 
     const transaction = await this.sequelize.transaction();
@@ -66,6 +72,7 @@ export class GiftService {
 
   async put(id: number, data: TUpdateGift, media?: Express.MulterS3.File) {
     trimObj(data);
+    const num = (/([\d])/g);
     const gift = await this.findById(id);
 
     if (data.partnerId) await this.partnerService.findById(data.partnerId);
@@ -73,6 +80,11 @@ export class GiftService {
     if (media) {
       const image = (await this.uploadService.uploadFile(media)).url;
       Object.assign(data, { image });
+    }
+
+    if (data.weight) {
+      const weight = Number(data.weight.match(num)?.join(''));
+      if (isNaN(weight)) throw new HttpException('Peso inválido', 400);
     }
 
     const transaction = await this.sequelize.transaction();
