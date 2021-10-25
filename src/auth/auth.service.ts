@@ -22,19 +22,15 @@ export class AuthService {
   async login(data: TLogin) {
     trimObj(data);
 
-    try {
-      const user = await this.userService.findByEmail(data.email);
+    const user = await this.userService.findByEmail(data.email);
 
-      if (!user || !(await user.checkPass(data.password))) throw new HttpException('As credenciais estão incorretas', 400);
+    if (!user || !(await user.checkPass(data.password))) throw new HttpException('As credenciais estão incorretas', 400);
 
-      if (!user.emailVerified) throw new HttpException('E-mail não verificado', 400);
+    if (!user.emailVerified) throw new HttpException('E-mail não verificado', 400);
 
-      const auth = await this.createTokenJwt(user);
+    const auth = await this.createTokenJwt(user);
 
-      return auth;
-    } catch (error) {
-      throw new HttpException(error, 400);
-    }
+    return auth;
   }
 
   async validate(payload: { email: string; }) {
