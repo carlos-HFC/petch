@@ -3,7 +3,7 @@ import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedR
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 
-import { Solicitation, TCreateSolicitation } from './solicitation.dto';
+import { Solicitation, TCreateSolicitation, TRegisteredSolicitation } from './solicitation.dto';
 import { SolicitationService } from './solicitation.service';
 import { RoleDecorator } from '../common/decorators/role.decorator';
 import { JwtAuthGuard, OptionalAuthGuard } from '../common/guards/auth.guard';
@@ -19,9 +19,13 @@ import { config } from '../config/multer';
         type: 'number',
         example: 401,
       },
+      background: {
+        type: 'string',
+        example: 'error',
+      },
       message: {
         type: 'string',
-        example: 'Unauthorized'
+        example: 'Não autorizado'
       }
     }
   }
@@ -33,6 +37,10 @@ import { config } from '../config/multer';
       statusCode: {
         type: 'number',
         example: 403,
+      },
+      background: {
+        type: 'string',
+        example: 'error',
       },
       message: {
         type: 'string',
@@ -68,6 +76,10 @@ export class SolicitationController {
           type: 'number',
           example: 404,
         },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
         message: {
           type: 'string',
           example: 'Solicitação não encontrada',
@@ -84,7 +96,7 @@ export class SolicitationController {
   }
 
   @ApiOperation({ summary: 'Cadastrar uma nova solicitação' })
-  @ApiCreatedResponse({ type: Solicitation, description: 'Created' })
+  @ApiCreatedResponse({ type: TRegisteredSolicitation, description: 'Created' })
   @ApiBadRequestResponse({
     description: 'Bad Request',
     schema: {
@@ -93,6 +105,10 @@ export class SolicitationController {
         statusCode: {
           type: 'number',
           example: 400,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           oneOf: [
@@ -122,6 +138,10 @@ export class SolicitationController {
           type: 'number',
           example: 404,
         },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
         message: {
           type: 'string',
           example: 'Tipo de solicitação não encontrada',
@@ -148,6 +168,10 @@ export class SolicitationController {
         statusCode: {
           type: 'number',
           example: 404,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           type: 'string',

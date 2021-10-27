@@ -86,11 +86,11 @@ export class OngService {
     const transaction = await this.sequelize.transaction();
 
     try {
-      const ong = await this.ongModel.create({ ...data }, { transaction });
+      await this.ongModel.create({ ...data }, { transaction });
 
       await transaction.commit();
 
-      return ong;
+      return { message: 'ONG cadastrada com sucesso', background: 'success' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);
@@ -121,6 +121,8 @@ export class OngService {
       await ong.update({ ...data }, { transaction });
 
       await transaction.commit();
+
+      return { message: 'ONG editada com sucesso', background: 'success' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);

@@ -120,7 +120,7 @@ export class SchedulingService {
     const transaction = await this.sequelize.transaction();
 
     try {
-      const scheduling = await this.schedulingModel.create({
+      await this.schedulingModel.create({
         ...data,
         userId: user.id
       }, { transaction });
@@ -129,7 +129,7 @@ export class SchedulingService {
 
       await this.mailService.newScheduling(user, dateFormatted, schedulingType.name);
 
-      return scheduling;
+      return { message: 'Agendamento marcado com sucesso', background: 'success' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);
@@ -161,6 +161,8 @@ export class SchedulingService {
       await transaction.commit();
 
       await this.mailService.cancelScheduling(user, dateFormatted, scheduling.schedulingTypes.name);
+
+      return { message: 'Agendamento cancelado com sucesso', background: 'success' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);

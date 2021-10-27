@@ -40,11 +40,23 @@ export class UserService {
     });
   }
 
+  async profile(id: number) {
+    const user = (await this.findById(id)).toJSON() as User;
+
+    const [address, number] = user.address.split(',').map(ad => ad.trim());
+
+    return {
+      ...user,
+      address,
+      number,
+    };
+  }
+
   async findById(id: number, inactives?: 'true' | 'false') {
     const user = await this.userModel.findByPk(id, {
       paranoid: !convertBool(inactives),
       attributes: {
-        exclude: ['hash', 'tokenVerificationEmail', 'tokenResetPassword', 'tokenResetPasswordExpires', 'emailVerified']
+        exclude: ['hash', 'tokenVerificationEmail', 'tokenResetPassword', 'tokenResetPasswordExpires', 'emailVerified', 'googleId']
       }
     });
 
@@ -84,11 +96,7 @@ export class UserService {
 
     if (await this.findByCPF(data.cpf) || await this.findByEmail(data.email)) throw new HttpException('Usuário já cadastrado', 400);
 
-    if (!isAdmin) {
-      if (!data.password && !data.googleId) throw new HttpException('A senha é obrigatória', 400);
-    }
-
-    if (isAdmin) data.password = createTokenHEX(5);
+    const password = createTokenHEX(5);
 
     if (differenceInCalendarYears(Date.now(), parseISO(data.birthday)) < 18) throw new HttpException('Você não tem a idade mínima de 18 anos', 400);
 
@@ -100,11 +108,12 @@ export class UserService {
     const transaction = await this.sequelize.transaction();
 
     try {
-      const role = await this.roleService.getByName(isAdmin ? 'Admin' : 'Adotante');
+      const { id: roleId } = await this.roleService.getByName(isAdmin ? 'Admin' : 'Adotante');
 
       const user = await this.userModel.create({
         ...data,
-        roleId: role.id,
+        roleId,
+        password,
         tokenVerificationEmail: createTokenHEX()
       }, { transaction });
 
@@ -112,7 +121,7 @@ export class UserService {
 
       await this.mailService.newUser(user);
 
-      return user;
+      return { message: isAdmin ? 'Usuário cadastrado com sucesso' : 'Registro efetuado com sucesso', background: 'success' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);
@@ -162,6 +171,8 @@ export class UserService {
       await transaction.commit();
 
       if (data.email) await this.mailService.newUser(user);
+
+      return { message: 'Cadastrado editado com sucesso', background: 'success' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);
@@ -205,6 +216,5 @@ export class UserService {
       await transaction.rollback();
       throw new HttpException(error, 400);
     }
-
   }
 }

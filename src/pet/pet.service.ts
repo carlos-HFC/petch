@@ -151,11 +151,11 @@ export class PetService {
     const transaction = await this.sequelize.transaction();
 
     try {
-      const pet = await this.petModel.create({ ...data }, { transaction });
+      await this.petModel.create({ ...data }, { transaction });
 
       await transaction.commit();
 
-      return pet;
+      return { message: 'Pet cadastrado com sucesso', background: 'success' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);
@@ -193,6 +193,8 @@ export class PetService {
       await pet.update({ ...data }, { transaction });
 
       await transaction.commit();
+
+      return { message: 'Pet editado com sucesso', background: 'success' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);
@@ -219,6 +221,8 @@ export class PetService {
       await Promise.all(favorites.map(favorite => favorite.destroy({ force: true, transaction })));
 
       await transaction.commit();
+
+      return { message: 'Pet adotado com sucesso', background: 'success' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);

@@ -23,6 +23,10 @@ export class AuthController {
           type: 'number',
           example: 400,
         },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
         message: {
           oneOf: [
             {
@@ -64,6 +68,10 @@ export class AuthController {
           type: 'number',
           example: 400,
         },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
         message: {
           oneOf: [
             {
@@ -87,6 +95,10 @@ export class AuthController {
         statusCode: {
           type: 'number',
           example: 404
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           type: 'string',
@@ -112,6 +124,10 @@ export class AuthController {
         statusCode: {
           type: 'number',
           example: 400,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           oneOf: [
@@ -181,6 +197,10 @@ export class AuthController {
           type: 'number',
           example: 400,
         },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
         message: {
           oneOf: [
             {
@@ -204,6 +224,10 @@ export class AuthController {
         statusCode: {
           type: 'number',
           example: 404
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           type: 'string',
@@ -229,6 +253,10 @@ export class AuthController {
         statusCode: {
           type: 'number',
           example: 400,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           oneOf: [
@@ -277,6 +305,10 @@ export class AuthController {
         statusCode: {
           type: 'number',
           example: 404
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           type: 'string',

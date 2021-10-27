@@ -10,9 +10,9 @@ export class Scheduling {
   id: number;
 
   @ApiProperty({ type: 'string', format: 'date-time', example: '2021-01-01T00:00:00-03:00' })
+  @IsDateString({}, { message: 'Data inválida' })
   @IsNotEmpty({ message: 'Data é obrigatória' })
   @Transform(({ value }) => value.trim())
-  @IsDateString({}, { message: 'Data inválida' })
   date: Date;
 
   @ApiProperty({ type: 'string', format: 'date-time', required: false, default: null })
@@ -59,9 +59,9 @@ export class TAvailableScheduling {
 
 export class TCreateScheduling extends PickType(Scheduling, ['schedulingTypesId']) {
   @ApiProperty({ type: 'string', format: 'date-time', example: '2021-01-01T00:00:00-03:00' })
+  @IsDateString({}, { message: 'Data inválida' })
   @IsNotEmpty({ message: 'Data é obrigatória' })
   @Transform(({ value }) => value.trim())
-  @IsDateString({}, { message: 'Data inválida' })
   date: string;
 }
 
@@ -76,4 +76,12 @@ export class TFilterScheduling {
 
   @ApiProperty({ type: 'string', enum: ['true', 'false'], required: false })
   canceled?: 'true' | 'false';
+}
+
+export class TRegisteredScheduling {
+  @ApiProperty({ type: 'string' })
+  message: string;
+
+  @ApiProperty({ type: 'string' })
+  background: string;
 }

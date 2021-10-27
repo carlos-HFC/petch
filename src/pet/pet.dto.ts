@@ -38,9 +38,9 @@ export class Pet {
   weight: string;
 
   @ApiProperty({ type: 'string', enum: ['M', 'F'] })
-  @IsNotEmpty({ message: 'Gênero é obrigatório' })
-  @Transform(({ value }) => value.trim())
   @IsEnum(['M', 'F'], { message: 'Gênero inválido' })
+  @IsNotEmpty({ message: 'Gênero é obrigatório' })
+  @Transform(({ value }) => value.trim().toUpperCase())
   gender: string;
 
   @ApiProperty({ type: 'string' })
@@ -123,4 +123,12 @@ export class TChooseGift {
 
   @ApiProperty({ type: 'number' })
   giftId: number;
+}
+
+export class TRegisteredPet {
+  @ApiProperty({ type: 'string' })
+  message: string;
+
+  @ApiProperty({ type: 'string' })
+  background: string;
 }

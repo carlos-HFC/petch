@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
 import { SpeciesService } from './species.service';
-import { IndexSpecies, Species, TCreateSpecies, TUpdateSpecies, TFilterSpecies } from './species.dto';
+import { IndexSpecies, Species, TCreateSpecies, TUpdateSpecies, TFilterSpecies, TRegisteredSpecies } from './species.dto';
 import { config } from '../config/multer';
 
 @ApiTags('Species')
@@ -32,6 +32,10 @@ export class SpeciesController {
           type: 'number',
           example: 404,
         },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
         message: {
           type: 'string',
           example: 'Espécie não encontrada',
@@ -47,7 +51,7 @@ export class SpeciesController {
   }
 
   @ApiOperation({ summary: 'Cadastrar uma nova espécie' })
-  @ApiCreatedResponse({ type: Species, description: 'Created' })
+  @ApiCreatedResponse({ type: TRegisteredSpecies, description: 'Created' })
   @ApiBadRequestResponse({
     description: 'Bad Request',
     schema: {
@@ -56,6 +60,10 @@ export class SpeciesController {
         statusCode: {
           type: 'number',
           example: 400,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           oneOf: [
@@ -85,7 +93,7 @@ export class SpeciesController {
   }
 
   @ApiOperation({ summary: 'Editar uma espécie' })
-  @ApiOkResponse({ description: 'Success' })
+  @ApiOkResponse({ type: TRegisteredSpecies, description: 'Success' })
   @ApiBadRequestResponse({
     description: 'Bad Request',
     schema: {
@@ -94,6 +102,10 @@ export class SpeciesController {
         statusCode: {
           type: 'number',
           example: 400,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           oneOf: [
@@ -123,6 +135,10 @@ export class SpeciesController {
           type: 'number',
           example: 404,
         },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
         message: {
           type: 'string',
           example: 'Espécie não encontrada',
@@ -149,6 +165,10 @@ export class SpeciesController {
         statusCode: {
           type: 'number',
           example: 404,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           type: 'string',

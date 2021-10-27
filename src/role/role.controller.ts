@@ -30,6 +30,10 @@ export class RoleController {
           type: 'number',
           example: 404,
         },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
         message: {
           type: 'string',
           example: 'Função não encontrada',

@@ -3,7 +3,7 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 
-import { IndexUser, TConfirmRegister, TCreateUser, TFilterUser, TUpdateUser, User } from './user.dto';
+import { IndexUser, TConfirmRegister, TCreateUser, TFilterUser, TRegisteredUser, TUpdateUser, User } from './user.dto';
 import { UserService } from './user.service';
 import { RoleDecorator } from '../common/decorators/role.decorator';
 import { JwtAuthGuard } from '../common/guards/auth.guard';
@@ -19,9 +19,13 @@ import { config } from '../config/multer';
         type: 'number',
         example: 401,
       },
+      background: {
+        type: 'string',
+        example: 'error',
+      },
       message: {
         type: 'string',
-        example: 'Unauthorized'
+        example: 'Não autorizado'
       }
     }
   }
@@ -33,6 +37,10 @@ import { config } from '../config/multer';
       statusCode: {
         type: 'number',
         example: 403,
+      },
+      background: {
+        type: 'string',
+        example: 'error',
       },
       message: {
         type: 'string',
@@ -57,6 +65,34 @@ export class UserController {
     return await this.userService.get(query);
   }
 
+  @ApiOperation({ summary: 'Perfil do usuário logado' })
+  @ApiOkResponse({ type: User, description: 'Success' })
+  @ApiNotFoundResponse({
+    description: 'Not Found',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 404,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
+        message: {
+          type: 'string',
+          example: 'Usuário não encontrado',
+        },
+      }
+    }
+  })
+  @UseGuards(JwtAuthGuard)
+  @Get('/profile')
+  async profile(@Req() req: Request) {
+    return await this.userService.profile(req.user.id);
+  }
+
   @ApiOperation({ summary: 'Listar um usuário pelo ID' })
   @ApiOkResponse({ type: User, description: 'Success' })
   @ApiNotFoundResponse({
@@ -67,6 +103,10 @@ export class UserController {
         statusCode: {
           type: 'number',
           example: 404,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           type: 'string',
@@ -85,7 +125,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Cadastrar um novo admin' })
-  @ApiCreatedResponse({ type: User, description: 'Created' })
+  @ApiCreatedResponse({ type: TRegisteredUser, description: 'Created' })
   @ApiBadRequestResponse({
     description: 'Bad Request',
     schema: {
@@ -94,6 +134,10 @@ export class UserController {
         statusCode: {
           type: 'number',
           example: 400,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           oneOf: [
@@ -165,7 +209,7 @@ export class UserController {
   }
 
   @ApiOperation({ summary: 'Editar os próprios dados' })
-  @ApiOkResponse({ description: 'Success' })
+  @ApiOkResponse({ type: TRegisteredUser, description: 'Success' })
   @ApiBadRequestResponse({
     description: 'Bad Request',
     schema: {
@@ -174,6 +218,10 @@ export class UserController {
         statusCode: {
           type: 'number',
           example: 400,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           oneOf: [
@@ -270,6 +318,10 @@ export class UserController {
           type: 'number',
           example: 400,
         },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
         message: {
           oneOf: [
             {
@@ -306,6 +358,10 @@ export class UserController {
           type: 'number',
           example: 404
         },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
         message: {
           type: 'string',
           example: 'Usuário não encontrado',
@@ -329,6 +385,10 @@ export class UserController {
         statusCode: {
           type: 'number',
           example: 404
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           type: 'string',

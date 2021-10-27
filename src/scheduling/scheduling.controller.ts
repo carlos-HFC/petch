@@ -2,7 +2,7 @@ import { Body, Controller, Get, Param, Post, Put, Query, Req, UseGuards } from '
 import { ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiBody, ApiBearerAuth, ApiTags, ApiOkResponse, ApiParam, ApiQuery, ApiForbiddenResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 
-import { Scheduling, TAvailableScheduling, TCreateScheduling, TFilterScheduling } from './scheduling.dto';
+import { Scheduling, TAvailableScheduling, TCreateScheduling, TFilterScheduling, TRegisteredScheduling } from './scheduling.dto';
 import { SchedulingService } from './scheduling.service';
 import { RoleDecorator } from '../common/decorators/role.decorator';
 import { JwtAuthGuard } from '../common/guards/auth.guard';
@@ -18,9 +18,13 @@ import { RoleGuard } from '../common/guards/role.guard';
         type: 'number',
         example: 401,
       },
+      background: {
+        type: 'string',
+        example: 'error',
+      },
       message: {
         type: 'string',
-        example: 'Unauthorized'
+        example: 'Não autorizado'
       }
     }
   }
@@ -33,6 +37,10 @@ import { RoleGuard } from '../common/guards/role.guard';
       statusCode: {
         type: 'number',
         example: 403,
+      },
+      background: {
+        type: 'string',
+        example: 'error',
       },
       message: {
         type: 'string',
@@ -51,7 +59,7 @@ export class SchedulingController {
   @ApiOperation({ summary: 'Visualizar todos os agendamentos' })
   @ApiOkResponse({ type: Scheduling, description: 'Success' })
   @UseGuards(JwtAuthGuard, RoleGuard)
-  // @RoleDecorator('admin')
+  @RoleDecorator('admin')
   @Get()
   async index(@Query() query?: TFilterScheduling) {
     return await this.schedulingService.get(query);
@@ -67,6 +75,10 @@ export class SchedulingController {
         statusCode: {
           type: 'number',
           example: 400,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           oneOf: [
@@ -96,6 +108,10 @@ export class SchedulingController {
           type: 'number',
           example: 404,
         },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
         message: {
           type: 'string',
           example: 'Tipo de agendamento não encontrado',
@@ -118,7 +134,7 @@ export class SchedulingController {
   }
 
   @ApiOperation({ summary: 'Cadastrar um novo agendamento' })
-  @ApiCreatedResponse({ type: Scheduling, description: 'Created' })
+  @ApiCreatedResponse({ type: TRegisteredScheduling, description: 'Created' })
   @ApiBadRequestResponse({
     description: 'Bad Request',
     schema: {
@@ -127,6 +143,10 @@ export class SchedulingController {
         statusCode: {
           type: 'number',
           example: 400,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           oneOf: [
@@ -164,6 +184,10 @@ export class SchedulingController {
           type: 'number',
           example: 404,
         },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
         message: {
           type: 'string',
           example: 'Tipo de agendamento não encontrado',
@@ -180,7 +204,7 @@ export class SchedulingController {
   }
 
   @ApiOperation({ summary: 'Cancelar um agendamento marcado' })
-  @ApiOkResponse({ description: 'Success' })
+  @ApiOkResponse({ type: TRegisteredScheduling, description: 'Success' })
   @ApiBadRequestResponse({
     description: 'Bad Request',
     schema: {
@@ -189,6 +213,10 @@ export class SchedulingController {
         statusCode: {
           type: 'number',
           example: 400,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           type: 'string',
@@ -205,6 +233,10 @@ export class SchedulingController {
         statusCode: {
           type: 'number',
           example: 404,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           type: 'string',

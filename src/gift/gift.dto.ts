@@ -76,3 +76,11 @@ export class TFilterGift {
   @ApiProperty({ type: 'string', required: false })
   name?: string;
 }
+
+export class TRegisteredGift {
+  @ApiProperty({ type: 'string' })
+  message: string;
+
+  @ApiProperty({ type: 'string' })
+  background: string;
+}

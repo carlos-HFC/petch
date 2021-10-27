@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, Uploa
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
-import { IndexOng, Ong, TCreateOng, TFilterOng, TUpdateOng } from './ong.dto';
+import { IndexOng, Ong, TCreateOng, TFilterOng, TRegisteredOng, TUpdateOng } from './ong.dto';
 import { OngService } from './ong.service';
 import { config } from '../config/multer';
 
@@ -31,6 +31,10 @@ export class OngController {
           type: 'number',
           example: 404,
         },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
         message: {
           type: 'string',
           example: 'ONG não encontrada',
@@ -46,14 +50,19 @@ export class OngController {
   }
 
   @ApiOperation({ summary: 'Cadastar uma nova ONG' })
-  @ApiCreatedResponse({ type: Ong, description: 'Created' })
+  @ApiCreatedResponse({ type: TRegisteredOng, description: 'Created' })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
         statusCode: {
           type: 'number',
           example: 400,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           oneOf: [
@@ -95,14 +104,19 @@ export class OngController {
   }
 
   @ApiOperation({ summary: 'Editar uma ONG' })
-  @ApiOkResponse({ description: 'Success' })
+  @ApiOkResponse({ type: TRegisteredOng, description: 'Success' })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
         statusCode: {
           type: 'number',
           example: 400,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           oneOf: [
@@ -144,6 +158,10 @@ export class OngController {
           type: 'number',
           example: 404,
         },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
         message: {
           type: 'string',
           example: 'ONG não encontrada',
@@ -170,6 +188,10 @@ export class OngController {
         statusCode: {
           type: 'number',
           example: 404,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           type: 'string',

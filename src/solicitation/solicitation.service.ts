@@ -61,11 +61,11 @@ export class SolicitationService {
       if (!data.email) throw new HttpException('E-mail é obrigatório', 400);
       if (!data.name) throw new HttpException('Nome é obrigatório', 400);
 
-      const solicitation = await this.solicitationModel.create({ ...data }, { transaction });
+      await this.solicitationModel.create({ ...data }, { transaction });
 
       await transaction.commit();
 
-      return solicitation;
+      return { message: 'Solicitação enviada com sucesso', background: 'success' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);

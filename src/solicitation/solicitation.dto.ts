@@ -13,8 +13,9 @@ export class Solicitation {
   name?: string;
 
   @ApiProperty({ type: 'string', required: false })
-  @ValidateIf((_, value) => value)
   @IsEmail({}, { message: 'E-mail inválido' })
+  @ValidateIf((_, value) => value)
+  @Transform(({ value }) => value.trim())
   email?: string;
 
   @ApiProperty({ type: 'string' })
@@ -51,4 +52,12 @@ export class Solicitation {
 export class TCreateSolicitation extends OmitType(Solicitation, ['id', 'createdAt', 'updatedAt', 'deletedAt', 'user', 'solicitationType', 'userId', 'image']) {
   @ApiProperty({ type: 'string', format: 'binary', required: false })
   media?: string;
+}
+
+export class TRegisteredSolicitation {
+  @ApiProperty({ type: 'string' })
+  message: string;
+
+  @ApiProperty({ type: 'string' })
+  background: string;
 }

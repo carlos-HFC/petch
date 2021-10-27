@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, Uploa
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
-import { TCreateGift, TFilterGift, Gift, IndexGift, TUpdateGift } from './gift.dto';
+import { TCreateGift, TFilterGift, Gift, IndexGift, TUpdateGift, TRegisteredGift } from './gift.dto';
 import { GiftService } from './gift.service';
 import { config } from '../config/multer';
 
@@ -23,12 +23,17 @@ export class GiftController {
   @ApiOperation({ summary: 'Listar um brinde pelo ID' })
   @ApiOkResponse({ type: Gift, description: 'Success' })
   @ApiNotFoundResponse({
+    description: 'Not Found',
     schema: {
       type: 'object',
       properties: {
         statusCode: {
           type: 'number',
           example: 404,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           type: 'string',
@@ -45,14 +50,19 @@ export class GiftController {
   }
 
   @ApiOperation({ summary: 'Cadastrar um novo brinde' })
-  @ApiCreatedResponse({ type: Gift, description: 'Created' })
+  @ApiCreatedResponse({ type: TRegisteredGift, description: 'Created' })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
         statusCode: {
           type: 'number',
           example: 400,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           oneOf: [
@@ -78,6 +88,10 @@ export class GiftController {
           type: 'number',
           example: 404,
         },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
         message: {
           type: 'string',
           example: 'Parceiro não encontrado',
@@ -94,14 +108,19 @@ export class GiftController {
   }
 
   @ApiOperation({ summary: 'Editar um brinde' })
-  @ApiOkResponse({ description: 'Success' })
+  @ApiOkResponse({ type: TRegisteredGift, description: 'Success' })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
         statusCode: {
           type: 'number',
           example: 400,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           oneOf: [
@@ -119,12 +138,17 @@ export class GiftController {
     }
   })
   @ApiNotFoundResponse({
+    description: 'Not Found',
     schema: {
       type: 'object',
       properties: {
         statusCode: {
           type: 'number',
           example: 404,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           oneOf: [
@@ -153,12 +177,17 @@ export class GiftController {
   @ApiOperation({ summary: 'Ativar e inativar um brinde' })
   @ApiNoContentResponse({ description: 'No Content' })
   @ApiNotFoundResponse({
+    description: 'Not Found',
     schema: {
       type: 'object',
       properties: {
         statusCode: {
           type: 'number',
           example: 404,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           type: 'string',

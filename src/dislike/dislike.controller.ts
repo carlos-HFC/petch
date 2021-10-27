@@ -18,9 +18,13 @@ import { RoleGuard } from '../common/guards/role.guard';
         type: 'number',
         example: 401,
       },
+      background: {
+        type: 'string',
+        example: 'error',
+      },
       message: {
         type: 'string',
-        example: 'Unauthorized'
+        example: 'Não autorizado'
       }
     }
   }
@@ -33,6 +37,10 @@ import { RoleGuard } from '../common/guards/role.guard';
       statusCode: {
         type: 'number',
         example: 403,
+      },
+      background: {
+        type: 'string',
+        example: 'error',
       },
       message: {
         type: 'string',
@@ -61,6 +69,10 @@ export class DislikeController {
           type: 'number',
           example: 400,
         },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
         message: {
           type: 'string',
           example: 'Pet já recebeu dislike'
@@ -76,6 +88,10 @@ export class DislikeController {
         statusCode: {
           type: 'number',
           example: 404,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           type: 'string',

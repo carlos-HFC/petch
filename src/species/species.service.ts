@@ -63,11 +63,11 @@ export class SpeciesService {
     const transaction = await this.sequelize.transaction();
 
     try {
-      const species = await this.speciesModel.create({ ...data }, { transaction });
+      await this.speciesModel.create({ ...data }, { transaction });
 
       await transaction.commit();
 
-      return species;
+      return { message: 'Espécie cadastrada com sucesso', background: 'success' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);
@@ -91,6 +91,8 @@ export class SpeciesService {
       await species.update({ ...data }, { transaction });
 
       await transaction.commit();
+
+      return { message: 'Espécie editada com sucesso', background: 'success' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);

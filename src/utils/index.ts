@@ -1,6 +1,5 @@
 import { HttpException } from '@nestjs/common';
 import { randomBytes } from 'crypto';
-import { format, parseISO } from 'date-fns';
 
 export function trimObj(obj: object) {
   for (let key in obj) {

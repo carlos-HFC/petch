@@ -69,11 +69,11 @@ export class PartnerService {
     const transaction = await this.sequelize.transaction();
 
     try {
-      const partner = await this.partnerModel.create({ ...data }, { transaction });
+      await this.partnerModel.create({ ...data }, { transaction });
 
       await transaction.commit();
 
-      return partner;
+      return { message: 'Parceiro cadastrado com sucesso', background: 'success' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);
@@ -104,6 +104,8 @@ export class PartnerService {
       await partner.update({ ...data }, { transaction });
 
       await transaction.commit();
+
+      return { message: 'Parceiro editado com sucesso', background: 'success' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);

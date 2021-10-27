@@ -59,11 +59,11 @@ export class GiftService {
     const transaction = await this.sequelize.transaction();
 
     try {
-      const gift = await this.giftModel.create({ ...data }, { transaction });
+      await this.giftModel.create({ ...data }, { transaction });
 
       await transaction.commit();
 
-      return gift;
+      return { message: 'Brinde cadastrado com sucesso', background: 'success' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);
@@ -93,6 +93,8 @@ export class GiftService {
       await gift.update({ ...data }, { transaction });
 
       await transaction.commit();
+
+      return { message: 'Brinde editado com sucesso', background: 'success' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);

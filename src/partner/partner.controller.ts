@@ -2,7 +2,7 @@ import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, Uploa
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
 
-import { IndexPartner, Partner, TCreatePartner, TFilterPartner, TUpdatePartner } from './partner.dto';
+import { IndexPartner, Partner, TCreatePartner, TFilterPartner, TRegisteredPartner, TUpdatePartner } from './partner.dto';
 import { PartnerService } from './partner.service';
 import { config } from '../config/multer';
 
@@ -31,6 +31,10 @@ export class PartnerController {
           type: 'number',
           example: 404,
         },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
         message: {
           type: 'string',
           example: 'Parceiro não encontrado',
@@ -46,14 +50,19 @@ export class PartnerController {
   }
 
   @ApiOperation({ summary: 'Cadastrar um novo parceiro' })
-  @ApiCreatedResponse({ type: Partner, description: 'Created' })
+  @ApiCreatedResponse({ type: TRegisteredPartner, description: 'Created' })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
         statusCode: {
           type: 'number',
           example: 400,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           oneOf: [
@@ -99,14 +108,19 @@ export class PartnerController {
   }
 
   @ApiOperation({ summary: 'Editar um parceiro' })
-  @ApiOkResponse({ description: 'Success' })
+  @ApiOkResponse({ type: TRegisteredPartner, description: 'Success' })
   @ApiBadRequestResponse({
+    description: 'Bad Request',
     schema: {
       type: 'object',
       properties: {
         statusCode: {
           type: 'number',
           example: 400,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           oneOf: [
@@ -162,6 +176,10 @@ export class PartnerController {
         statusCode: {
           type: 'number',
           example: 404,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
         },
         message: {
           type: 'string',
