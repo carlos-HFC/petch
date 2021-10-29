@@ -14,8 +14,7 @@ export class AllExceptionsFilter extends BaseExceptionFilter {
 
     if (exception.response.message instanceof Array) {
       response = { message: exception.response.message[0], statusCode, background };
-    }
-    else if (exception.response.message instanceof Object) {
+    } else if (exception.response.message instanceof Object) {
       response = { message: exception.response.message, statusCode, background };
     } else {
       response = { message: exception.response, statusCode, background };

@@ -133,6 +133,10 @@ export class UserService {
 
     if (data.email && data.email !== user.email) {
       if (await this.findByEmail(data.email)) throw new HttpException('Usuário já cadastrado', 400);
+      Object.assign(data, {
+        emailVerified: false,
+        tokenVerificationEmail: createTokenHEX(),
+      });
     }
 
     if (data.cpf && data.cpf !== user.cpf) {
@@ -162,15 +166,11 @@ export class UserService {
     const transaction = await this.sequelize.transaction();
 
     try {
-      await user.update({
-        ...data,
-        emailVerified: data.email && false,
-        tokenVerificationEmail: data.email && createTokenHEX(),
-      }, { transaction });
+      await user.update({ ...data }, { transaction });
 
       await transaction.commit();
 
-      if (data.email) await this.mailService.newUser(user);
+      if (data.email !== user.email) await this.mailService.newUser(user);
 
       return { message: 'Cadastrado editado com sucesso', background: 'success' };
     } catch (error) {
