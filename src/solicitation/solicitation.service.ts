@@ -31,37 +31,19 @@ export class SolicitationService {
     return solicitation;
   }
 
-  async post(data: TCreateSolicitation, media?: Express.MulterS3.File, user?: User) {
+  async post(data: TCreateSolicitation, user?: User) {
     trimObj(data);
 
-    if (media) {
-      const image = (await this.uploadService.uploadFile(media)).url;
-      Object.assign(data, { image });
-    }
 
     await this.solicitationTypeService.findById(data.solicitationTypeId);
 
     const transaction = await this.sequelize.transaction();
 
     try {
-      if (user) {
-        data.name = null;
-        data.email = null;
-
-        const solicitation = await this.solicitationModel.create({
-          ...data,
-          userId: user.id
-        }, { transaction });
-
-        await transaction.commit();
-
-        return solicitation;
-      }
-
-      if (!data.email) throw new HttpException('E-mail é obrigatório', 400);
-      if (!data.name) throw new HttpException('Nome é obrigatório', 400);
-
-      await this.solicitationModel.create({ ...data }, { transaction });
+      await this.solicitationModel.create({
+        ...data,
+        userId: user.id
+      }, { transaction });
 
       await transaction.commit();
 

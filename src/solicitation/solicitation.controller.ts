@@ -50,6 +50,7 @@ import { config } from '../config/multer';
   }
 })
 @ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RoleGuard)
 @Controller('solicitations')
 export class SolicitationController {
   constructor(
@@ -58,7 +59,6 @@ export class SolicitationController {
 
   @ApiOperation({ summary: 'Listar todas as solicitações' })
   @ApiOkResponse({ type: [Solicitation], description: 'Success' })
-  // @UseGuards(JwtAuthGuard, RoleGuard)
   // @RoleDecorator('admin')
   @Get()
   async index() {
@@ -88,7 +88,6 @@ export class SolicitationController {
     }
   })
   @ApiParam({ name: 'id', required: true })
-  @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('admin')
   @Get(':id')
   async byId(@Param('id') id: number) {
@@ -149,13 +148,11 @@ export class SolicitationController {
       }
     }
   })
-  @ApiConsumes('multipart/form-data')
   @ApiBody({ type: TCreateSolicitation })
-  @UseGuards(OptionalAuthGuard)
+  @RoleDecorator('adotante')
   @Post()
-  @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
-  async create(@Body() data: TCreateSolicitation, @UploadedFile() media: Express.MulterS3.File, @Req() req: Request) {
-    return await this.solicitationService.post(data, media, req.user);
+  async create(@Body() data: TCreateSolicitation, @Req() req: Request) {
+    return await this.solicitationService.post(data, req.user);
   }
 
   @ApiOperation({ summary: 'Inativar uma solicitação' })
@@ -181,7 +178,6 @@ export class SolicitationController {
     }
   })
   @ApiParam({ name: 'id', required: true })
-  @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('admin')
   @Delete(':id')
   @HttpCode(204)
