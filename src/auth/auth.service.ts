@@ -54,8 +54,7 @@ export class AuthService {
 
       await transaction.commit();
 
-      // await this.mailService.forgotPassword(user);
-      return { token };
+      await this.mailService.forgotPassword(user);
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);
@@ -101,11 +100,9 @@ export class AuthService {
   }
 
   private async createTokenJwt(user: User) {
-    const { id, name, avatar, email, gender, cep, cpf, birthday, phone, complement, district, city, uf, deletedAt, role } = user;
+    const { id, name, avatar, email, cpf, role } = user;
 
     const token = this.jwtService.sign({ id, email, role: role.name, cpf, password: user.hash, google: user.googleId });
-
-    const [address, number] = user.address.split(',').map(address => address.trim());
 
     return {
       token,
@@ -113,19 +110,6 @@ export class AuthService {
         id,
         name,
         avatar,
-        email,
-        cpf,
-        birthday,
-        gender,
-        cep,
-        address,
-        number,
-        complement,
-        district,
-        city,
-        uf,
-        phone,
-        deletedAt,
         role: role.name
       }
     };

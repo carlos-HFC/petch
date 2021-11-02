@@ -172,7 +172,15 @@ export class UserService {
 
       if (data.email !== user.email) await this.mailService.newUser(user);
 
-      return { message: 'Cadastrado editado com sucesso', background: 'success' };
+      return {
+        message: 'Cadastrado editado com sucesso',
+        background: 'success',
+        user: {
+          id: user.id,
+          name: user.name,
+          avatar: user.avatar
+        }
+      };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);

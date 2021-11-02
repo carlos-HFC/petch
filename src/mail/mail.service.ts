@@ -50,7 +50,7 @@ export class MailService {
             dynamicTemplateData: {
               subject: "Esqueceu sua senha?",
               name: user.name,
-              link: `https://petch-front.herokuapp.com/adopter/RegisterConfirmation?token=${user.tokenResetPassword}&email=${user.email}`
+              link: `https://petch-front.herokuapp.com/Adopter/AlterPassword?token=${user.tokenResetPassword}&email=${user.email}`
             }
           }
         ],
