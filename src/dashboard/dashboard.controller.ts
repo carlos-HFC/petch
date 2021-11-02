@@ -58,7 +58,7 @@ export class DashboardController {
   ) { }
 
   @ApiOperation({ summary: 'Pets por gênero' })
-  @ApiOkResponse({ type: TPetsByGender, description: 'Success' })
+  @ApiOkResponse({ type: [TPetsByGender], description: 'Success' })
   @Get('/pets')
   async petsByGender() {
     return await this.dashboardService.petsByGender();

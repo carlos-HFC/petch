@@ -1,11 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 
 export class TPetsByGender {
-  @ApiProperty({ type: 'number' })
-  males: number;
+  @ApiProperty({ type: 'string' })
+  gender: string;
 
   @ApiProperty({ type: 'number' })
-  females: number;
+  total: number;
 }
 
 export class TPetsByOng {

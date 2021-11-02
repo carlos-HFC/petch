@@ -23,7 +23,16 @@ export class DashboardService {
     const males = pets.filter(pet => pet.gender === 'M').length;
     const females = pets.filter(pet => pet.gender === 'F').length;
 
-    return { males, females };
+    return [
+      {
+        gender: "Macho",
+        total: males
+      },
+      {
+        gender: "Fêmea",
+        total: females
+      },
+    ]
   }
 
   async petsByOng() {
