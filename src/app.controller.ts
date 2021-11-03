@@ -1,4 +1,4 @@
-import { Controller, HttpCode, Post } from '@nestjs/common';
+import { Controller, Post } from '@nestjs/common';
 
 import { GiftService } from './gift/gift.service';
 import { OngService } from './ong/ong.service';
@@ -22,7 +22,6 @@ export class AppController {
     private speciesService: SpeciesService,
   ) { }
 
-  @HttpCode(204)
   @Post()
   async createAll() {
     return await Promise.all([
