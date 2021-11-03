@@ -4,7 +4,6 @@ import { Sequelize } from 'sequelize-typescript';
 
 import { TCreateSolicitation } from './solicitation.dto';
 import { Solicitation } from './solicitation.model';
-import { UploadService } from '../config/upload.service';
 import { SolicitationTypesService } from '../solicitationTypes/solicitationTypes.service';
 import { User } from '../user/user.model';
 import { trimObj } from '../utils';
@@ -15,7 +14,6 @@ export class SolicitationService {
     @InjectModel(Solicitation)
     private readonly solicitationModel: typeof Solicitation,
     private solicitationTypeService: SolicitationTypesService,
-    private uploadService: UploadService,
     private sequelize: Sequelize
   ) { }
 

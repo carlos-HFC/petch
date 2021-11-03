@@ -1,4 +1,4 @@
-import { AfterSync, BeforeSave, BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, NotEmpty, Table } from 'sequelize-typescript';
+import { BelongsTo, Column, DataType, DefaultScope, ForeignKey, Model, Table } from 'sequelize-typescript';
 
 import { SolicitationTypes } from '../solicitationTypes/solicitationTypes.model';
 import { User } from '../user/user.model';

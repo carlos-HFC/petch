@@ -11,6 +11,14 @@ export class SchedulingTypesService {
     private readonly schedulingTypesModel: typeof SchedulingTypes
   ) { }
 
+  async createSchedulingTypes() {
+    await this.schedulingTypesModel.bulkCreate([
+      { id: 1, name: "Vacina" },
+      { id: 2, name: "Banho" },
+      { id: 3, name: "Medicação" },
+    ])
+  }
+
   async dash() {
     return await this.schedulingTypesModel.scope('dash').findAll();
   }

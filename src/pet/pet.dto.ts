@@ -107,14 +107,14 @@ export class TFilterPet {
   @ApiProperty({ type: 'string', required: false })
   uf?: string;
 
-  @ApiProperty({ type: 'number', required: false })
-  age?: number;
+  @ApiProperty({ type: 'string', required: false })
+  age?: string;
 
-  @ApiProperty({ type: 'number', required: false })
-  weight?: number;
+  @ApiProperty({ type: 'string', required: false })
+  weight?: string;
 
-  @ApiProperty({ type: 'number', required: false })
-  speciesId?: number;
+  @ApiProperty({ type: 'string', required: false })
+  speciesId?: string;
 }
 
 export class TChooseGift {

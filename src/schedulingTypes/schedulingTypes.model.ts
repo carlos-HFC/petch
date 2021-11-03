@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AfterSync, Column, DataType, HasMany, Model, Scopes, Table } from 'sequelize-typescript';
+import { Column, DataType, HasMany, Model, Scopes, Table } from 'sequelize-typescript';
 
 import { Scheduling } from '../scheduling/scheduling.model';
 
@@ -35,13 +35,4 @@ export class SchedulingTypes extends Model {
 
   @HasMany(() => Scheduling)
   schedulings: Scheduling[];
-
-  @AfterSync
-  static async createAll() {
-    process.env.NODE_ENV !== 'dev' && await this.bulkCreate([
-      { id: 1, name: "Vacina" },
-      { id: 2, name: "Banho" },
-      { id: 3, name: "Medicação" },
-    ], { ignoreDuplicates: true });
-  }
 }

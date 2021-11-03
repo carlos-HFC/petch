@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { AfterSync, Column, DataType, HasMany, Model, Scopes, Table } from 'sequelize-typescript';
+import { Column, DataType, HasMany, Model, Scopes, Table } from 'sequelize-typescript';
 
 import { Solicitation } from '../solicitation/solicitation.model';
 
@@ -34,13 +34,4 @@ export class SolicitationTypes extends Model {
 
   @HasMany(() => Solicitation)
   solicitations: Solicitation[];
-
-  @AfterSync
-  static async createAll() {
-    process.env.NODE_ENV !== 'dev' && await this.bulkCreate([
-      { id: 1, name: "Elogio" },
-      { id: 2, name: "Reclamação" },
-      { id: 3, name: "Dúvida" },
-    ], { ignoreDuplicates: true });
-  }
 }

@@ -11,6 +11,14 @@ export class SolicitationTypesService {
     private readonly solicitationTypesModel: typeof SolicitationTypes
   ) { }
 
+  async createSolicitationTypes() {
+    await this.solicitationTypesModel.bulkCreate([
+      { id: 1, name: "Elogio" },
+      { id: 2, name: "Reclamação" },
+      { id: 3, name: "Dúvida" },
+    ])
+  }
+
   async dash() {
     return await this.solicitationTypesModel.scope('dash').findAll();
   }

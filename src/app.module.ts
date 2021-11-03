@@ -5,7 +5,6 @@ import { MulterModule } from '@nestjs/platform-express';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { SendGridModule } from '@ntegral/nestjs-sendgrid';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { SeederModule } from 'nestjs-sequelize-seeder';
 import { resolve } from 'path';
 
 import { AuthModule } from './auth/auth.module';
@@ -24,69 +23,64 @@ import { SolicitationModule } from './solicitation/solicitation.module';
 import { SolicitationTypesModule } from './solicitationTypes/solicitationTypes.module';
 import { SpeciesModule } from './species/species.module';
 import { UserModule } from './user/user.module';
-
-const imports = [
-  ServeStaticModule.forRoot({
-    rootPath: './uploads',
-    serveRoot: '/files'
-  }),
-  MulterModule.register({
-    dest: resolve('./uploads'),
-  }),
-  ConfigModule.forRoot(),
-  process.env.NODE_ENV === 'dev'
-    ? SequelizeModule.forRoot({
-      dialect: 'mysql',
-      port: Number(process.env.DB_PORT),
-      host: process.env.DB_HOST,
-      database: process.env.DB_NAME,
-      username: process.env.DB_USER,
-      password: process.env.DB_PASS,
-      autoLoadModels: true,
-      synchronize: true
-    }) : SequelizeModule.forRoot({
-      dialect: 'postgres',
-      port: Number(process.env.DB_PORT),
-      host: process.env.DB_HOST,
-      database: process.env.DB_NAME,
-      username: process.env.DB_USER,
-      password: process.env.DB_PASS,
-      autoLoadModels: true,
-      synchronize: true,
-      dialectOptions: {
-        ssl: {
-          require: true,
-          rejectUnauthorized: false
-        }
-      },
-      protocol: 'postgres'
-    }),
-  SendGridModule.forRoot({
-    apiKey: process.env.MAIL_KEY
-  }),
-  RoleModule,
-  SpeciesModule,
-  SolicitationTypesModule,
-  SchedulingTypesModule,
-  UserModule,
-  AuthModule,
-  OngModule,
-  PartnerModule,
-  GiftModule,
-  SolicitationModule,
-  PetModule,
-  MailModule,
-  SchedulingModule,
-  DashboardModule
-];
-if (process.env.NODE_ENV === 'dev') {
-  imports.push(SeederModule.forRoot({
-    runOnlyIfTableIsEmpty: true
-  }));
-}
+import { AppController } from './app.controller';
 
 @Module({
-  imports,
+  imports: [
+    ServeStaticModule.forRoot({
+      rootPath: './uploads',
+      serveRoot: '/files'
+    }),
+    MulterModule.register({
+      dest: resolve('./uploads'),
+    }),
+    ConfigModule.forRoot(),
+    process.env.NODE_ENV === 'dev'
+      ? SequelizeModule.forRoot({
+        dialect: 'mysql',
+        port: Number(process.env.DB_PORT),
+        host: process.env.DB_HOST,
+        database: process.env.DB_NAME,
+        username: process.env.DB_USER,
+        password: process.env.DB_PASS,
+        autoLoadModels: true,
+        synchronize: true
+      }) : SequelizeModule.forRoot({
+        dialect: 'postgres',
+        port: Number(process.env.DB_PORT),
+        host: process.env.DB_HOST,
+        database: process.env.DB_NAME,
+        username: process.env.DB_USER,
+        password: process.env.DB_PASS,
+        autoLoadModels: true,
+        synchronize: true,
+        dialectOptions: {
+          ssl: {
+            require: true,
+            rejectUnauthorized: false
+          }
+        },
+        protocol: 'postgres'
+      }),
+    SendGridModule.forRoot({
+      apiKey: process.env.MAIL_KEY
+    }),
+    RoleModule,
+    SpeciesModule,
+    SolicitationTypesModule,
+    SchedulingTypesModule,
+    UserModule,
+    AuthModule,
+    OngModule,
+    PartnerModule,
+    GiftModule,
+    SolicitationModule,
+    PetModule,
+    MailModule,
+    SchedulingModule,
+    DashboardModule
+  ],
+  controllers: [AppController],
   providers: [
     UploadService,
     {

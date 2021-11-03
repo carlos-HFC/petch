@@ -49,11 +49,23 @@ export class PetService {
       id: { [$.notIn]: dislikesPetIds }
     };
 
-    if (query.age) Object.assign(options, { age: { [$.startsWith]: query.age } });
-    if (query.weight) Object.assign(options, { weight: { [$.startsWith]: query.weight } });
+    const num = (/([\d])/g);
+
+    if (query.age) {
+      const age = Number(query.age.match(num)?.join(''));
+      if (isNaN(age)) throw new HttpException('Idade inválida', 400);
+
+      Object.assign(options, { age: { [$.startsWith]: query.age } });
+    }
+    if (query.weight) {
+      const weight = Number(query.weight.match(num)?.join(''));
+      if (isNaN(weight)) throw new HttpException('Peso inválido', 400);
+
+      Object.assign(options, { weight: { [$.startsWith]: query.weight } });
+    }
     if (query.cut) Object.assign(options, { cut: convertBool(query.cut) });
     if (query.gender) Object.assign(options, { gender: query.gender });
-    if (query.speciesId) Object.assign(options, { speciesId: query.speciesId });
+    if (query.speciesId) Object.assign(options, { speciesId: Number(query.speciesId) });
     if (query.uf) Object.assign(options, { ong: where(col('ong.coverage'), { [$.substring]: query.uf.toUpperCase() }) });
 
     return await this.petModel.scope('findToAdopt').findAll({
@@ -115,18 +127,17 @@ export class PetService {
   async findMyFavorites(userId: number) {
     const favorites = await this.favoriteService.get({
       where: { userId },
-      attributes: ['petId']
+      attributes: ['id'],
+      include: [
+        {
+          model: Pet,
+          attributes: ['id', 'name', 'description', 'gender', 'image'],
+          as: 'pet'
+        }
+      ]
     });
 
-    const favoritesPetIds = favorites.map(favorite => favorite.petId);
-
-    const pets = await this.petModel.scope('findToAdopt').findAll({
-      where: {
-        id: { [$.in]: favoritesPetIds }
-      }
-    });
-
-    return pets;
+    return favorites;
   }
 
   async create(data: TCreatePet, media: Express.MulterS3.File) {

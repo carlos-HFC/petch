@@ -10,6 +10,7 @@ import { UploadService } from '../config/upload.service';
 import { MailService } from '../mail/mail.service';
 import { RoleService } from '../role/role.service';
 import { capitalizeFirstLetter, convertBool, createTokenHEX, trimObj, validateCPF } from '../utils';
+import { hash } from 'bcrypt';
 
 @Injectable()
 export class UserService {
@@ -21,6 +22,47 @@ export class UserService {
     private mailService: MailService,
     private sequelize: Sequelize
   ) { }
+
+  async createUsers() {
+    await this.userModel.bulkCreate([
+      {
+        id: 1,
+        name: 'Luara Silva Oliveira',
+        email: 'luara.oliveira8@gmail.com',
+        emailVerified: true,
+        hash: await hash('C@ju1208', 10),
+        cpf: '55122610029',
+        birthday: '1996-08-12',
+        gender: 'F',
+        cep: '13841155',
+        address: 'Rua Carlos Manoel Franco de Campos, 130',
+        district: 'Jardim Nova Mogi Guaçu',
+        city: 'Mogi Guaçu',
+        uf: 'SP',
+        phone: '19997111194',
+        roleId: 1,
+        avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8cGVyc29ufGVufDB8fDB8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
+      },
+      {
+        id: 2,
+        name: 'Carlos Henrique Faustino Cardoso',
+        email: 'chfcchfc96@gmail.com',
+        emailVerified: true,
+        hash: await hash('Chfc@1234', 10),
+        cpf: '06105014880',
+        birthday: '1996-12-21',
+        gender: 'M',
+        cep: '05372100',
+        address: 'Rua Deolinda Rodrigues, 592',
+        district: 'Jardim Ester',
+        city: 'São Paulo',
+        uf: 'SP',
+        phone: '11994034599',
+        roleId: 2,
+        avatar: 'https://images.unsplash.com/photo-1504593811423-6dd665756598?ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTN8fHBlcnNvbnxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60'
+      },
+    ]);
+  }
 
   async userWithPet(id: number) {
     return await this.userModel.scope('withPet').findByPk(id);

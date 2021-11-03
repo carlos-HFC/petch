@@ -11,6 +11,13 @@ export class RoleService {
     private readonly roleModel: typeof Role
   ) { }
 
+  async createRoles() {
+    await this.roleModel.bulkCreate([
+      { id: 1, name: "Admin" },
+      { id: 2, name: "Adotante" },
+    ])
+  }
+
   async get(name?: string) {
     if (name) return await this.getByName(name);
 
