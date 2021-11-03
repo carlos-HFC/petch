@@ -1,6 +1,6 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { isAfter } from 'date-fns';
+import { addHours, isAfter } from 'date-fns';
 import { Sequelize } from 'sequelize-typescript';
 
 import { TForgotPassword, TGoogleLogin, TLogin, TResetPassword } from './auth.dto';
@@ -38,7 +38,7 @@ export class AuthService {
   }
 
   async forgotPassword({ email }: TForgotPassword) {
-    const token = createTokenHEX(), now = new Date().setHours(new Date().getHours() + 1);
+    const tokenResetPassword = createTokenHEX(), tokenResetPasswordExpires = addHours(new Date(), 1);
 
     const user = await this.userService.findByEmail(email);
 
@@ -48,8 +48,8 @@ export class AuthService {
 
     try {
       await user.update({
-        tokenResetPassword: token,
-        tokenResetPasswordExpires: now.toString(),
+        tokenResetPassword,
+        tokenResetPasswordExpires,
       }, { transaction });
 
       await transaction.commit();
@@ -71,7 +71,7 @@ export class AuthService {
     switch (true) {
       case data.token !== user.tokenResetPassword:
         throw new HttpException('Token inválido', 400);
-      case isAfter(new Date(), Number(user.tokenResetPasswordExpires)):
+      case isAfter(new Date(), user.tokenResetPasswordExpires):
         throw new HttpException('Token expirou', 400);
       case await user.checkPass(data.password):
         throw new HttpException('Nova senha não pode ser igual a senha atual', 400);

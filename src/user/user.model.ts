@@ -143,10 +143,10 @@ export class User extends Model {
   tokenResetPassword: string;
 
   @Column({
-    type: DataType.STRING,
+    type: DataType.DATE,
     defaultValue: null
   })
-  tokenResetPasswordExpires: string;
+  tokenResetPasswordExpires: Date;
 
   @ForeignKey(() => Role)
   @Column({ allowNull: false })
