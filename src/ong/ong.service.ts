@@ -21,8 +21,8 @@ export class OngService {
     const transaction = await this.sequelize.transaction();
 
     try {
-      await this.ongModel.bulkCreate([
-        {
+      await Promise.all([
+        this.ongModel.create({
           id: 1,
           name: 'Dogs do Coração',
           email: 'doguineos@dogscore.com',
@@ -36,8 +36,8 @@ export class OngService {
           uf: 'SP',
           coverage: 'SP, RJ, MG, ES',
           responsible: 'Raimunda Renata Brito'
-        },
-        {
+        }, { transaction }),
+        this.ongModel.create({
           id: 2,
           name: 'Pet Place',
           email: 'place@petplace.com.br',
@@ -51,8 +51,8 @@ export class OngService {
           uf: 'SC',
           coverage: 'SC, PR, SP',
           responsible: 'Jaqueline Aparecida Pereira'
-        },
-        {
+        }, { transaction }),
+        this.ongModel.create({
           id: 3,
           name: 'ONG Melhor Amigo',
           email: 'OMA@melhoramigo.com.br',
@@ -67,8 +67,8 @@ export class OngService {
           uf: 'CE',
           coverage: 'CE, PE',
           responsible: 'Francisco Davi Diogo de Paula'
-        },
-      ], { transaction });
+        }, { transaction }),
+      ])
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();
