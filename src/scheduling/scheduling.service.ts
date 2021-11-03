@@ -37,9 +37,7 @@ export class SchedulingService {
 
   async mySchedules(userId: number, query?: TFilterScheduling) {
     trimObj(query);
-    const where = {
-      userId
-    };
+    const where = { userId };
 
     if (query.schedulingTypesId) Object.assign(where, { schedulingTypesId: query.schedulingTypesId });
     if (query.date) Object.assign(where, { date: { [$.between]: [startOfDay(parseISO(query.date)), endOfDay(parseISO(query.date))] } });
@@ -114,7 +112,7 @@ export class SchedulingService {
   async post(user: User, data: TCreateScheduling) {
     trimObj(data);
 
-    // if ((await this.userService.userWithPet(user.id)).pets.length === 0) throw new HttpException('Você não adotou um pet para efetuar um agendamento', 400);
+    if ((await this.userService.userWithPet(user.id)).pets.length === 0) throw new HttpException('Você não adotou um pet para efetuar um agendamento', 400);
 
     const schedulingType = await this.schedulingTypesService.getById(data.schedulingTypesId);
 
@@ -142,7 +140,7 @@ export class SchedulingService {
 
       await transaction.commit();
 
-      // await this.mailService.newScheduling(user, dateFormatted, schedulingType.name);
+      await this.mailService.newScheduling(user, dateFormatted, schedulingType.name);
 
       return { message: 'Agendamento marcado com sucesso', background: 'success' };
     } catch (error) {
