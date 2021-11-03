@@ -4,7 +4,6 @@ import { APP_FILTER } from '@nestjs/core';
 import { MulterModule } from '@nestjs/platform-express';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { SendGridModule } from '@ntegral/nestjs-sendgrid';
-import { ServeStaticModule } from '@nestjs/serve-static';
 import { resolve } from 'path';
 
 import { AuthModule } from './auth/auth.module';
@@ -23,14 +22,9 @@ import { SolicitationModule } from './solicitation/solicitation.module';
 import { SolicitationTypesModule } from './solicitationTypes/solicitationTypes.module';
 import { SpeciesModule } from './species/species.module';
 import { UserModule } from './user/user.module';
-import { AppController } from './app.controller';
 
 @Module({
   imports: [
-    ServeStaticModule.forRoot({
-      rootPath: './uploads',
-      serveRoot: '/files'
-    }),
     MulterModule.register({
       dest: resolve('./uploads'),
     }),
@@ -80,7 +74,6 @@ import { AppController } from './app.controller';
     SchedulingModule,
     DashboardModule
   ],
-  controllers: [AppController],
   providers: [
     UploadService,
     {
