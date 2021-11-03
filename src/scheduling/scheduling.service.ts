@@ -35,8 +35,24 @@ export class SchedulingService {
     return await this.schedulingModel.findAll({ where });
   }
 
-  async findById(id: number, inactives?: boolean) {
-    const scheduling = await this.schedulingModel.findByPk(id, { paranoid: !inactives });
+  async mySchedules(userId: number, query?: TFilterScheduling) {
+    trimObj(query);
+    const where = {
+      userId
+    };
+
+    if (query.schedulingTypesId) Object.assign(where, { schedulingTypesId: query.schedulingTypesId });
+    if (query.date) Object.assign(where, { date: { [$.between]: [startOfDay(parseISO(query.date)), endOfDay(parseISO(query.date))] } });
+
+    return await this.schedulingModel.findAll({ where });
+  }
+
+  async findById(id: number, userId?: number) {
+    const where = { id };
+
+    if (userId) Object.assign(where, { userId });
+
+    const scheduling = await this.schedulingModel.findOne({ where });
 
     if (!scheduling) throw new HttpException('Agendamento não encontrado', 404);
 
@@ -89,7 +105,6 @@ export class SchedulingService {
         time,
         value: format(value, "yyyy-MM-dd'T'HH:mm:ssxxx"),
         available: isAfter(subHours(value, 1), new Date()) && !schedulings.find(sch => format(sch.date, "HH:mm") === time),
-        limitHour: format(subHours(value, 1), "HH:mm")
       };
     });
 
@@ -99,7 +114,7 @@ export class SchedulingService {
   async post(user: User, data: TCreateScheduling) {
     trimObj(data);
 
-    if ((await this.userService.userWithPet(user.id)).pets.length === 0) throw new HttpException('Você não adotou um pet para efetuar um agendamento', 400);
+    // if ((await this.userService.userWithPet(user.id)).pets.length === 0) throw new HttpException('Você não adotou um pet para efetuar um agendamento', 400);
 
     const schedulingType = await this.schedulingTypesService.getById(data.schedulingTypesId);
 
@@ -127,7 +142,7 @@ export class SchedulingService {
 
       await transaction.commit();
 
-      await this.mailService.newScheduling(user, dateFormatted, schedulingType.name);
+      // await this.mailService.newScheduling(user, dateFormatted, schedulingType.name);
 
       return { message: 'Agendamento marcado com sucesso', background: 'success' };
     } catch (error) {

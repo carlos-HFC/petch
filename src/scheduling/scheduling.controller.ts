@@ -50,6 +50,7 @@ import { RoleGuard } from '../common/guards/role.guard';
   }
 })
 @ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RoleGuard)
 @Controller('schedulings')
 export class SchedulingController {
   constructor(
@@ -57,11 +58,10 @@ export class SchedulingController {
   ) { }
 
   @ApiOperation({ summary: 'Visualizar todos os agendamentos' })
-  @ApiOkResponse({ type: Scheduling, description: 'Success' })
-  @UseGuards(JwtAuthGuard, RoleGuard)
-  @RoleDecorator('admin')
+  @ApiOkResponse({ type: [Scheduling], description: 'Success' })
   @Get()
-  async index(@Query() query?: TFilterScheduling) {
+  async index(@Req() req: Request, @Query() query?: TFilterScheduling) {
+    if (req.user.role.name === 'Adotante') return await this.schedulingService.mySchedules(req.user.id, query);
     return await this.schedulingService.get(query);
   }
 
@@ -119,17 +119,40 @@ export class SchedulingController {
       }
     }
   })
-  @ApiParam({ name: 'schedulingTypesId', required: true })
+  @ApiParam({ name: 'schedulingTypesId', type: 'number', required: true })
   @ApiQuery({ name: 'date', type: 'string', required: true })
-  @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('adotante')
   @Get(':schedulingTypesId/available')
   async available(@Param('schedulingTypesId') schedulingTypesId: number, @Query('date') date: string) {
     return await this.schedulingService.availableSchedulings(schedulingTypesId, date);
   }
 
+  @ApiOperation({ summary: 'Visualizar um agendamento pelo ID' })
+  @ApiOkResponse({ type: Scheduling, description: 'Success' })
+  @ApiNotFoundResponse({
+    description: 'Not Found',
+    schema: {
+      type: 'object',
+      properties: {
+        statusCode: {
+          type: 'number',
+          example: 404,
+        },
+        background: {
+          type: 'string',
+          example: 'error',
+        },
+        message: {
+          type: 'string',
+          example: 'Agendamento não encontrado',
+        },
+      }
+    }
+  })
+  @ApiParam({ name: 'id', type: 'number', required: true })
   @Get(':id')
-  async byId(@Param('id') id: number) {
+  async byId(@Param('id') id: number, @Req() req: Request) {
+    if (req.user.role.name === 'Adotante') return await this.schedulingService.findById(id, req.user.id);
     return await this.schedulingService.findById(id);
   }
 
@@ -196,7 +219,6 @@ export class SchedulingController {
     }
   })
   @ApiBody({ type: TCreateScheduling })
-  @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('adotante')
   @Post()
   async create(@Req() req: Request, @Body() data: TCreateScheduling) {
@@ -246,7 +268,6 @@ export class SchedulingController {
     }
   })
   @ApiParam({ name: 'id', required: true })
-  @UseGuards(JwtAuthGuard, RoleGuard)
   @RoleDecorator('adotante')
   @Put(':id')
   async cancelSchedule(@Req() req: Request, @Param('id') id: number) {

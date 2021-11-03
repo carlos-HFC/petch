@@ -4,7 +4,7 @@ import { SchedulingTypes } from '../schedulingTypes/schedulingTypes.model';
 import { User } from '../user/user.model';
 
 @DefaultScope(() => ({
-  order: [['id', 'asc']]
+  order: [['date', 'asc']]
 }))
 @Table({ paranoid: true })
 export class Scheduling extends Model {
