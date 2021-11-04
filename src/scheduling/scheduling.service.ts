@@ -98,11 +98,13 @@ export class SchedulingService {
     const available = schedule.map(time => {
       const [hour, minute] = time.split(':').map(Number);
       const value = setSeconds(setMinutes(setHours(searchDate, hour), minute), 0);
+      const now = parseISO(format(startOfHour(new Date()), "yyyy-MM-dd'T'HH:mm:ss'-03:00'", { locale: ptBR }));
 
       return {
         time,
-        value: format(value, "yyyy-MM-dd'T'HH:mm:ss'-03:00'"),
-        available: isAfter(subHours(value, 1), new Date()) && !schedulings.find(sch => format(sch.date, "HH:mm") === time),
+        value: format(value, "yyyy-MM-dd'T'HH:mm:ss'-03:00'", { locale: ptBR }),
+        available: isAfter(subHours(value, 1), now) && !schedulings.find(sch => format(sch.date, "HH:mm") === time),
+        now: format(startOfHour(new Date()), "yyyy-MM-dd'T'HH:mm:ss'-03:00'", { locale: ptBR })
       };
     });
 
