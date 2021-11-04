@@ -95,17 +95,33 @@ export class SchedulingService {
       }
     });
 
+    // const available = schedule.map(time => {
+    //   const [hour, minute] = time.split(':').map(Number);
+    //   const value = setSeconds(setMinutes(setHours(searchDate, hour), minute), 0);
+
+    //   const valueISO = formatISO(value, { format: 'extended', representation: 'complete' });
+
+    //   return {
+    //     time,
+    //     value,
+    //     valueISO,
+    //     limitHour: subHours(value, 1),
+    //     parse: parseISO(valueISO)
+    //   };
+    // });
+
     const available = schedule.map(time => {
       const [hour, minute] = time.split(':').map(Number);
-      const value = setSeconds(setMinutes(setHours(searchDate, hour), minute), 0);
-      const now = parseISO(format(startOfHour(new Date()), "yyyy-MM-dd'T'HH:mm:ss"));
+      // const value = setSeconds(setMinutes(setHours(searchDate, hour), minute), 0);
+      const value = formatISO(setSeconds(setMinutes(setHours(searchDate, hour), minute), 0), { format: 'extended', representation: 'complete' });
 
       return {
         time,
         value,
-        available: isAfter(subHours(value, 1), now) && !schedulings.find(sch => format(sch.date, "HH:mm") === time),
-        limitHour: subHours(value, 1),
-        now,
+        limitHour: formatISO(subHours(parseISO(value), 1), { format: 'extended', representation: 'complete' }),
+        valueISO: parseISO(value),
+        limitHourISO: subHours(parseISO(value), 1),
+        available: isAfter(subHours(parseISO(value), 1), startOfHour(new Date())) && !schedulings.find(sch => format(sch.date, "HH:mm") === time),
       };
     });
 
