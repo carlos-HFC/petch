@@ -98,13 +98,14 @@ export class SchedulingService {
     const available = schedule.map(time => {
       const [hour, minute] = time.split(':').map(Number);
       const value = setSeconds(setMinutes(setHours(searchDate, hour), minute), 0);
-      const now = parseISO(format(startOfHour(new Date()), "yyyy-MM-dd'T'HH:mm:ss'-03:00'", { locale: ptBR }));
+      const now = parseISO(format(startOfHour(new Date()), "yyyy-MM-dd'T'HH:mm:ss"));
 
       return {
         time,
-        value: format(value, "yyyy-MM-dd'T'HH:mm:ss'-03:00'", { locale: ptBR }),
+        value,
         available: isAfter(subHours(value, 1), now) && !schedulings.find(sch => format(sch.date, "HH:mm") === time),
-        now: format(startOfHour(new Date()), "yyyy-MM-dd'T'HH:mm:ss'-03:00'", { locale: ptBR })
+        limitHour: subHours(value, 1),
+        now,
       };
     });
 
@@ -114,7 +115,7 @@ export class SchedulingService {
   async post(user: User, data: TCreateScheduling) {
     trimObj(data);
 
-    if ((await this.userService.userWithPet(user.id)).pets.length === 0) throw new HttpException('Você não adotou um pet para efetuar um agendamento', 400);
+    // if ((await this.userService.userWithPet(user.id)).pets.length === 0) throw new HttpException('Você não adotou um pet para efetuar um agendamento', 400);
 
     const schedulingType = await this.schedulingTypesService.getById(data.schedulingTypesId);
 
@@ -144,9 +145,9 @@ export class SchedulingService {
 
       await transaction.commit();
 
-      await this.mailService.newScheduling(user, dateFormatted, schedulingType.name);
+      // await this.mailService.newScheduling(user, dateFormatted, schedulingType.name);
 
-      return { message: 'Agendamento marcado com sucesso', background: 'success' };
+      return { message: 'Agendamento marcado com sucesso', background: 'success', dateFormatted };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);
