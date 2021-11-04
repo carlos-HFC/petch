@@ -101,8 +101,7 @@ export class SchedulingService {
 
       return {
         time,
-        value: format(value, "yyyy-MM-dd'T'HH:mm:ssXXX"),
-        valueDF: format(value, "yyyy-MM-dd'T'HH:mm:ss'-03:00'"),
+        value: format(value, "yyyy-MM-dd'T'HH:mm:ss'-03:00'"),
         available: isAfter(subHours(value, 1), new Date()) && !schedulings.find(sch => format(sch.date, "HH:mm") === time),
       };
     });
