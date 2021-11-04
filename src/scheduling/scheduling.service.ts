@@ -1,7 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { endOfDay, format, isAfter, isBefore, isValid, parseISO, setHours, setMinutes, setSeconds, startOfDay, startOfHour, startOfToday, subHours } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { endOfDay, format, formatISO, isAfter, isBefore, isValid, parseISO, setHours, setMinutes, setSeconds, startOfDay, startOfHour, startOfToday, subHours } from 'date-fns';
+import { es, ptBR } from 'date-fns/locale';
 import { Op as $ } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
@@ -101,7 +101,8 @@ export class SchedulingService {
 
       return {
         time,
-        value: format(value, "yyyy-MM-dd'T'HH:mm:ssxxx"),
+        value: format(value, "yyyy-MM-dd'T'HH:mm:ssXXX"),
+        valueDF: format(value, "yyyy-MM-dd'T'HH:mm:ss'-03:00'"),
         available: isAfter(subHours(value, 1), new Date()) && !schedulings.find(sch => format(sch.date, "HH:mm") === time),
       };
     });
@@ -116,19 +117,21 @@ export class SchedulingService {
 
     const schedulingType = await this.schedulingTypesService.getById(data.schedulingTypesId);
 
-    if (isBefore(parseISO(data.date), new Date())) throw new HttpException('Data passada não permitida', 400);
+    const date = parseISO(data.date);
+
+    if (isBefore(date, new Date())) throw new HttpException('Data passada não permitida', 400);
 
     const available = await this.schedulingModel.findOne({
       where: {
         schedulingTypesId: data.schedulingTypesId,
-        date: startOfHour(parseISO(data.date)),
+        date: startOfHour(date),
         canceledAt: null
       }
     });
 
     if (available) throw new HttpException('Data de agendamento indisponível', 400);
 
-    const dateFormatted = format(parseISO(data.date), "dd 'de' MMMM 'de' yyyy', às' HH:mm", { locale: ptBR });
+    const dateFormatted = format(date, "dd 'de' MMMM 'de' yyyy', às' HH:mm", { locale: ptBR });
 
     const transaction = await this.sequelize.transaction();
 
@@ -164,7 +167,7 @@ export class SchedulingService {
 
     if (isBefore(cancelTimeLimit, new Date())) throw new HttpException('Você só pode cancelar um agendamento com uma hora de antecedência', 400);
 
-    const dateFormatted = format(new Date(), "dd 'de' MMMM 'de' yyyy', às' HH:mm", { locale: ptBR });
+    const dateFormatted = format(scheduling.date, "dd 'de' MMMM 'de' yyyy', às' HH:mm", { locale: ptBR });
 
     const transaction = await this.sequelize.transaction();
 
