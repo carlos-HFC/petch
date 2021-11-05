@@ -26,7 +26,7 @@ export class Solicitation extends Model {
 
   @ForeignKey(() => SolicitationTypes)
   @Column({ allowNull: false })
-  solicitationTypeId: number;
+  solicitationTypesId: number;
 
   @ForeignKey(() => User)
   @Column({ allowNull: false })

@@ -32,8 +32,7 @@ export class SolicitationService {
   async post(data: TCreateSolicitation, user?: User) {
     trimObj(data);
 
-
-    await this.solicitationTypeService.findById(data.solicitationTypeId);
+    await this.solicitationTypeService.findById(data.solicitationTypesId);
 
     const transaction = await this.sequelize.transaction();
 

@@ -16,7 +16,7 @@ export class Solicitation {
 
   @ApiProperty({ type: 'number' })
   @IsNotEmpty({ message: 'Tipo de solicitação é obrigatória' })
-  solicitationTypeId: number;
+  solicitationTypesId: number;
 
   @ApiProperty({ type: SolicitationTypes, required: false })
   solicitationType: SolicitationTypes;
