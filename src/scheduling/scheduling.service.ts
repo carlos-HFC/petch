@@ -1,6 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { endOfDay, format, formatISO, isAfter, isBefore, isValid, parseISO, setHours, setMinutes, setSeconds, startOfDay, startOfHour, startOfToday, subHours } from 'date-fns';
+import { endOfDay, isAfter, isBefore, isValid, parseISO, setHours, setMinutes, setSeconds, startOfDay, startOfHour, startOfToday, subHours } from 'date-fns';
+import { format, utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
 import { es, ptBR } from 'date-fns/locale';
 import { Op as $ } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
@@ -95,6 +96,13 @@ export class SchedulingService {
       }
     });
 
+    // return schedulings.map(sch => {
+    //   return {
+    //     normal: sch.date,
+    //     tz: format(parseISO(sch.date),'yyyy-MM-dd HH:mm',{timeZone:'America/Sao_Paulo'}),
+    //   }
+    // });
+
     const available = schedule.map(time => {
       const [hour, minute] = time.split(':').map(Number);
 
@@ -106,7 +114,7 @@ export class SchedulingService {
         time,
         value,
         limit,
-        available: isAfter(limit, now) && !schedulings.find(sch => format(parseISO(sch.date), 'HH:mm') === time)
+        available: isAfter(limit, now) && !schedulings.find(sch => format(parseISO(sch.date), 'HH:mm',{timeZone:"America/Sao_Paulo"}) === time)
       };
     });
 
@@ -134,7 +142,7 @@ export class SchedulingService {
 
     if (available) throw new HttpException('Data de agendamento indisponível', 400);
 
-    const dateFormatted = format(date, "dd 'de' MMMM 'de' yyyy', as' HH:mm", { locale: ptBR });
+    // const dateFormatted = format(date, "dd 'de' MMMM 'de' yyyy', as' HH:mm", { locale: ptBR });
 
     const transaction = await this.sequelize.transaction();
 
@@ -146,7 +154,7 @@ export class SchedulingService {
 
       await transaction.commit();
 
-      await this.mailService.newScheduling(user, dateFormatted, schedulingType.name);
+      await this.mailService.newScheduling(user, 'dateFormatted', schedulingType.name);
 
       return { message: 'Agendamento marcado com sucesso', background: 'success' };
     } catch (error) {
@@ -170,7 +178,7 @@ export class SchedulingService {
 
     if (isBefore(cancelTimeLimit, new Date())) throw new HttpException('Você só pode cancelar um agendamento com uma hora de antecedência', 400);
 
-    const dateFormatted = format(parseISO(scheduling.date), "dd 'de' MMMM 'de' yyyy', as' HH:mm", { locale: ptBR });
+    // const dateFormatted = format(parseISO(scheduling.date), "dd 'de' MMMM 'de' yyyy', as' HH:mm", { locale: ptBR });
 
     const transaction = await this.sequelize.transaction();
 
@@ -179,7 +187,7 @@ export class SchedulingService {
 
       await transaction.commit();
 
-      await this.mailService.cancelScheduling(user, dateFormatted, scheduling.schedulingTypes.name);
+      await this.mailService.cancelScheduling(user, 'dateFormatted', scheduling.schedulingTypes.name);
 
       return { message: 'Agendamento cancelado com sucesso', background: 'success' };
     } catch (error) {

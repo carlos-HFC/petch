@@ -38,8 +38,7 @@ import { UserModule } from './user/user.module';
         username: process.env.DB_USER,
         password: process.env.DB_PASS,
         autoLoadModels: true,
-        synchronize: true,
-        timezone: '+00:00'
+        synchronize: true
       }) : SequelizeModule.forRoot({
         dialect: 'postgres',
         port: Number(process.env.DB_PORT),
@@ -55,8 +54,7 @@ import { UserModule } from './user/user.module';
             rejectUnauthorized: false
           }
         },
-        protocol: 'postgres',
-        timezone: '+00:00'
+        protocol: 'postgres'
       }),
     SendGridModule.forRoot({
       apiKey: process.env.MAIL_KEY
