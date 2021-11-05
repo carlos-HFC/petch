@@ -99,7 +99,8 @@ export class SchedulingService {
     // return schedulings.map(sch => {
     //   return {
     //     normal: sch.date,
-    //     tz: format(parseISO(sch.date),'yyyy-MM-dd HH:mm',{timeZone:'America/Sao_Paulo'}),
+    //     tz: format(parseISO(sch.date),"HH:mm:ss",{timeZone:'America/Sao_Paulo'}),
+    //     tzone: utcToZonedTime(parseISO(sch.date),"America/Sao_Paulo",),
     //   }
     // });
 
@@ -107,7 +108,7 @@ export class SchedulingService {
       const [hour, minute] = time.split(':').map(Number);
 
       const now = startOfHour(new Date());
-      const value = setSeconds(setMinutes(setHours(searchDate, hour), minute), 0);
+      const value = utcToZonedTime(setSeconds(setMinutes(setHours(searchDate, hour), minute), 0),"America/Sao_Paulo");
       const limit = subHours(value, 1);
 
       return {
