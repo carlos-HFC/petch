@@ -79,26 +79,6 @@ export class GiftController {
       }
     }
   })
-  @ApiNotFoundResponse({
-    description: 'Not Found',
-    schema: {
-      type: 'object',
-      properties: {
-        statusCode: {
-          type: 'number',
-          example: 404,
-        },
-        background: {
-          type: 'string',
-          example: 'error',
-        },
-        message: {
-          type: 'string',
-          example: 'Parceiro não encontrado',
-        },
-      }
-    }
-  })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: TCreateGift })
   @Post()
@@ -151,16 +131,8 @@ export class GiftController {
           example: 'error',
         },
         message: {
-          oneOf: [
-            {
-              type: 'string',
-              example: 'Brinde não encontrado'
-            },
-            {
-              type: 'string',
-              example: 'Parceiro não encontrado'
-            },
-          ]
+          type: 'string',
+          example: 'Brinde não encontrado'
         },
       }
     }

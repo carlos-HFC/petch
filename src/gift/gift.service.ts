@@ -6,15 +6,13 @@ import { Sequelize } from 'sequelize-typescript';
 import { TCreateGift, TFilterGift, TUpdateGift } from './gift.dto';
 import { Gift } from './gift.model';
 import { UploadService } from '../config/upload.service';
-import { PartnerService } from '../partner/partner.service';
-import { convertBool, trimObj } from '../utils';
+import { capitalizeFirstLetter, convertBool, trimObj } from '../utils';
 
 @Injectable()
 export class GiftService {
   constructor(
     @InjectModel(Gift)
     private readonly giftModel: typeof Gift,
-    private partnerService: PartnerService,
     private uploadService: UploadService,
     private sequelize: Sequelize
   ) { }
@@ -23,12 +21,12 @@ export class GiftService {
     trimObj(query);
     const where = {};
 
-    if (query.name) Object.assign(where, { name: { [$.startsWith]: query.name.normalize().toLowerCase() } });
+    if (query.name) Object.assign(where, { name: { [$.startsWith]: capitalizeFirstLetter(query.name).normalize() } });
 
     return await this.giftModel.findAll({
       paranoid: !convertBool(query.inactives),
       where,
-      attributes: ['id', 'name', 'description', 'image', 'deletedAt']
+      attributes: ['id', 'name', 'image', 'deletedAt']
     });
   }
 
@@ -42,18 +40,10 @@ export class GiftService {
 
   async post(data: TCreateGift, media?: Express.MulterS3.File) {
     trimObj(data);
-    const num = (/([\d])/g);
-
-    await this.partnerService.findById(data.partnerId);
 
     if (media) {
       const image = (await this.uploadService.uploadFile(media)).url;
       Object.assign(data, { image });
-    }
-
-    if (data.weight) {
-      const weight = Number(data.weight.match(num)?.join(''));
-      if (isNaN(weight)) throw new HttpException('Peso inválido', 400);
     }
 
     const transaction = await this.sequelize.transaction();
@@ -72,19 +62,11 @@ export class GiftService {
 
   async put(id: number, data: TUpdateGift, media?: Express.MulterS3.File) {
     trimObj(data);
-    const num = (/([\d])/g);
     const gift = await this.findById(id);
-
-    if (data.partnerId) await this.partnerService.findById(data.partnerId);
 
     if (media) {
       const image = (await this.uploadService.uploadFile(media)).url;
       Object.assign(data, { image });
-    }
-
-    if (data.weight) {
-      const weight = Number(data.weight.match(num)?.join(''));
-      if (isNaN(weight)) throw new HttpException('Peso inválido', 400);
     }
 
     const transaction = await this.sequelize.transaction();
