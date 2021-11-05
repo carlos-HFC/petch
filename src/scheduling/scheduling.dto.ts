@@ -9,11 +9,15 @@ export class Scheduling {
   @ApiProperty({ uniqueItems: true, type: 'integer', readOnly: true })
   id: number;
 
-  @ApiProperty({ type: 'string', format: 'date-time', example: '2021-01-01T00:00:00-03:00' })
-  @IsDateString({}, { message: 'Data inválida' })
+  @ApiProperty({ type: 'string' })
   @IsNotEmpty({ message: 'Data é obrigatória' })
   @Transform(({ value }) => value.trim())
   date: string;
+
+  @ApiProperty({ type: 'string' })
+  @IsNotEmpty({ message: 'Hora é obrigatória' })
+  @Transform(({ value }) => value.trim())
+  hour: string;
 
   @ApiProperty({ type: 'string', format: 'date-time', required: false, default: null })
   @IsDate({ message: 'Data de cancelamento inválida' })
@@ -47,19 +51,18 @@ export class TAvailableScheduling {
   @ApiProperty({ type: 'string', example: '00:00' })
   time: string;
 
-  @ApiProperty({ type: 'string', format: 'date-time', example: '2021-01-01T00:00:00-03:00' })
+  @ApiProperty({ type: 'string', example: '2021-01-01at00' })
   value: string;
 
   @ApiProperty({ type: 'boolean' })
   available: boolean;
 
   @ApiProperty({ type: 'string', example: '00:00' })
-  limitHour: string;
+  limit: string;
 }
 
 export class TCreateScheduling extends PickType(Scheduling, ['schedulingTypesId']) {
-  @ApiProperty({ type: 'string', format: 'date-time', example: '2021-01-01T00:00:00-03:00' })
-  @IsDateString({}, { message: 'Data inválida' })
+  @ApiProperty({ type: 'string', example: '2021-01-01at00' })
   @IsNotEmpty({ message: 'Data é obrigatória' })
   @Transform(({ value }) => value.trim())
   date: string;
@@ -69,7 +72,7 @@ export class TFilterScheduling {
   @ApiProperty({ type: 'number', required: false })
   schedulingTypesId?: number;
 
-  @ApiProperty({ type: 'string', format: 'date', required: false })
+  @ApiProperty({ type: 'string', required: false })
   @IsOptional()
   @IsDateString({}, { message: 'Data inválida' })
   date?: string;

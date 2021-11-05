@@ -1,8 +1,7 @@
 import { HttpException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { endOfDay, isAfter, isBefore, isValid, parseISO, setHours, setMinutes, setSeconds, startOfDay, startOfHour, startOfToday, subHours } from 'date-fns';
-import { format, utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz';
-import { es, ptBR } from 'date-fns/locale';
+import { endOfDay, format, isBefore, isEqual, isValid, parseISO, startOfDay, startOfToday } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
 import { Op as $ } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 
@@ -30,7 +29,7 @@ export class SchedulingService {
     const where = {};
 
     if (query.schedulingTypesId) Object.assign(where, { schedulingTypesId: query.schedulingTypesId });
-    if (query.date) Object.assign(where, { date: { [$.between]: [startOfDay(parseISO(query.date)), endOfDay(parseISO(query.date))] } });
+    if (query.date) Object.assign(where, { date: query.date });
     if (convertBool(query.canceled)) Object.assign(where, { canceledAt: { [$.not]: null } });
 
     return await this.schedulingModel.findAll({ where });
@@ -41,7 +40,7 @@ export class SchedulingService {
     const where = { userId };
 
     if (query.schedulingTypesId) Object.assign(where, { schedulingTypesId: query.schedulingTypesId });
-    if (query.date) Object.assign(where, { date: { [$.between]: [startOfDay(parseISO(query.date)), endOfDay(parseISO(query.date))] } });
+    if (query.date) Object.assign(where, { date: query.date });
 
     return await this.schedulingModel.findAll({ where });
   }
@@ -74,13 +73,14 @@ export class SchedulingService {
     await this.schedulingTypesService.getById(schedulingTypesId);
 
     const searchDate = parseISO(date);
+    const today = startOfToday();
 
     switch (true) {
       case !date:
         throw new HttpException('Data é obrigatória', 400);
       case !isValid(searchDate):
         throw new HttpException('Data inválida', 400);
-      case isBefore(startOfDay(searchDate), startOfToday()):
+      case isBefore(searchDate, today):
         throw new HttpException('Impossível agendar em uma data passada', 400);
       default:
         break;
@@ -90,72 +90,86 @@ export class SchedulingService {
       where: {
         schedulingTypesId,
         canceledAt: null,
-        date: {
-          [$.between]: [startOfDay(searchDate), endOfDay(searchDate)]
-        }
+        date
       }
     });
-
-    // return schedulings.map(sch => {
-    //   return {
-    //     normal: sch.date,
-    //     tz: format(parseISO(sch.date),"HH:mm:ss",{timeZone:'America/Sao_Paulo'}),
-    //     tzone: utcToZonedTime(parseISO(sch.date),"America/Sao_Paulo",),
-    //   }
-    // });
 
     const available = schedule.map(time => {
       const [hour, minute] = time.split(':').map(Number);
 
-      const now = startOfHour(new Date());
-      const value = utcToZonedTime(setSeconds(setMinutes(setHours(searchDate, hour), minute), 0),"America/Sao_Paulo");
-      const limit = subHours(value, 1);
+      const limit = `${String(hour - 1).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
+      const tmp = new Date().getUTCHours() - 3;
+      const value = `${date}at${String(hour).padStart(2, '0')}`;
+
+      const equal = isEqual(searchDate, today);
+
+      if (!equal) {
+        return {
+          time,
+          limit,
+          value,
+          available: !schedulings.find(sch => sch.date === date && sch.hour === time)
+        };
+      }
 
       return {
         time,
-        value,
         limit,
-        available: isAfter(limit, now) && !schedulings.find(sch => format(parseISO(sch.date), 'HH:mm',{timeZone:"America/Sao_Paulo"}) === time)
+        value,
+        available: (hour - 1) > tmp && !schedulings.find(sch => sch.date === date && sch.hour === time),
       };
     });
 
-    return available
+    return available;
   }
 
   async post(user: User, data: TCreateScheduling) {
     trimObj(data);
 
-    // if ((await this.userService.userWithPet(user.id)).pets.length === 0) throw new HttpException('Você não adotou um pet para efetuar um agendamento', 400);
+    if ((await this.userService.userWithPet(user.id)).pets.length === 0) throw new HttpException('Você não adotou um pet para efetuar um agendamento', 400);
 
     const schedulingType = await this.schedulingTypesService.getById(data.schedulingTypesId);
 
-    const date = parseISO(data.date);
+    const [date, time] = data.date.split('at');
+    const tmp = new Date().getUTCHours() - 3;
+    const dateParsed = parseISO(date);
 
-    if (isBefore(date, startOfHour(new Date()))) throw new HttpException('Data passada não permitida', 400);
+
+    if (!isValid(dateParsed)) throw new HttpException('Data inválida', 400);
+    if (isBefore(dateParsed, startOfToday())) throw new HttpException('Data passada não permitida', 400);
+
+    if (isEqual(dateParsed, startOfToday())) {
+      if (Number(time) <= tmp) throw new HttpException('Hora passada não permitida', 400);
+    }
+
+    const hour = `${time}:00`;
 
     const available = await this.schedulingModel.findOne({
       where: {
         schedulingTypesId: data.schedulingTypesId,
-        date: startOfHour(date),
+        date,
+        hour,
         canceledAt: null
       }
     });
 
-    if (available) throw new HttpException('Data de agendamento indisponível', 400);
+    if (available || (Number(time) < 9 || Number(time) > 17)) throw new HttpException('Data de agendamento indisponível', 400);
 
-    // const dateFormatted = format(date, "dd 'de' MMMM 'de' yyyy', as' HH:mm", { locale: ptBR });
+    const dateFormatted = `${format(parseISO(date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}, as ${hour}`;
 
     const transaction = await this.sequelize.transaction();
 
     try {
       await this.schedulingModel.create({
         ...data,
+        date,
+        hour,
         userId: user.id
       }, { transaction });
 
       await transaction.commit();
 
-      await this.mailService.newScheduling(user, 'dateFormatted', schedulingType.name);
+      await this.mailService.newScheduling(user, dateFormatted, schedulingType.name);
 
       return { message: 'Agendamento marcado com sucesso', background: 'success' };
     } catch (error) {
@@ -175,11 +189,16 @@ export class SchedulingService {
 
     if (!scheduling) throw new HttpException('Agendamento não encontrado', 404);
 
-    const cancelTimeLimit = subHours(parseISO(scheduling.date), 1);
+    if (isBefore(parseISO(scheduling.date), startOfToday())) throw new HttpException('Agendamento ocorrido não pode ser cancelado', 400);
 
-    if (isBefore(cancelTimeLimit, new Date())) throw new HttpException('Você só pode cancelar um agendamento com uma hora de antecedência', 400);
+    const tmp = new Date().getUTCHours() - 3;
+    const [time,] = scheduling.hour.split(":").map(Number);
 
-    // const dateFormatted = format(parseISO(scheduling.date), "dd 'de' MMMM 'de' yyyy', as' HH:mm", { locale: ptBR });
+    if (isEqual(parseISO(scheduling.date), startOfToday())) {
+      if (time - 1 <= tmp) throw new HttpException('Você só pode cancelar um agendamento com uma hora de antecedência', 400);
+    }
+
+    const dateFormatted = `${format(parseISO(scheduling.date), "dd 'de' MMMM 'de' yyyy", { locale: ptBR })}, as ${scheduling.hour}`;
 
     const transaction = await this.sequelize.transaction();
 
@@ -188,7 +207,7 @@ export class SchedulingService {
 
       await transaction.commit();
 
-      await this.mailService.cancelScheduling(user, 'dateFormatted', scheduling.schedulingTypes.name);
+      await this.mailService.cancelScheduling(user, dateFormatted, scheduling.schedulingTypes.name);
 
       return { message: 'Agendamento cancelado com sucesso', background: 'success' };
     } catch (error) {

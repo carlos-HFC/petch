@@ -191,6 +191,10 @@ export class SchedulingController {
             },
             {
               type: 'string',
+              example: 'Hora passada não permitida'
+            },
+            {
+              type: 'string',
               example: 'Data de agendamento indisponível'
             },
           ]
@@ -241,8 +245,16 @@ export class SchedulingController {
           example: 'error',
         },
         message: {
-          type: 'string',
-          example: 'Você só pode cancelar uma agendamento com uma hora de antecedência'
+          oneOf: [
+            {
+              type: 'string',
+              example: 'Você só pode cancelar uma agendamento com uma hora de antecedência'
+            },
+            {
+              type: 'string',
+              example: 'Agendamento ocorrido não pode ser cancelado'
+            },
+          ]
         },
       }
     }

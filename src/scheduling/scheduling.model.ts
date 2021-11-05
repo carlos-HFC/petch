@@ -25,6 +25,12 @@ export class Scheduling extends Model {
   date: string;
 
   @Column({
+    type: DataType.STRING,
+    allowNull: false,
+  })
+  hour: string;
+
+  @Column({
     type: DataType.DATE,
     defaultValue: null,
   })
