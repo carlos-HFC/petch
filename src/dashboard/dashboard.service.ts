@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { format, getMonth, setMonth } from 'date-fns';
+import { format, getMonth, parseISO, setMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 import { OngService } from '../ong/ong.service';
@@ -32,7 +32,7 @@ export class DashboardService {
         gender: "Fêmea",
         total: females
       },
-    ]
+    ];
   }
 
   async petsByOng() {
@@ -55,10 +55,12 @@ export class DashboardService {
       const total = types.map(schedule => {
         return {
           name: schedule.name,
-          month: {
-            quantity: schedule.schedulings.filter(sch => getMonth(sch.date) + 1 === month).length,
-            mes: capitalizeFirstLetter(format(displayMonth(month - 1), 'MMMM', { locale: ptBR }))
-          }
+          month: [
+            {
+              quantity: schedule.schedulings.filter(sch => getMonth(parseISO(sch.date)) + 1 === month).length,
+              mes: capitalizeFirstLetter(format(displayMonth(month - 1), 'MMMM', { locale: ptBR }))
+            }
+          ]
         };
       });
 
@@ -69,8 +71,8 @@ export class DashboardService {
           name: schedule.name,
           month: schedule.schedulings.map(sch => {
             return {
-              mes: capitalizeFirstLetter(format(displayMonth(getMonth(sch.date)), 'MMMM', { locale: ptBR })),
-              quantity: schedule.schedulings.filter(sc => getMonth(sc.date) === getMonth(sch.date)).length
+              mes: capitalizeFirstLetter(format(displayMonth(getMonth(parseISO(sch.date))), 'MMMM', { locale: ptBR })),
+              quantity: schedule.schedulings.filter(sc => getMonth(parseISO(sc.date)) === getMonth(parseISO(sch.date))).length
             };
           })
         };
@@ -91,7 +93,7 @@ export class DashboardService {
     return solicitationTypes.map(type => {
       return {
         name: type.name,
-        quantity: type.solicitations.filter(solicitation => solicitation.solicitationTypeId === type.id).length
+        quantity: type.solicitations.filter(solicitation => solicitation.solicitationTypesId === type.id).length
       };
     });
   }

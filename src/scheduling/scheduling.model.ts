@@ -4,15 +4,25 @@ import { SchedulingTypes } from '../schedulingTypes/schedulingTypes.model';
 import { User } from '../user/user.model';
 
 @DefaultScope(() => ({
-  order: [['date', 'asc']]
+  order: [['date', 'asc']],
+  include: [
+    {
+      model: User,
+      attributes: ['name', 'email']
+    },
+    {
+      model: SchedulingTypes,
+      attributes: ['name']
+    },
+  ]
 }))
 @Table({ paranoid: true })
 export class Scheduling extends Model {
   @Column({
-    type: DataType.DATE,
+    type: DataType.STRING,
     allowNull: false,
   })
-  date: Date;
+  date: string;
 
   @Column({
     type: DataType.DATE,

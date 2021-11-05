@@ -13,7 +13,7 @@ export class Scheduling {
   @IsDateString({}, { message: 'Data inválida' })
   @IsNotEmpty({ message: 'Data é obrigatória' })
   @Transform(({ value }) => value.trim())
-  date: Date;
+  date: string;
 
   @ApiProperty({ type: 'string', format: 'date-time', required: false, default: null })
   @IsDate({ message: 'Data de cancelamento inválida' })

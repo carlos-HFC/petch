@@ -28,8 +28,8 @@ export class TScheduleByMonth {
   @ApiProperty({ type: 'string' })
   name: string;
 
-  @ApiProperty({ type: ScheduleMonth || [ScheduleMonth] })
-  month: ScheduleMonth | ScheduleMonth[];
+  @ApiProperty({ type: [ScheduleMonth] })
+  month: ScheduleMonth[];
 }
 
 export class TTotalSolicitations extends TPetsByOng { }

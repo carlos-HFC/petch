@@ -98,20 +98,19 @@ export class SchedulingService {
     const available = schedule.map(time => {
       const [hour, minute] = time.split(':').map(Number);
 
-      const value = `${date}T${String(hour + 3).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00.000Z`;
-      const now = startOfHour(new Date())
+      const now = startOfHour(new Date());
+      const value = setSeconds(setMinutes(setHours(searchDate, hour), minute), 0);
+      const limit = subHours(value, 1);
 
       return {
         time,
-        valueBR: `${date}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00.000Z`,
-        limitBR: `${date}T${String(hour - 1).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00.000Z`,
         value,
-        limit: subHours(parseISO(value), 1),
-        available: isAfter(subHours(parseISO(value), 1), now) && !schedulings.find(sch => format(sch.date, 'HH:mm') === time),
+        limit,
+        available: isAfter(limit, now) && !schedulings.find(sch => format(parseISO(sch.date), 'HH:mm') === time)
       };
     });
 
-    return available;
+    return { available, schedulings, searchDate };
   }
 
   async post(user: User, data: TCreateScheduling) {
@@ -123,7 +122,6 @@ export class SchedulingService {
 
     const date = parseISO(data.date);
 
-    
     if (isBefore(date, startOfHour(new Date()))) throw new HttpException('Data passada não permitida', 400);
 
     const available = await this.schedulingModel.findOne({
@@ -136,7 +134,7 @@ export class SchedulingService {
 
     if (available) throw new HttpException('Data de agendamento indisponível', 400);
 
-    const dateFormatted = format(date, "dd 'de' MMMM 'de' yyyy', às' HH:mm", { locale: ptBR });
+    const dateFormatted = format(date, "dd 'de' MMMM 'de' yyyy', as' HH:mm", { locale: ptBR });
 
     const transaction = await this.sequelize.transaction();
 
@@ -148,9 +146,9 @@ export class SchedulingService {
 
       await transaction.commit();
 
-      // await this.mailService.newScheduling(user, dateFormatted, schedulingType.name);
+      await this.mailService.newScheduling(user, dateFormatted, schedulingType.name);
 
-      return { message: 'Agendamento marcado com sucesso', background: 'success', dateFormatted };
+      return { message: 'Agendamento marcado com sucesso', background: 'success' };
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);
@@ -168,11 +166,11 @@ export class SchedulingService {
 
     if (!scheduling) throw new HttpException('Agendamento não encontrado', 404);
 
-    const cancelTimeLimit = subHours(scheduling.date, 1);
+    const cancelTimeLimit = subHours(parseISO(scheduling.date), 1);
 
     if (isBefore(cancelTimeLimit, new Date())) throw new HttpException('Você só pode cancelar um agendamento com uma hora de antecedência', 400);
 
-    const dateFormatted = format(scheduling.date, "dd 'de' MMMM 'de' yyyy', às' HH:mm", { locale: ptBR });
+    const dateFormatted = format(parseISO(scheduling.date), "dd 'de' MMMM 'de' yyyy', as' HH:mm", { locale: ptBR });
 
     const transaction = await this.sequelize.transaction();
 
