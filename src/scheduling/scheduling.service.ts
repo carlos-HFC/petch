@@ -110,7 +110,7 @@ export class SchedulingService {
       };
     });
 
-    return { available, schedulings, searchDate };
+    return available
   }
 
   async post(user: User, data: TCreateScheduling) {
