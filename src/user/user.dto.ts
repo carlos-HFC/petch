@@ -135,7 +135,7 @@ export class TUpdateUser extends OmitType(PartialType(TCreateUser), ['googleId']
   @ApiProperty({ type: 'string', required: false })
   @ValidateIf((obj, _) => obj.oldPassword)
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[-_@#$!%+*=()?&,.:;?|])[A-Za-z\d-_@#$!%+*=()?&,.:;?|]/, { message: 'Senha precisa ter uma letra maiúscula, uma letra minúscula, um caractere especial e um número' })
-  @MinLength(8, { message: 'Senha muito curta' })
+  @MinLength(8, { message: 'Senha precisa conter, no mínimo, 8 caracteres' })
   @IsNotEmpty({ message: 'Nova senha é obrigatória' })
   password?: string;
 

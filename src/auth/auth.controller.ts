@@ -157,7 +157,7 @@ export class AuthController {
             },
             {
               type: 'string',
-              example: 'Senha muito curta'
+              example: 'Senha precisa conter, no mínimo, 8 caracteres'
             },
             {
               type: 'string',
@@ -286,7 +286,7 @@ export class AuthController {
             },
             {
               type: 'string',
-              example: 'Senha muito curta'
+              example: 'Senha precisa conter, no mínimo, 8 caracteres'
             },
             {
               type: 'string',

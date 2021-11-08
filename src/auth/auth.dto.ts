@@ -52,7 +52,7 @@ export class TResetPassword {
 
   @ApiProperty({ type: 'string' })
   @Matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[-_@#$!%/+*=()?&,.:;?|])[A-Za-z\d-_@#$!%/+*=()?&,.:;?|]/, { message: 'Senha precisa ter uma letra maiúscula, uma letra minúscula, um caractere especial e um número' })
-  @MinLength(8, { message: 'Senha muito curta' })
+  @MinLength(8, { message: 'Senha precisa conter, no mínimo, 8 caracteres' })
   @IsNotEmpty({ message: 'Senha é obrigatória' })
   password: string;
 
