@@ -1,5 +1,6 @@
-import { BeforeSave, Column, DataType, DefaultScope, Model, Table } from 'sequelize-typescript';
+import { BeforeSave, Column, DataType, DefaultScope, HasMany, Model, Table } from 'sequelize-typescript';
 
+import { Pet } from '../pet/pet.model';
 import { capitalizeFirstLetter } from '../utils';
 
 @DefaultScope(() => ({
@@ -16,6 +17,9 @@ export class Species extends Model {
 
   @Column(DataType.STRING)
   image: string;
+
+  @HasMany(() => Pet)
+  pets: Pet[];
 
   @BeforeSave
   static async upperFirst(species: Species) {

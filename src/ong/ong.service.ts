@@ -28,20 +28,6 @@ export class OngService {
     if (query.name) Object.assign(where, { name: { [$.startsWith]: query.name.normalize().toLowerCase() } });
     if (query.uf) Object.assign(where, { uf: query.uf.toUpperCase() });
 
-    // if (query.coverage) {
-    //   const ongs = await this.ongModel.findAll({
-    //     paranoid: !convertBool(query.inactives),
-    //     where,
-    //     attributes: ['id', 'name', 'email', 'phone1', 'responsible', 'cep', 'city', 'deletedAt']
-    //   });
-
-    //   const states = query.coverage.toUpperCase().split(',').map(cov => cov.trim());
-
-    //   const ongsFiltered = states.flatMap(state => ongs.filter(ong => ong.coverage.includes(state)));
-
-    //   return [...new Map(ongsFiltered.map(ong => [ong['id'], ong])).values()].sort((a, b) => a.id < b.id ? - 1 : 1);
-    // }
-
     return await this.ongModel.findAll({
       paranoid: !convertBool(query.inactives),
       where,
@@ -132,9 +118,20 @@ export class OngService {
   async activeInactive(id: number, status: 'true' | 'false') {
     const st = convertBool(status);
 
-    const ong = await this.findById(id, 'true');
+    const ong = await this.ongModel.findOne({
+      where: { id },
+      paranoid: false,
+      include: { all: true, paranoid: false }
+    });
 
-    if (!st) return await ong.destroy();
-    return await ong.restore();
+    if (!ong) throw new HttpException('ONG não encontrada', 404);
+
+    if (!st) {
+      await ong.destroy();
+      return ong.pets.map(pet => pet.destroy());
+    }
+
+    await ong.restore();
+    return ong.pets.map(pet => pet.restore());
   }
 }

@@ -10,7 +10,6 @@ import { UploadService } from '../config/upload.service';
 import { MailService } from '../mail/mail.service';
 import { RoleService } from '../role/role.service';
 import { capitalizeFirstLetter, convertBool, createTokenHEX, trimObj, validateCPF } from '../utils';
-import { hash } from 'bcrypt';
 
 @Injectable()
 export class UserService {

@@ -102,9 +102,18 @@ export class SpeciesService {
   async activeInactive(id: number, status: 'true' | 'false') {
     const st = convertBool(status);
 
-    const specie = await this.findById(id, 'true');
+    const specie = await this.speciesModel.findOne({
+      where: { id },
+      paranoid: false,
+      include: { all: true, paranoid: false }
+    });
 
-    if (!st) return await specie.destroy();
-    return await specie.restore();
+    if (!st) {
+      await specie.destroy();
+      return specie.pets.map(pet => !pet.userId && pet.destroy());
+    }
+
+    await specie.restore();
+    return specie.pets.map(pet => pet.restore());
   }
 }

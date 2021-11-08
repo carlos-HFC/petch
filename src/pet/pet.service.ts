@@ -29,7 +29,7 @@ export class PetService {
   ) { }
 
   async petsByGender() {
-    return await this.petModel.findAll({ where: { userId: null }, attributes: ['id', 'gender'] });
+    return await this.petModel.findAll({ attributes: ['id', 'gender'] });
   }
 
   async find(id: number, query?: TFilterPet) {
@@ -65,7 +65,10 @@ export class PetService {
     }
     if (query.cut) Object.assign(options, { cut: convertBool(query.cut) });
     if (query.gender) Object.assign(options, { gender: query.gender });
-    if (query.speciesId) Object.assign(options, { speciesId: Number(query.speciesId) });
+    if (query.speciesId) {
+      await this.speciesService.findById(Number(query.speciesId));
+      Object.assign(options, { speciesId: Number(query.speciesId) });
+    }
     if (query.uf) Object.assign(options, { ong: where(col('ong.coverage'), { [$.substring]: query.uf.toUpperCase() }) });
 
     return await this.petModel.scope('findToAdopt').findAll({
@@ -140,14 +143,14 @@ export class PetService {
     return favorites;
   }
 
-  async myPets(id:number) {
+  async myPets(id: number) {
     const pets = await this.petModel.findAll({
       where: {
         userId: id
       }
     });
 
-    return pets
+    return pets;
   }
 
   async create(data: TCreatePet, media: Express.MulterS3.File) {
@@ -275,11 +278,28 @@ export class PetService {
   }
 
   async activeInactive(id: number, status: 'true' | 'false') {
+    const favorites = await this.favoriteService.get({
+      where: { petId: id }
+    });
+
     const st = convertBool(status);
 
-    const pet = await this.findById(id, 'true');
+    const pet = await this.petModel.findOne({
+      where: { id },
+      include: [User],
+      paranoid: false
+    });
 
-    if (!st) return await pet.destroy();
-    return await pet.restore();
+    if (!pet) throw new HttpException('Pet não encontrado', 404);
+
+    if (!st) {
+      if (pet.userId) throw new HttpException('Pets adotados não podem ser inativados', 400);
+
+      await pet.destroy();
+      return favorites.map(fav => fav.destroy());
+    }
+
+    await pet.restore();
+    return favorites.map(fav => fav.restore());
   }
 }
