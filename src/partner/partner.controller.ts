@@ -1,12 +1,58 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 import { IndexPartner, Partner, TCreatePartner, TFilterPartner, TRegisteredPartner, TUpdatePartner } from './partner.dto';
 import { PartnerService } from './partner.service';
+import { RoleDecorator } from '../common/decorators/role.decorator';
+import { JwtAuthGuard } from '../common/guards/auth.guard';
+import { RoleGuard } from '../common/guards/role.guard';
 import { config } from '../config/multer';
 
 @ApiTags('Partners')
+@ApiUnauthorizedResponse({
+  description: 'Unauthorized',
+  schema: {
+    type: 'object',
+    properties: {
+      statusCode: {
+        type: 'number',
+        example: 401,
+      },
+      background: {
+        type: 'string',
+        example: 'error',
+      },
+      message: {
+        type: 'string',
+        example: 'Não autorizado'
+      }
+    }
+  }
+})
+@ApiForbiddenResponse({
+  description: 'Forbidden',
+  schema: {
+    type: 'object',
+    properties: {
+      statusCode: {
+        type: 'number',
+        example: 403,
+      },
+      background: {
+        type: 'string',
+        example: 'error',
+      },
+      message: {
+        type: 'string',
+        example: 'Você não tem permissão'
+      }
+    }
+  }
+})
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RoleGuard)
+@RoleDecorator('admin')
 @Controller('partners')
 export class PartnerController {
   constructor(

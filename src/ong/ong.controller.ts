@@ -1,12 +1,57 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBody, ApiConsumes, ApiCreatedResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 import { IndexOng, Ong, TCreateOng, TFilterOng, TRegisteredOng, TUpdateOng } from './ong.dto';
 import { OngService } from './ong.service';
+import { RoleDecorator } from '../common/decorators/role.decorator';
+import { JwtAuthGuard } from '../common/guards/auth.guard';
+import { RoleGuard } from '../common/guards/role.guard';
 import { config } from '../config/multer';
 
 @ApiTags('ONGs')
+@ApiUnauthorizedResponse({
+  description: 'Unauthorized',
+  schema: {
+    type: 'object',
+    properties: {
+      statusCode: {
+        type: 'number',
+        example: 401,
+      },
+      background: {
+        type: 'string',
+        example: 'error',
+      },
+      message: {
+        type: 'string',
+        example: 'Não autorizado'
+      }
+    }
+  }
+})
+@ApiForbiddenResponse({
+  description: 'Forbidden',
+  schema: {
+    type: 'object',
+    properties: {
+      statusCode: {
+        type: 'number',
+        example: 403,
+      },
+      background: {
+        type: 'string',
+        example: 'error',
+      },
+      message: {
+        type: 'string',
+        example: 'Você não tem permissão'
+      }
+    }
+  }
+})
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RoleGuard)
 @Controller('ongs')
 export class OngController {
   constructor(
@@ -44,6 +89,7 @@ export class OngController {
   })
   @ApiParam({ name: 'id', required: true })
   @ApiQuery({ name: 'inactives', type: 'string', enum: ['true', 'false'], required: false })
+  @RoleDecorator('admin')
   @Get(':id')
   async byId(@Param('id') id: number, @Query() { inactives }: Pick<TFilterOng, 'inactives'>) {
     return await this.ongService.findById(id, inactives);
@@ -97,6 +143,7 @@ export class OngController {
   })
   @ApiConsumes('multipart/form-data')
   @ApiBody({ type: TCreateOng })
+  @RoleDecorator('admin')
   @Post()
   @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
   async create(@Body() data: TCreateOng, @UploadedFile() media?: Express.MulterS3.File) {
@@ -172,6 +219,7 @@ export class OngController {
   @ApiConsumes('multipart/form-data')
   @ApiParam({ name: 'id', required: true })
   @ApiBody({ type: TUpdateOng })
+  @RoleDecorator('admin')
   @Put(':id')
   @UseInterceptors(FileInterceptor('media', process.env.NODE_ENV === 'dev' ? config : {}))
   async update(@Param('id') id: number, @Body() data: TUpdateOng, @UploadedFile() media?: Express.MulterS3.File) {
@@ -202,6 +250,7 @@ export class OngController {
   })
   @ApiParam({ name: 'id', required: true })
   @ApiQuery({ name: 'status', type: 'string', enum: ['true', 'false'], required: true })
+  @RoleDecorator('admin')
   @Delete(':id')
   @HttpCode(204)
   async activeInactive(@Param('id') id: number, @Query('status') status: 'true' | 'false') {
