@@ -65,11 +65,12 @@ export class PetController {
   @Get()
   async index(@Req() req: Request, @Query() query?: TFilterPet) {
     if (req.user.role.name === 'Adotante') return await this.petService.find(req.user.id, query);
-    return await this.petService.get(req.user.id);
+    return await this.petService.get(query);
   }
 
   @ApiOperation({ summary: 'Listar pets adotados pelo usuário' })
   @ApiOkResponse({ type: [Pet], description: 'Success' })
+  @RoleDecorator('adotante')
   @Get('mypets')
   async myPets(@Req() req: Request) {
     return await this.petService.myPets(req.user.id);
@@ -408,6 +409,7 @@ export class PetController {
   })
   @ApiParam({ name: 'id', required: true })
   @ApiQuery({ name: 'status', type: 'string', enum: ['true', 'false'], required: true })
+  @RoleDecorator('admin')
   @Delete(':id')
   @HttpCode(204)
   async activeInactive(@Param('id') id: number, @Query('status') status: 'true' | 'false') {

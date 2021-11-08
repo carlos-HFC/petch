@@ -1,6 +1,6 @@
-import { ApiProperty, OmitType, PartialType, PickType } from '@nestjs/swagger';
+import { ApiProperty, OmitType, PartialType } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsEnum, IsNotEmpty } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
 
 import { Gift } from '../gift/gift.dto';
 import { Ong } from '../ong/ong.dto';
@@ -96,12 +96,18 @@ export class TUpdatePet extends PartialType(TCreatePet) { }
 
 export class TFilterPet {
   @ApiProperty({ type: 'string', enum: ['true', 'false'], required: false })
+  @IsOptional()
+  @IsEnum(['true', 'false'], { message: 'Busca por inativos inválida' })
   inactives?: 'true' | 'false';
 
   @ApiProperty({ type: 'string', enum: ['true', 'false'], required: false })
+  @IsOptional()
+  @IsEnum(['true', 'false'], { message: 'Busca por castrado inválida' })
   cut?: 'true' | 'false';
 
   @ApiProperty({ type: 'string', enum: ['M', 'F'], required: false })
+  @IsOptional()
+  @IsEnum(['M', 'F'], { message: 'Busca por gênero inválido' })
   gender?: string;
 
   @ApiProperty({ type: 'string', required: false })
