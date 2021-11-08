@@ -68,6 +68,13 @@ export class PetController {
     return await this.petService.get(req.user.id);
   }
 
+  @ApiOperation({ summary: 'Listar pets adotados pelo usuário' })
+  @ApiOkResponse({ type: [Pet], description: 'Success' })
+  @Get('mypets')
+  async myPets(@Req() req: Request) {
+    return await this.petService.myPets(req.user.id);
+  }
+
   @ApiOperation({ summary: 'Listar pets favoritos do usuário logado' })
   @ApiOkResponse({ type: [Pet], description: 'Success' })
   @RoleDecorator('adotante')

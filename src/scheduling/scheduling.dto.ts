@@ -51,7 +51,7 @@ export class TAvailableScheduling {
   @ApiProperty({ type: 'string', example: '00:00' })
   time: string;
 
-  @ApiProperty({ type: 'string', example: '2021-01-01at00' })
+  @ApiProperty({ type: 'string', example: '2021-01-01T00' })
   value: string;
 
   @ApiProperty({ type: 'boolean' })
@@ -62,7 +62,7 @@ export class TAvailableScheduling {
 }
 
 export class TCreateScheduling extends PickType(Scheduling, ['schedulingTypesId']) {
-  @ApiProperty({ type: 'string', example: '2021-01-01at00' })
+  @ApiProperty({ type: 'string', example: '2021-01-01T00' })
   @IsNotEmpty({ message: 'Data é obrigatória' })
   @Transform(({ value }) => value.trim())
   date: string;

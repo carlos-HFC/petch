@@ -140,6 +140,16 @@ export class PetService {
     return favorites;
   }
 
+  async myPets(id:number) {
+    const pets = await this.petModel.findAll({
+      where: {
+        userId: id
+      }
+    });
+
+    return pets
+  }
+
   async create(data: TCreatePet, media: Express.MulterS3.File) {
     trimObj(data);
 
