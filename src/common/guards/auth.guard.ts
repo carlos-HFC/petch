@@ -8,10 +8,3 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return token;
   }
 }
-
-@Injectable()
-export class OptionalAuthGuard extends AuthGuard('jwt') {
-  handleRequest(err, user, info, context) {
-    return user;
-  }
-}
