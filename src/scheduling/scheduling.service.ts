@@ -99,7 +99,7 @@ export class SchedulingService {
 
       const limit = `${String(hour - 1).padStart(2, '0')}:${String(minute).padStart(2, '0')}`;
       const tmp = new Date().getUTCHours() - 3;
-      const value = `${date}at${String(hour).padStart(2, '0')}`;
+      const value = `${date}T${String(hour).padStart(2, '0')}`;
 
       const equal = isEqual(searchDate, today);
 
@@ -130,7 +130,7 @@ export class SchedulingService {
 
     const schedulingType = await this.schedulingTypesService.getById(data.schedulingTypesId);
 
-    const [date, time] = data.date.split('at');
+    const [date, time] = data.date.split('T');
     const tmp = new Date().getUTCHours() - 3;
     const dateParsed = parseISO(date);
 

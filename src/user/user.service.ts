@@ -97,7 +97,7 @@ export class UserService {
 
     if (await this.findByCPF(data.cpf) || await this.findByEmail(data.email)) throw new HttpException('Usuário já cadastrado', 400);
 
-    const password = createTokenHEX(5);
+    if (!data.googleId) Object.assign(data, { password: createTokenHEX(5) });
 
     if (differenceInCalendarYears(Date.now(), parseISO(data.birthday)) < 18) throw new HttpException('Você não tem a idade mínima de 18 anos', 400);
 
@@ -114,13 +114,12 @@ export class UserService {
       const user = await this.userModel.create({
         ...data,
         roleId,
-        password,
         tokenVerificationEmail: createTokenHEX()
       }, { transaction });
 
       await transaction.commit();
 
-      await this.mailService.newUser(user);
+      await this.mailService.newUser(user, data.password);
 
       return { message: isAdmin ? 'Usuário cadastrado com sucesso' : 'Registro efetuado com sucesso', background: 'success' };
     } catch (error) {
@@ -171,7 +170,7 @@ export class UserService {
 
       await transaction.commit();
 
-      if (data.email !== user.email) await this.mailService.newUser(user);
+      if (data.email !== user.email) await this.mailService.updateEmail(user);
 
       return {
         message: 'Cadastrado editado com sucesso',

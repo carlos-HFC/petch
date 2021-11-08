@@ -124,6 +124,8 @@ export class IndexUser extends PickType(User, ['id', 'name', 'cpf', 'email', 'av
 export class TCreateUser extends OmitType(User, ['createdAt', 'updatedAt', 'deletedAt', 'id', 'hash', 'avatar', 'tokenResetPassword', 'tokenResetPasswordExpires', 'tokenVerificationEmail', 'emailVerified', 'roleId', 'role']) {
   @ApiProperty({ type: 'string', format: 'binary', required: false })
   media?: string;
+
+  password?: string;
 }
 
 export class TUpdateUser extends OmitType(PartialType(TCreateUser), ['googleId']) {
