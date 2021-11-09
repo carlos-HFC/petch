@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { format, getMonth, parseISO, setMonth } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { SpeciesService } from 'src/species/species.service';
 
 import { OngService } from '../ong/ong.service';
 import { PetService } from '../pet/pet.service';
@@ -11,10 +12,11 @@ import { capitalizeFirstLetter } from '../utils';
 @Injectable()
 export class DashboardService {
   constructor(
-    private petService: PetService,
     private ongService: OngService,
+    private petService: PetService,
     private schedulingTypesService: SchedulingTypesService,
     private solicitationTypeService: SolicitationTypesService,
+    private speciesService: SpeciesService,
   ) { }
 
   async petsByGender() {
@@ -25,12 +27,12 @@ export class DashboardService {
 
     return [
       {
-        gender: "Macho",
-        total: males
+        name: "Macho",
+        quantity: males
       },
       {
-        gender: "Fêmea",
-        total: females
+        name: "Fêmea",
+        quantity: females
       },
     ];
   }
@@ -46,45 +48,15 @@ export class DashboardService {
     });
   }
 
-  async scheduleByMonth(month?: number) {
+  async totalSchedulings() {
     const types = await this.schedulingTypesService.dash();
 
-    const displayMonth = (value: number) => setMonth(new Date(), value);
-
-    if (month) {
-      const total = types.map(schedule => {
-        return {
-          name: schedule.name,
-          month: [
-            {
-              quantity: schedule.schedulings.filter(sch => getMonth(parseISO(sch.date)) + 1 === month).length,
-              mes: capitalizeFirstLetter(format(displayMonth(month - 1), 'MMMM', { locale: ptBR }))
-            }
-          ]
-        };
-      });
-
-      return total;
-    } else {
-      const total = types.map(schedule => {
-        return {
-          name: schedule.name,
-          month: schedule.schedulings.map(sch => {
-            return {
-              mes: capitalizeFirstLetter(format(displayMonth(getMonth(parseISO(sch.date))), 'MMMM', { locale: ptBR })),
-              quantity: schedule.schedulings.filter(sc => getMonth(parseISO(sc.date)) === getMonth(parseISO(sch.date))).length
-            };
-          })
-        };
-      });
-
-      return total.map(t => {
-        return {
-          name: t.name,
-          month: [...new Map(t.month.map(m => [m['quantity'], m])).values()]
-        };
-      });
-    }
+    return types.map(schedule => {
+      return {
+        name: schedule.name,
+        quantity: schedule.schedulings.filter(sch => sch.schedulingTypesId === schedule.id).length
+      };
+    });
   }
 
   async totalSolicitations() {
@@ -94,6 +66,17 @@ export class DashboardService {
       return {
         name: type.name,
         quantity: type.solicitations.filter(solicitation => solicitation.solicitationTypesId === type.id).length
+      };
+    });
+  }
+
+  async petsBySpecies() {
+    const species = await this.speciesService.dash();
+
+    return species.map(specie => {
+      return {
+        name: specie.name,
+        quantity: specie.pets.filter(pet => pet.speciesId === specie.id).length
       };
     });
   }

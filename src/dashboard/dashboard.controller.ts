@@ -1,7 +1,7 @@
-import { Controller, Get, Query, UseGuards } from '@nestjs/common';
-import { ApiBearerAuth, ApiForbiddenResponse, ApiOkResponse, ApiOperation, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { Controller, Get, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiForbiddenResponse, ApiOkResponse, ApiOperation, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
-import { TPetsByGender, TPetsByOng, TScheduleByMonth, TTotalSolicitations } from './dashboard.dto';
+import { TPetsByGender, TPetsByOng, TPetsBySpecies, TTotalSchedulings, TTotalSolicitations } from './dashboard.dto';
 import { DashboardService } from './dashboard.service';
 import { RoleDecorator } from '../common/decorators/role.decorator';
 import { JwtAuthGuard } from '../common/guards/auth.guard';
@@ -71,12 +71,11 @@ export class DashboardController {
     return await this.dashboardService.petsByOng();
   }
 
-  @ApiOperation({ summary: 'Agendamentos por mês' })
-  @ApiOkResponse({ type: [TScheduleByMonth], description: 'Success' })
-  @ApiQuery({ type: 'string', name: 'month', required: false })
+  @ApiOperation({ summary: 'Total de agendamentos' })
+  @ApiOkResponse({ type: [TTotalSchedulings], description: 'Success' })
   @Get('/schedulings')
-  async scheduleByMonth(@Query('month') month: number) {
-    return await this.dashboardService.scheduleByMonth(month);
+  async totalSchedulings() {
+    return await this.dashboardService.totalSchedulings();
   }
 
   @ApiOperation({ summary: 'Total de solicitações' })
@@ -84,5 +83,12 @@ export class DashboardController {
   @Get('/solicitations')
   async totalSolicitations() {
     return await this.dashboardService.totalSolicitations();
+  }
+
+  @ApiOperation({ summary: 'Total de pets por espécie' })
+  @ApiOkResponse({ type: [TPetsBySpecies], description: 'Success' })
+  @Get('/species')
+  async petsBySpecies() {
+    return await this.dashboardService.petsBySpecies();
   }
 }
