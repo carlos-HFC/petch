@@ -134,7 +134,6 @@ export class SchedulingService {
     const tmp = new Date().getUTCHours() - 3;
     const dateParsed = parseISO(date);
 
-
     if (!isValid(dateParsed)) throw new HttpException('Data inválida', 400);
     if (isBefore(dateParsed, startOfToday())) throw new HttpException('Data passada não permitida', 400);
 
@@ -182,12 +181,12 @@ export class SchedulingService {
     const scheduling = await this.schedulingModel.findOne({
       where: {
         id,
-        userId: user.id,
-        canceledAt: null
+        userId: user.id
       }
     });
 
     if (!scheduling) throw new HttpException('Agendamento não encontrado', 404);
+    if (scheduling.canceledAt) throw new HttpException('Agendamento já foi cancelado', 400);
 
     if (isBefore(parseISO(scheduling.date), startOfToday())) throw new HttpException('Agendamento ocorrido não pode ser cancelado', 400);
 
