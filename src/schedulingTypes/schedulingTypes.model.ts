@@ -9,8 +9,7 @@ import { Scheduling } from '../scheduling/scheduling.model';
     include: [
       {
         model: Scheduling,
-        where: { canceledAt: null },
-        attributes: ['id', 'date']
+        attributes: ['id', 'schedulingTypesId']
       }
     ]
   }
