@@ -9,7 +9,7 @@ import { Solicitation } from '../solicitation/solicitation.model';
     include: [
       {
         model: Solicitation,
-        attributes: ['id', 'solicitationTypeId']
+        attributes: ['id', 'solicitationTypesId']
       }
     ]
   }
