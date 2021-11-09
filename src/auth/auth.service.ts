@@ -123,32 +123,34 @@ export class AuthService {
       this.userService.findByEmail(data.email)
     ]);
 
+    let user: User;
+
     if (!userByGoogle && !userByEmail) throw new HttpException('Usuário não encontrado', 404);
+
+    if (userByGoogle) {
+      if (userByGoogle.role.name.toLowerCase() === 'admin') throw new HttpException('Você não tem permissão para este login', 400);
+      if (!userByGoogle.emailVerified) throw new HttpException('E-mail não verificado', 400);
+
+      user = userByGoogle;
+    }
+
+    if (!userByGoogle && userByEmail) {
+      if (userByEmail.role.name.toLowerCase() === 'admin') throw new HttpException('Você não tem permissão para este login', 400);
+      if (!userByEmail.emailVerified) throw new HttpException('E-mail não verificado', 400);
+
+      user = userByEmail;
+    }
 
     const transaction = await this.sequelize.transaction();
 
     try {
-      if (userByGoogle) {
-        await userByGoogle.update({ ...data }, { transaction });
+      await user.update({ ...data }, { transaction });
 
-        const auth = await this.createTokenJwt(userByGoogle);
+      const auth = await this.createTokenJwt(user);
 
-        await transaction.commit();
+      await transaction.commit();
 
-        return auth;
-      }
-
-      if (!userByGoogle && userByEmail) {
-        if (userByEmail.role.name.toLowerCase() === 'admin') throw new HttpException('Você não tem permissão para este login', 400);
-
-        await userByEmail.update({ ...data }, { transaction });
-
-        const auth = await this.createTokenJwt(userByEmail);
-
-        await transaction.commit();
-
-        return auth;
-      }
+      return auth;
     } catch (error) {
       await transaction.rollback();
       throw new HttpException(error, 400);
