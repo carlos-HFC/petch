@@ -1,10 +1,21 @@
-import { BeforeSave, Column, DataType, DefaultScope, HasMany, Model, Table } from 'sequelize-typescript';
+import { BeforeSave, Column, DataType, DefaultScope, HasMany, Model, Scopes, Table } from 'sequelize-typescript';
 
 import { Pet } from '../pet/pet.model';
 import { capitalizeFirstLetter } from '../utils';
 
 @DefaultScope(() => ({
   order: [['id', 'asc']]
+}))
+@Scopes(() => ({
+  petsBySpecies: {
+    attributes: ['id', 'name'],
+    include: [
+      {
+        model: Pet,
+        attributes: ['id', 'speciesId']
+      }
+    ]
+  }
 }))
 @Table({ paranoid: true })
 export class Species extends Model {
