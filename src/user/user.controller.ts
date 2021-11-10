@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiExcludeEndpoint, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 
 import { IndexUser, TConfirmRegister, TCreateUser, TFilterUser, TRegisteredUser, TUpdateUser, User } from './user.dto';
@@ -55,6 +55,12 @@ export class UserController {
   constructor(
     private userService: UserService
   ) { }
+
+  @ApiExcludeEndpoint()
+  @Get('all')
+  async all(@Query('role') role: string) {
+    return await this.userService.all(role)
+  }
 
   @ApiOperation({ summary: 'Listar todos os usuários' })
   @ApiOkResponse({ type: [IndexUser], description: 'Success' })

@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Param, Post, Put, Query, Req, UseGuards } from '@nestjs/common';
-import { ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiBody, ApiBearerAuth, ApiTags, ApiOkResponse, ApiParam, ApiQuery, ApiForbiddenResponse, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiOperation, ApiCreatedResponse, ApiBadRequestResponse, ApiNotFoundResponse, ApiBody, ApiBearerAuth, ApiTags, ApiOkResponse, ApiParam, ApiQuery, ApiForbiddenResponse, ApiUnauthorizedResponse, ApiExcludeEndpoint } from '@nestjs/swagger';
 import { Request } from 'express';
 
 import { Scheduling, TAvailableScheduling, TCreateScheduling, TFilterScheduling, TRegisteredScheduling } from './scheduling.dto';
@@ -56,6 +56,12 @@ export class SchedulingController {
   constructor(
     private schedulingService: SchedulingService
   ) { }
+
+  @ApiExcludeEndpoint()
+  @Get('all')
+  async all() {
+    return await this.schedulingService.all()
+  }
 
   @ApiOperation({ summary: 'Visualizar todos os agendamentos' })
   @ApiOkResponse({ type: [Scheduling], description: 'Success' })

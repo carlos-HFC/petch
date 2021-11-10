@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Patch, Post, Put, Query, Req, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiExcludeEndpoint, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 
 import { Pet, TChooseGift, TCreatePet, TFilterPet, TRegisteredPet, TUpdatePet } from './pet.dto';
@@ -58,6 +58,12 @@ export class PetController {
   constructor(
     private petService: PetService
   ) { }
+
+  @ApiExcludeEndpoint()
+  @Get('all')
+  async all() {
+    return await this.petService.all();
+  }
 
   @ApiOperation({ summary: 'Procurar pet para adoção e listar todos os pets' })
   @ApiOkResponse({ type: [Pet], description: 'Success' })

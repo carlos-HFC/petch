@@ -17,6 +17,10 @@ export class OngService {
     private sequelize: Sequelize
   ) { }
 
+  async all() {
+    return await this.ongModel.findAll()
+  }
+
   async petsByOng() {
     return await this.ongModel.scope('petsByOng').findAll();
   }

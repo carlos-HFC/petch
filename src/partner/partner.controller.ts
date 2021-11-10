@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiExcludeEndpoint, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 import { IndexPartner, Partner, TCreatePartner, TFilterPartner, TRegisteredPartner, TUpdatePartner } from './partner.dto';
 import { PartnerService } from './partner.service';
@@ -58,6 +58,12 @@ export class PartnerController {
   constructor(
     private partnerService: PartnerService
   ) { }
+
+  @ApiExcludeEndpoint()
+  @Get('all')
+  async all() {
+    return await this.partnerService.all();
+  }
 
   @ApiOperation({ summary: 'Listar todos os parceiros' })
   @ApiOkResponse({ type: [IndexPartner], description: 'Success' })

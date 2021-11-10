@@ -24,6 +24,10 @@ export class SchedulingService {
     private userService: UserService
   ) { }
 
+  async all() {
+    return await this.schedulingModel.findAll()
+  }
+  
   async get(query?: TFilterScheduling) {
     trimObj(query);
     const where = {};

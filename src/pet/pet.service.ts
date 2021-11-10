@@ -28,6 +28,10 @@ export class PetService {
     private giftService: GiftService,
   ) { }
 
+  async all() {
+    return await this.petModel.findAll()
+  }
+
   async petsByGender() {
     return await this.petModel.findAll({ attributes: ['id', 'gender'] });
   }

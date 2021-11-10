@@ -17,10 +17,14 @@ export class SpeciesService {
     private sequelize: Sequelize
   ) { }
 
-  async dash() {
-    return await this.speciesModel.scope('petsBySpecies').findAll()
+  async all() {
+    return await this.speciesModel.findAll();
   }
-  
+
+  async dash() {
+    return await this.speciesModel.scope('petsBySpecies').findAll();
+  }
+
   async get(query?: TFilterSpecies) {
     trimObj(query);
     const where = {};

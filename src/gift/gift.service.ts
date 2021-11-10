@@ -17,6 +17,10 @@ export class GiftService {
     private sequelize: Sequelize
   ) { }
 
+  async all() {
+    return await this.giftModel.findAll()
+  }
+
   async get(query?: TFilterGift) {
     trimObj(query);
     const where = {};

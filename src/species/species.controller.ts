@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiExcludeEndpoint, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 import { SpeciesService } from './species.service';
 import { IndexSpecies, Species, TCreateSpecies, TUpdateSpecies, TFilterSpecies, TRegisteredSpecies } from './species.dto';
@@ -57,6 +57,12 @@ export class SpeciesController {
   constructor(
     private speciesService: SpeciesService,
   ) { }
+
+  @ApiExcludeEndpoint()
+  @Get('all')
+  async all() {
+    return await this.speciesService.all();
+  }
 
   @ApiOperation({ summary: 'Listar todas as espécies' })
   @ApiOkResponse({ type: [IndexSpecies], description: 'Success' })

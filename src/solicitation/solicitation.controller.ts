@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Post, Req, UseGuards } from '@nestjs/common';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiCreatedResponse, ApiExcludeEndpoint, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { Request } from 'express';
 
 import { Solicitation, TCreateSolicitation, TRegisteredSolicitation } from './solicitation.dto';
@@ -55,9 +55,15 @@ export class SolicitationController {
     private solicitationService: SolicitationService,
   ) { }
 
+  @ApiExcludeEndpoint()
+  @Get('all')
+  async all() {
+    return await this.solicitationService.get();
+  }
+
   @ApiOperation({ summary: 'Listar todas as solicitações' })
   @ApiOkResponse({ type: [Solicitation], description: 'Success' })
-  // @RoleDecorator('admin')
+  @RoleDecorator('admin')
   @Get()
   async index() {
     return await this.solicitationService.get();

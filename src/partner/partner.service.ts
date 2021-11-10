@@ -17,6 +17,10 @@ export class PartnerService {
     private uploadService: UploadService
   ) { }
 
+  async all() {
+    return await this.partnerModel.findAll();
+  }
+
   async get(query?: TFilterPartner) {
     trimObj(query);
     const where = {};

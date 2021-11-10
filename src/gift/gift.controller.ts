@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
+import { ApiBadRequestResponse, ApiBearerAuth, ApiBody, ApiConsumes, ApiCreatedResponse, ApiExcludeEndpoint, ApiForbiddenResponse, ApiNoContentResponse, ApiNotFoundResponse, ApiOkResponse, ApiOperation, ApiParam, ApiQuery, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 
 import { TCreateGift, TFilterGift, Gift, IndexGift, TUpdateGift, TRegisteredGift } from './gift.dto';
 import { GiftService } from './gift.service';
@@ -57,6 +57,12 @@ export class GiftController {
   constructor(
     private giftService: GiftService
   ) { }
+
+  @ApiExcludeEndpoint()
+  @Get('all')
+  async all() {
+    return await this.giftService.all();
+  }
 
   @ApiOperation({ summary: 'Listar todos os brindes' })
   @ApiOkResponse({ type: [IndexGift], description: 'Success' })

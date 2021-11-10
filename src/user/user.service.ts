@@ -22,6 +22,14 @@ export class UserService {
     private sequelize: Sequelize
   ) { }
 
+  async all(role: string) {
+    return await this.userModel.findAll({
+      where: {
+        role: { name: role.trim() }
+      }
+    });
+  }
+
   async userWithPet(id: number) {
     return await this.userModel.scope('withPet').findByPk(id);
   }
