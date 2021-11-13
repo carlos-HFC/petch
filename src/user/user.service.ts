@@ -25,7 +25,7 @@ export class UserService {
   async all(role: string) {
     return await this.userModel.findAll({
       where: {
-        role: { name: role.trim() }
+        role: where(col('role.name'), capitalizeFirstLetter(role))
       }
     });
   }
