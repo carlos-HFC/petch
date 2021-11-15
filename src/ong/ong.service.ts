@@ -18,7 +18,7 @@ export class OngService {
   ) { }
 
   async all() {
-    return await this.ongModel.findAll()
+    return await this.ongModel.findAll();
   }
 
   async petsByOng() {
@@ -73,6 +73,8 @@ export class OngService {
       Object.assign(data, { image });
     }
 
+    if (capitalizeFirstLetter(data.coverage) === 'Nacional') data.coverage = 'AC,AL,AP,AM,BA,CE,DF,ES,GO,MA,MT,MS,MG,PA,PB,PR,PE,PI,RJ,RN,RS,RO,RR,SC,SP,SE,TO';
+
     const transaction = await this.sequelize.transaction();
 
     try {
@@ -104,6 +106,8 @@ export class OngService {
       const image = (await this.uploadService.uploadFile(media)).url;
       Object.assign(data, { image });
     }
+
+    if (data.coverage && capitalizeFirstLetter(data.coverage) === 'Nacional') data.coverage = 'AC,AL,AP,AM,BA,CE,DF,ES,GO,MA,MT,MS,MG,PA,PB,PR,PE,PI,RJ,RN,RS,RO,RR,SC,SP,SE,TO';
 
     const transaction = await this.sequelize.transaction();
 
