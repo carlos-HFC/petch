@@ -73,7 +73,7 @@ export class OngService {
       Object.assign(data, { image });
     }
 
-    if (capitalizeFirstLetter(data.coverage) === 'Nacional') data.coverage = 'AC,AL,AP,AM,BA,CE,DF,ES,GO,MA,MT,MS,MG,PA,PB,PR,PE,PI,RJ,RN,RS,RO,RR,SC,SP,SE,TO';
+    if (capitalizeFirstLetter(data.coverage) === 'Nacional') data.coverage = 'AC, AL, AP, AM, BA, CE, DF, ES, GO, MA, MT, MS, MG, PA, PB, PR, PE, PI, RJ, RN, RS, RO, RR, SC, SP, SE, TO';
 
     const transaction = await this.sequelize.transaction();
 
@@ -107,7 +107,7 @@ export class OngService {
       Object.assign(data, { image });
     }
 
-    if (data.coverage && capitalizeFirstLetter(data.coverage) === 'Nacional') data.coverage = 'AC,AL,AP,AM,BA,CE,DF,ES,GO,MA,MT,MS,MG,PA,PB,PR,PE,PI,RJ,RN,RS,RO,RR,SC,SP,SE,TO';
+    if (data.coverage && capitalizeFirstLetter(data.coverage) === 'Nacional') data.coverage = 'AC, AL, AP, AM, BA, CE, DF, ES, GO, MA, MT, MS, MG, PA, PB, PR, PE, PI, RJ, RN, RS, RO, RR, SC, SP, SE, TO';
 
     const transaction = await this.sequelize.transaction();
 
